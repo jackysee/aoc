@@ -19,12 +19,12 @@ function countOrbits(str) {
         return 0;
     }
 
-    console.log(Object.entries(nodeMap).reduce((a, [k, v]) => {
+    return Object.entries(nodeMap).reduce((a, [k, v]) => {
         return a + countParent(k);
-    }, 0));
+    }, 0);
 }
 
-countOrbits(data());
+console.log(countOrbits(data()));
 
 
 
