@@ -1,4 +1,3 @@
-
 function getNodes(str) {
     return str.split('\n').reduce((m, l) => {
         let [parent, child] = l.split(')');
@@ -8,25 +7,32 @@ function getNodes(str) {
 }
 
 function countOrbits(str) {
-
-    var nodeMap = getNodes(str);
-
-    var countParent = (nodeId) => {
-        var parent = nodeMap[nodeId];
-        if(parent) {
-            return 1 + countParent(parent);
-        }
-        return 0;
+    var map = getNodes(str);
+    var countParent = (id) => {
+        var parent = map[id];
+        return parent? 1 + countParent(parent) : 0;
     }
-
-    return Object.entries(nodeMap).reduce((a, [k, v]) => {
-        return a + countParent(k);
-    }, 0);
+    return Object.keys(map).reduce(
+        (a, k) => a + countParent(k), 
+        0
+    );
 }
 
 console.log(countOrbits(data()));
 
+function countOrbits2(str, from, to) {
+    var map = getNodes(str);
+    var parents = from => {
+        var parent = map[from];
+        return parent? [parent, ...parents(parent)] : [];
+    }
+    var p1 = parents(from);
+    var p2 = parents(to);
+    var common = p1.find(p => p2.includes(p));
+    return p1.indexOf(common) + p2.indexOf(common);
+}
 
+console.log(countOrbits2(data(), 'YOU', 'SAN'));
 
 
 
