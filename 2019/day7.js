@@ -6,6 +6,7 @@ const createProgram = (str, phase) => {
     let pos = 0;
     let output = [];
     let halted = false;
+    let firstRun = true;
     const run = (input) => {
         if(halted) {
             return output[0];
@@ -14,7 +15,6 @@ const createProgram = (str, phase) => {
         let op = ins % 100;
         let m1 = Math.floor(ins / 100 % 10) === 1;
         let m2 = Math.floor(ins / 1000 % 10) === 1;
-        console.log('op', ins, list.join(','));
         let v1 = m1? p1 : list[p1];
         let v2 = m2? p2 : list[p2];
         // console.log(' >>>> ' , { pos, op, p1, p2, p3, v1, v2, input, output });
@@ -59,7 +59,12 @@ const createProgram = (str, phase) => {
     }
     return { 
         run: function(input) {
-            return run([phase, input])
+            if(firstRun) {
+                firstRun = false;
+                return run([phase, input])
+            } else {
+                return run([input]);
+            }
         },
         halted: () => halted,
         output: () => output
@@ -109,14 +114,10 @@ const amplify2 = (str, seq) => {
     var programs = seq.map(phase => createProgram(str, phase));
     var result = 0;
     while(!programs[programs.length - 1].halted()) { 
-        console.log('---');
         result = programs.reduce((r, prg) => {
-            console.log('in', r);
             return prg.run(r);
         }, result)
-        console.log('result', result);
     }
-    console.log(programs[programs.length - 1].output())
     return result;
 }
 console.log(
