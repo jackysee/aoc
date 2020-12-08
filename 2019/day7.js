@@ -106,9 +106,9 @@ const permutator = (inputArr) => {
 }
 
 
-// console.log(Math.max(
-//     ...permutator([0,1,2,3,4]).map(seq => amplify(data(), seq))
-// ));
+console.log(Math.max(
+    ...permutator([0,1,2,3,4]).map(seq => amplify(data(), seq))
+));
 
 const amplify2 = (str, seq) => {
     var programs = seq.map(phase => createProgram(str, phase));
@@ -120,17 +120,14 @@ const amplify2 = (str, seq) => {
     }
     return result;
 }
-console.log(
-    amplify2(`3,26,1001,26,-4,26,3,27,1002,27,2,27,1,27,26,27,4,27,1001,28,-1,28,1005,28,6,99,0,0,5`, [9,8,7,6,5])
-);
 
-// console.log(Math.max(
-//     ...permutator([5,6,7,8,9]).map(seq => amplify2(`3,26,1001,26,-4,26,3,27,1002,27,2,27,1,27,26,27,4,27,1001,28,-1,28,1005,28,6,99,0,0,5`, seq))
-// ));
+console.log(Math.max(
+    ...permutator([5,6,7,8,9]).map(seq => amplify2(`3,26,1001,26,-4,26,3,27,1002,27,2,27,1,27,26,27,4,27,1001,28,-1,28,1005,28,6,99,0,0,5`, seq))
+));
 
-// console.log(Math.max(
-//     ...permutator([5,6,7,8,9]).map(seq => amplify2(data(), seq))
-// ));
+console.log(Math.max(
+    ...permutator([5,6,7,8,9]).map(seq => amplify2(data(), seq))
+));
 
 
 
