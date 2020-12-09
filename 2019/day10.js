@@ -23,11 +23,10 @@ function gcd(n1, n2) {
     return n1;
 }
 
-function getPointsAlong(x1,y1,x2,y2){
+function getPointsBetween([x1,y1],[x2,y2]){
     let dx = x2 - x1;
     let dy = y2 - y1;
     let f = gcd(Math.abs(dx), Math.abs(dy));
-    console.log('getPointsAlong' , {dx,dy,f});
     if(f !== 0) {
         dx = dx / f;
         dy = dy / f;
@@ -47,28 +46,18 @@ function getPointsAlong(x1,y1,x2,y2){
     return points;
 }
 
-function range(from, to) {
-    return Array(to - from + 1).fill(from).map((n,i) => n + i)
-}
-
-function getEdges(x,y,map) {
-   return  [
-        ...range(0, map.width - 1).map(x => [x, 0]), //top
-        ...range(1, map.height - 1).map(y => [map.width - 1, y]), //right
-        ...range(0, map.width - 1).map(x => [x, map.height - 1]), //bottom
-        ...range(1, map.height - 2).map(y => [0, y]) //left
-    ]
-}
 
 function countAsteroids(x,y,map) {
-    console.log('countAsteroids', x, y);
     let num = 0;
-    getEdges(x,y,map).forEach(([x1,y1]) => {
-        let points = getPointsAlong(x1, y1, x, y)
-        if(points.some(p => map.at(...p) === '#')) {
-            num++;
+    for(let j=0; j<map.height; j++) {
+        for(let i=0; i<map.width; i++) {
+            if(map.at(i,j) === '#') {
+                if(getPointsBetween([i,j], [x,y]).filter(p => map.at(...p) === '#').length === 1) {
+                    num++;
+                }
+            }
         }
-    });
+    }
     return num;
 }
 
@@ -78,7 +67,6 @@ function findBest(map) {
         for(let i=0; i<map.width; i++) {
             if(map.at(i,j) === '#') {
                 let count = countAsteroids(i,j,map);
-                console.log(count);
                 if(result === undefined || count > result.count) {
                     result = { point:[i,j], count };
                 } 
@@ -88,15 +76,21 @@ function findBest(map) {
     return result;
 }
 
-// console.log(getPointsAlong(5,0,0,0));
-//console.log(getEdges({ width:6, height:3}));
-console.log(findBest(parseMap(sample())));
+// console.log(getPointsBetween([9,8],[5,8]));
+// console.log(getTargetPoints(2,2,{ width:6, height:3}));
+console.log(findBest(parseMap(data())));
 
 
 
+function sample1() {
+    return `.#..#
+.....
+#####
+....#
+...##`;
+}
 
-
-function sample() {
+function sample2() {
     return `......#.#.
 #..#.#....
 ..#######.
@@ -107,6 +101,55 @@ function sample() {
 .##.#..###
 ##...#..#.
 .#....####`;
+}
+
+function sample3() {
+    return `#.#...#.#.
+.###....#.
+.#....#...
+##.#.#.#.#
+....#.#.#.
+.##..###.#
+..#...##..
+..##....##
+......#...
+.####.###.`;
+}
+
+function sample4() {
+    return `.#..#..###
+####.###.#
+....###.#.
+..###.##.#
+##.##.#.#.
+....###..#
+..#.#..#.#
+#..#.#.###
+.##...##.#
+.....#.#..`;
+}
+
+function sample5() {
+    return `.#..##.###...#######
+##.############..##.
+.#.######.########.#
+.###.#######.####.#.
+#####.##.#.##.###.##
+..#####..#.#########
+####################
+#.####....###.#.#.##
+##.#################
+#####.##.###..####..
+..######..##.#######
+####.##.####...##..#
+.#####..#.######.###
+##...#.##########...
+#.##########.#######
+.####.#.###.###.#.##
+....##.##.###..#####
+.#.#.###########.###
+#.#.#.#####.####.###
+###.##.####.##.#..##`;
 }
 
 
