@@ -46,23 +46,6 @@ function getPointsBetween([x1,y1],[x2,y2]){
     return points;
 }
 
-function getAngles(dx,dy) {
-   let r = - Math.atan2(dy,dx) + 90 * Math.PI  / 180;
-   return r < 0 ? 2 * Math.PI + r : r;
-}
-
-function countAsteroids(x, y, map) {
-    let s = new Set();
-    for(let j=0; j<map.height; j++) {
-        for(let i=0; i<map.width; i++) {
-            if(!(i == x && j == y) && map.at(i,j) === '#') {
-                s.add(getAngles(i-x, y-j));
-            }
-        }
-    }
-    return s.size;
-}
-
 function countAsteroids2(x,y,map) {
     let num = 0;
     for(let j=0; j<map.height; j++) {
@@ -77,34 +60,67 @@ function countAsteroids2(x,y,map) {
     return num;
 }
 
-function findBest(map) {
-    let result;
+
+function getAngle(dx,dy) {
+   let r = - Math.atan2(dy,dx) + 90 * Math.PI  / 180;
+   return r < 0 ? 2 * Math.PI + r : r;
+}
+
+function getAsteroids(map) {
+    const list = [];
     for(let j=0; j<map.height; j++) {
         for(let i=0; i<map.width; i++) {
             if(map.at(i,j) === '#') {
-                let count = countAsteroids(i,j,map);
-                if(result === undefined || count > result.count) {
-                    result = { point:[i,j], count };
-                } 
+                list.push([i, j]);
             }
         }
     }
+    return list;
+}
+
+function viewableAsteroids(x, y, asteroids) {
+    let s = new Set();
+    asteroids.forEach(([i,j]) => {
+        if(i!==x || j!==y) {
+            s.add(getAngle(i-x, y-j));
+        }
+    });
+    return s.size;
+}
+
+function findBest(map) {
+    let result;
+    const asteroids = getAsteroids(map);
+    asteroids.forEach(([i,j]) => {
+        let count = viewableAsteroids(i,j,asteroids);
+        if(result === undefined || count > result.count) {
+            result = { point:[i,j], count };
+        } 
+    });
     return result;
 }
 
-// console.log(
-//     countAsteroids(
-//         0, 2,
-// parseMap(
-// `###
-// .#.
-// #..`)
-//     )
-// )
 // console.log(getPointsBetween([9,8],[5,8]));
 // console.log(getTargetPoints(2,2,{ width:6, height:3}));
-const best = findBest(parseMap(data()));
+const map = parseMap(data());
+const best = findBest(map);
 console.log(best);
+
+function vaporize(x, y, map) {
+    const asteroids = getAsteroids(map);
+    const list = asteroids
+        .filter(([i,j]) => i !== x || j !== y)
+        .map(([i,j]) => {
+            return {
+                angle: getAngle(i-x, y-j),
+                distance: Math.hypot(i-x, i-y),
+                point: [i, j]
+            }
+        });
+    return list;
+}
+
+console.log(vaporize(...best.point, map));
 
 
 function sample1() {
