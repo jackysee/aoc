@@ -78,8 +78,8 @@ function findBest(map) {
 
 // console.log(getPointsBetween([9,8],[5,8]));
 // console.log(getTargetPoints(2,2,{ width:6, height:3}));
-console.log(findBest(parseMap(data())));
-
+const best = findBest(parseMap(data()));
+console.log(best);
 
 
 function sample1() {
