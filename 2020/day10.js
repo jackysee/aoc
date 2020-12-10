@@ -40,6 +40,7 @@ const ones = deltas.reduce((a, n, i) => {
 
 console.log(ones.reduce((a,c) => a * getCombo(c), 1));
 
+/*
 function sample2() {
     return `28
 33
@@ -87,7 +88,7 @@ function sample1(){
 12
 4`;
 }
-
+*/
 
 
 function data() {

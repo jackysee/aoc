@@ -46,8 +46,24 @@ function getPointsBetween([x1,y1],[x2,y2]){
     return points;
 }
 
+function getAngles(dx,dy) {
+   let r = - Math.atan2(dy,dx) + 90 * Math.PI  / 180;
+   return r < 0 ? 2 * Math.PI + r : r;
+}
 
-function countAsteroids(x,y,map) {
+function countAsteroids(x, y, map) {
+    let s = new Set();
+    for(let j=0; j<map.height; j++) {
+        for(let i=0; i<map.width; i++) {
+            if(!(i == x && j == y) && map.at(i,j) === '#') {
+                s.add(getAngles(i-x, y-j));
+            }
+        }
+    }
+    return s.size;
+}
+
+function countAsteroids2(x,y,map) {
     let num = 0;
     for(let j=0; j<map.height; j++) {
         for(let i=0; i<map.width; i++) {
@@ -76,6 +92,15 @@ function findBest(map) {
     return result;
 }
 
+// console.log(
+//     countAsteroids(
+//         0, 2,
+// parseMap(
+// `###
+// .#.
+// #..`)
+//     )
+// )
 // console.log(getPointsBetween([9,8],[5,8]));
 // console.log(getTargetPoints(2,2,{ width:6, height:3}));
 const best = findBest(parseMap(data()));
