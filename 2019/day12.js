@@ -65,13 +65,36 @@ function getEnergyAfterSteps(str, steps) {
 console.log(getEnergyAfterSteps(data(), 1000));
 
 
-function getStepsUntilRepeat(stars) {
+function getCycle(stars, dim) {
+    const getId = stars => stars.map(s => s.pos[dim] + ',' + s.vel[dim]).join('|');
+    let _id = getId(stars);
+    let id;
+    let count = 0;
+    while(id !== _id) {
+        stars = applyGravity(stars);
+        stars = applyVelocity(stars);
+        id = getId(stars);
+        count++;
+    }
+    return count;
+}
+
+function lcm(...arr) {
+    const gcd = (x, y) => (!y ? x : gcd(y, x % y));
+    const _lcm = (x, y) => (x * y) / gcd(x, y);
+    return [...arr].reduce((a, b) => _lcm(a, b));
+}
+
+function getStepsUntilRepeat(str) {
+    let stars = getStars(str);
     return lcm(
         getCycle(stars, 0),
         getCycle(stars, 1),
         getCycle(stars, 2)
     )
 }
+
+console.log(getStepsUntilRepeat(data()))
 
 
 
@@ -80,6 +103,13 @@ function sample() {
 <x=2, y=-10, z=-7>
 <x=4, y=-8, z=8>
 <x=3, y=5, z=-1>`;
+}
+
+function sample2() {
+    return `<x=-8, y=-10, z=0>
+<x=5, y=5, z=10>
+<x=2, y=-7, z=3>
+<x=9, y=-8, z=-3>`;
 }
 
 function data(){
