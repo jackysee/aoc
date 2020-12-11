@@ -106,21 +106,37 @@ const map = parseMap(data());
 const best = findBest(map);
 console.log(best);
 
-function vaporize(x, y, map) {
+function vaporize(x, y, map, nth) {
     const asteroids = getAsteroids(map);
-    const list = asteroids
+    let list = asteroids
         .filter(([i,j]) => i !== x || j !== y)
         .map(([i,j]) => {
             return {
                 angle: getAngle(i-x, y-j),
-                distance: Math.hypot(i-x, i-y),
+                distance: Math.hypot(i-x, j-y),
                 point: [i, j]
             }
         });
-    return list;
+    list = Object.entries(
+            list.reduce((a, c) => {
+                a[c.angle] = a[c.angle] || [];
+                a[c.angle].push(c);
+                a[c.angle] = a[c.angle].sort((a, b) => a.distance - b.distance);
+                return a
+            }, {})
+        )
+        .sort((a, b) => a[0] - b[0]);
+    let i = 0, angleIdx = 0, point;
+    while(i < nth) {
+        point = list[angleIdx][1].shift()
+        angleIdx = (angleIdx + 1) % list.length;
+        i++;
+    }
+    const [x1,y1] = point.point;
+    return x1*100 + y1;
 }
 
-console.log(vaporize(...best.point, map));
+console.log(vaporize(...best.point, map, 200));
 
 
 function sample1() {
