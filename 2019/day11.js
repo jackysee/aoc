@@ -1,8 +1,7 @@
 //AOC2019 Day 11
-
 const toIntList = (str, sep =',') => (str+'').split(sep).map(s => parseInt(s,10));
 
-const createProgram = (str, outputCount = 1, debug = false) => {
+const createProgram = (str, outputCount = -1, debug = false) => {
     const list = toIntList(str);
     let pos = 0;
     let output = [];
@@ -102,7 +101,6 @@ function paint(startingPanel) {
     let dirIdx = 0;
     const canvas = {};
     const prg = createProgram(data(), 2);
-    // let i = 0;
     do {
         const color = canvas[currentPoint] !== undefined? canvas[currentPoint] : startingPanel;
         const [_color, turn]= prg.run([color]);
@@ -113,10 +111,6 @@ function paint(startingPanel) {
         if(turn === 1) { //turn right
             dirIdx = dirIdx === 0 ? 3 : dirIdx - 1;
         }
-        // if(i < 10) {
-        //     console.log( { currentPoint, inputColor:color, output: [_color, turn], dir:dirs[dirIdx] });
-        // }
-        // i++;
         const [x,y] = currentPoint;
         if(dirs[dirIdx] === 'U') currentPoint = [x, y-1];
         if(dirs[dirIdx] === 'D') currentPoint = [x, y+1];
@@ -125,7 +119,6 @@ function paint(startingPanel) {
     } while (!prg.halted())
     return canvas;
 }
-
 console.log(Object.keys(paint(0)).length);
 
 
