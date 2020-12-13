@@ -1,25 +1,40 @@
 function parse(str) {
   let [t, buses] = str.split("\n");
-  buses = buses.split(",").filter(x => x !== "x").map(x => parseInt(x, 10));
+  buses = buses.split(",")
+    .map(x => x === 'x'?'x':parseInt(x, 10));
   return {
     t: parseInt(t, 10), 
     buses
   };
 }
 
-const d = parse(data());
-console.log(d);
-let min, idx = 0;
-d.buses.map(b => b - (d.t % b))
-    .forEach((v, i) => {
-      console.log(v);
+function part1(str) {
+  const d = parse(str);
+  let min, idx = 0;
+  d.buses.forEach((v, i) => {
+      if(v === 'x')
+        return;
+      v = v - (d.t % v);
       if(min === undefined || v < min) {
         min = v;
         idx = i;
       }
-    })
+    });
+    return min * d.buses[idx];
+}
 
-console.log(min * d.buses[idx]);
+console.log(part1(data()));
+
+
+
+
+
+
+
+function sample1() {
+  return `0
+17,x,13,19`;
+}
 
 
 function data() {
