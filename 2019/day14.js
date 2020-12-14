@@ -1,19 +1,85 @@
 //AOC2019 D12
 
+function parseElementQty(s) {
+    var m = s.match(/^(\d+) (\w+)$/);
+    return { el: m[2], qty: parseInt(m[1], 10) }
+}
 function parse(str) {
-    return str.split('\n').map(l => {
-        let [_requires, target] = l.split(' => ');
-        let requires = _requires.split(',').map(s => s.trim()).map(s => {
-            var m = s.match(/^(\d+) (\w+)$/);
-            return { el: m[2], qty: m[1] }
-        })
-        //
-        return {}
+    const entries = str.split('\n').map(l => {
+        let [_requires, _target] = l.split(' => ');
+        let requires = _requires.split(',').map(s => s.trim()).map(parseElementQty);
+        var target = parseElementQty(_target);
+        return [
+            target.el, 
+            { 
+                qty: target.qty, 
+                requires,
+                tip: requires.length === 1 && requires[0].el === 'ORE'
+            }
+        ]
     });
+    return Object.fromEntries(entries);
+}
+/*
+
+1 FUEL
+ - 2 AB
+    - 3 A (6) => 18 * 2 ORE
+    - 4 B
+ - 3 BC
+    - 5 B (15)
+    - 7 C
+ - 4 AC
+    - 4 C (16)
+    - 1 A (4) => 9 * 4 ORE
+
+36 ORE * 2 = 72 ORE
+but if count 10A => 45 ORE
+
+ *
+    * */
+function findORE(str) {
+    console.log(str);
+    var map = parse(str);
+    function find(target) {
+        var { tip, qty, requires } = map[target];
+        return requires.reduce((a, c) => {
+            // return a + c.qty * 
+            
+        }, 0);
+
+
+        /*
+        console.log({ target, qty});
+        const sum = requires.reduce((a, c) => {
+            if(c.el === 'ORE') {
+                console.log('ORE', c.qty);
+                return a + c.qty;
+            }
+            console.log('===>', { target: [c.qty, c.el, map[c.el].qty]}, Math.ceil(c.qty / map[c.el].qty) );
+            return a + Math.ceil(c.qty / map[c.el].qty) * find(c.el);
+        }, 0);
+        return sum; 
+        */
+    }
+    return find('FUEL', 1);
+
+    // function find(target) {
+    //     var requires = map[target];
+    //     return requires.reduce((a, c) => {
+    //         if(c.el === 'ORE') {
+    //             return a + c.qty;
+    //         }
+    //         return a + c.qty * find(c.el);
+    //     }, 0);
+    // }
+    // return find('FUEL');
 }
 
+console.log(findORE(sample()));
 
-function sample() {
+
+function sample() { //165 ORE
     return `9 ORE => 2 A
 8 ORE => 3 B
 7 ORE => 5 C
