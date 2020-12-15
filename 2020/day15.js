@@ -13,14 +13,15 @@ function game(str, round) {
             current = list[i];
         } else {
             let n = nums.get(current);
-            current = n.length < 2? 0 : n[1] - n[0];
+            current = n.last2 === undefined ? 0 : n.last - n.last2;
         }
-        nums.set(
-            current, 
-            nums.has(current) 
-                ?  [...nums.get(current).slice(-1), i]
-                : [i]
-        );
+        if(nums.has(current)) {
+            let n = nums.get(current);
+            n.last2 = n.last;
+            n.last = i;
+        } else {
+            nums.set(current, {last:i});
+        }
     }
     return current;
 }
