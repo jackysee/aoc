@@ -8,7 +8,8 @@
 //   What is the fewest number of movement commands required to move the repair droid from its starting position to the location of the oxygen system?/
 
 
-
+let prg = createProgram(data(), 1);
+let map = {};
 
 
 
