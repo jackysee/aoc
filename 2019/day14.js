@@ -9,79 +9,73 @@ function parse(str) {
         let [_requires, _target] = l.split(' => ');
         let requires = _requires.split(',').map(s => s.trim()).map(parseElementQty);
         var target = parseElementQty(_target);
-        return [
-            target.el, 
-            { 
-                qty: target.qty, 
-                requires,
-                tip: requires.length === 1 && requires[0].el === 'ORE'
-            }
-        ]
+        return [ target.el, { qty: target.qty, requires, } ]
     });
     return Object.fromEntries(entries);
 }
-/*
 
-1 FUEL
- - 2 AB
-    - 3 A (6) => 18 * 2 ORE
-    - 4 B
- - 3 BC
-    - 5 B (15)
-    - 7 C
- - 4 AC
-    - 4 C (16)
-    - 1 A (4) => 9 * 4 ORE
-
-36 ORE * 2 = 72 ORE
-but if count 10A => 45 ORE
-
- *
-    * */
-function findORE(str) {
-    console.log(str);
+function findORE(str, qty = 1) {
     var map = parse(str);
     var els = {};
     
-    // 3ORE = 2A
-    // 7A => 3C
-    // 7C => 1 FUEL
-    // 1 FUEL => 3 * 4 * 3
-    // 1 * walk(C, 7)
-    // 1 * 3 * walk(A, 7)
-    // 1 * 3 * 4 * 3 
-    function walk(target, _qty) {
-        var { qty, requires } = map[target];
-        qty = Math.ceil(_qty / qty);
-        console.log('qty:', qty);
-        if(requires[0].el === 'ORE') {
-            els[target] = els[target] ?? 0;
-            els[target] += qty;
-            return;
+    function find(target, qty) {
+        if(target === 'ORE') {
+            return qty;
         }
-        requires.forEach(r=>  {
-            console.log(target, ':walk', r.el, r.qty); 
-            return walk(r.el, r.qty); 
-        });
-        // return rootEls;
+        const el = map[target];
+        els[target] = els[target] === undefined ? 0 : els[target];  
+        let remain = els[target];
+        let _qty = Math.ceil((qty - remain) / el.qty);
+        els[target] += el.qty * _qty - qty;
+        return el.requires.reduce((a, e) => {
+            return a + find(e.el, _qty * e.qty);
+        }, 0);
     }
-    return walk('FUEL', 1);
-    // return rootEls;
-    // console.log(rootEls);
-    // return Object.entries(rootEls).reduce((a, [el, qty]) => {
-    //     var _el = map[el];
-    //     return a + Math.ceil(qty / _el.qty) * _el.requires[0].qty;
-    // }, 0);
+    let result = find('FUEL', qty);
+    return result;
 }
 
-// console.log(findORE(sample4())); //36 ORE
-console.log(findORE(sample0())); //31 ORE
-// console.log(findORE(sample1()));
-// console.log(findORE(sample2()));
-// console.log(findORE(sample3()));
-// console.log(findORE(data()));
+// console.log(findORE(sample5())); //33 ORE
+// console.log(findORE(sample0())); //31 ORE
+// console.log(findORE(sample1())); //165 ORE
+// console.log(findORE(sample2())); //13312 ORE
+// console.log(findORE(sample3())); //180679 ORE
+// console.log(findORE(sample4())); //2210736 ORE
+console.log(findORE(data()));
 
-function sample4() {
+//sample2 => 13312 ORE-per-FUEL => 82892753 FUEL
+const TRI = 1000000000000;
+function findFUEL(str) {
+    let orePerFuel = findORE(str);
+    let fuel = Math.floor(TRI/ orePerFuel);
+    console.log('ORE per fuel', orePerFuel);
+    let delta ;
+    while(true) {
+        let ore = findORE(str, fuel);
+        let _delta = TRI - ore;
+        console.log({fuel, _delta, delta});
+        if(delta === _delta) {
+            break;
+        }
+        if(_delta > 0) {
+            fuel += fuel;
+            delta = _delta;
+        } else if(_delta < 0) {
+            fuel -= fuel / 2;
+            delta = _delta;
+        } 
+    }
+    return fuel;
+}
+// console.log(findFUEL(sample2())); //82892753
+// console.log(findFUEL(sample3())); //5586022 
+// console.log(findFUEL(sample4())); //460664 
+console.log(findFUEL(data()));
+console.log(findORE(data(), 5194173));
+
+
+
+function sample5() {
     return `3 ORE => 2 A
 7 A => 3 C
 7 C => 1 FUEL`;
@@ -117,6 +111,41 @@ function sample2() { //13312
 7 DCFZ, 7 PSHF => 2 XJWVT
 165 ORE => 2 GPVTF
 3 DCFZ, 7 NZVS, 5 HKGWZ, 10 PSHF => 8 KHKGT`;
+}
+
+function sample3() {
+    return `2 VPVL, 7 FWMGM, 2 CXFTF, 11 MNCFX => 1 STKFG
+17 NVRVD, 3 JNWZP => 8 VPVL
+53 STKFG, 6 MNCFX, 46 VJHF, 81 HVMC, 68 CXFTF, 25 GNMV => 1 FUEL
+22 VJHF, 37 MNCFX => 5 FWMGM
+139 ORE => 4 NVRVD
+144 ORE => 7 JNWZP
+5 MNCFX, 7 RFSQX, 2 FWMGM, 2 VPVL, 19 CXFTF => 3 HVMC
+5 VJHF, 7 MNCFX, 9 VPVL, 37 CXFTF => 6 GNMV
+145 ORE => 6 MNCFX
+1 NVRVD => 8 CXFTF
+1 VJHF, 6 MNCFX => 4 RFSQX
+176 ORE => 6 VJHF`;
+}
+
+function sample4() {
+    return `171 ORE => 8 CNZTR
+7 ZLQW, 3 BMBT, 9 XCVML, 26 XMNCP, 1 WPTQ, 2 MZWV, 1 RJRHP => 4 PLWSL
+114 ORE => 4 BHXH
+14 VRPVC => 6 BMBT
+6 BHXH, 18 KTJDG, 12 WPTQ, 7 PLWSL, 31 FHTLT, 37 ZDVW => 1 FUEL
+6 WPTQ, 2 BMBT, 8 ZLQW, 18 KTJDG, 1 XMNCP, 6 MZWV, 1 RJRHP => 6 FHTLT
+15 XDBXC, 2 LTCX, 1 VRPVC => 6 ZLQW
+13 WPTQ, 10 LTCX, 3 RJRHP, 14 XMNCP, 2 MZWV, 1 ZLQW => 1 ZDVW
+5 BMBT => 4 WPTQ
+189 ORE => 9 KTJDG
+1 MZWV, 17 XDBXC, 3 XCVML => 2 XMNCP
+12 VRPVC, 27 CNZTR => 2 XDBXC
+15 KTJDG, 12 BHXH => 5 XCVML
+3 BHXH, 2 VRPVC => 7 MZWV
+121 ORE => 7 VRPVC
+7 XCVML => 6 RJRHP
+5 BHXH, 4 VRPVC => 5 LTCX`;
 }
 
 
