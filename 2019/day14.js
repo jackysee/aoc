@@ -1,4 +1,4 @@
-//AOC2019 D12
+
 
 function parseElementQty(s) {
     var m = s.match(/^(\d+) (\w+)$/);
@@ -48,30 +48,31 @@ const TRI = 1000000000000;
 function findFUEL(str) {
     let orePerFuel = findORE(str);
     let fuel = Math.floor(TRI/ orePerFuel);
-    console.log('ORE per fuel', orePerFuel);
     let delta ;
     while(true) {
         let ore = findORE(str, fuel);
         let _delta = TRI - ore;
-        console.log({fuel, _delta, delta});
+        // console.log({fuel, _delta, delta});
         if(delta === _delta) {
             break;
         }
-        if(_delta > 0) {
-            fuel += fuel;
+        if(_delta < 0) {
+            let _fuel = Math.ceil(delta / orePerFuel); //revert
+            fuel -= Math.floor(_fuel / 2);
             delta = _delta;
-        } else if(_delta < 0) {
-            fuel -= fuel / 2;
+        }
+        if(_delta > 0) {
+            fuel += Math.ceil(_delta/ orePerFuel);
             delta = _delta;
         } 
     }
-    return fuel;
+    return fuel - 1;
 }
-// console.log(findFUEL(sample2())); //82892753
-// console.log(findFUEL(sample3())); //5586022 
-// console.log(findFUEL(sample4())); //460664 
+console.log(findFUEL(sample2())); //82892753
+console.log(findFUEL(sample3())); //5586022 
+console.log(findFUEL(sample4())); //460664 
 console.log(findFUEL(data()));
-console.log(findORE(data(), 5194173));
+// console.log(findORE(data(), 5194174));
 
 
 
