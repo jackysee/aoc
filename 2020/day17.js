@@ -1,11 +1,13 @@
 //AOC2020 D17
 
 function parse(str, d = 3) {
-    let map = new Map();
+    let map = new Set();
     str.split('\n').forEach((l, i) => {
-        l.split('').forEach(
-            (v,j) => map.set([i,j,...Array(d-2).fill(0)]+'', v)
-        );
+        l.split('').forEach((v,j) => {
+            if(v === '#') {
+                map.add([i,j,...Array(d-2).fill(0)]+'');
+            }
+        });
     });
     return map;
 }
@@ -36,9 +38,9 @@ function getNeighbors(s) {
 
 
 function cycle(map) {
-    let _map = new Map();
+    let _map = new Set();
     let s = [];
-    map.forEach((_, k) => {
+    map.forEach((k) => {
         toIntList(k).forEach((n, i) => {
             s[i] = s[i] ?? [];
             s[i].push(n);
@@ -47,17 +49,18 @@ function cycle(map) {
     let ranges = s.map((a, i) => [ Math.min(...a) - 1, Math.max(...a) +1 ] );
     let keys = getKeys(ranges);
     keys.forEach(k => {
-        let v = map.get(k);
         let neighbors = getNeighbors(k);
-        let actives = neighbors.filter(n => map.get(n) === '#').length;
+        let actives = neighbors.filter(n => map.has(n)).length;
         let _v;
-        if(v === '#') {
-            _v = (actives === 2 || actives === 3) ? '#' : '.';
+        if(map.has(k)) {
+            if(actives === 2 || actives === 3) {
+                _map.add(k);
+            }
+        } else {
+            if(actives === 3) {
+                _map.add(k);
+            }
         }
-        if(v !== '#') {
-            _v = (actives === 3) ? '#' : '.';
-        } 
-        _map.set(k, _v);
     });
     return _map;
 }
@@ -70,7 +73,7 @@ function simulate(str, d = 3) {
         map = cycle(map);
         i++;
     }
-    return [...map.values()].filter(v => v === '#').length;
+    return map.size;
 }
 
 console.log(simulate(data()));
