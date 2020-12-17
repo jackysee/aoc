@@ -1,15 +1,88 @@
 //AOC2019 D15
 
-//nly four movement commands are understood: north (1), south (2), west (3), and east (4)
-//0: The repair droid hit a wall. Its position has not changed.
-//1: The repair droid has moved one step in the requested direction.
-//2: The repair droid has moved one step in the requested direction; its 
-//   new position is the location of the oxygen system.
-//   What is the fewest number of movement commands required to move the repair droid from its starting position to the location of the oxygen system?/
+//movement: 1:north, 2:south, 3:west, 4:east
+//status 0:wall, 1:moved, 2:found
 
-
+const N = 1, E = 4, S = 2, W = 3;
 let prg = createProgram(data(), 1);
 let map = {};
+let pos = [0, 0];
+map[pos] = '.';
+let blocked = [];
+let facing = N;
+let move = N;
+let turnRight = M => {[N]:E, [E]:S, [S]:W, [W]:N }[M];
+let turnLeft = M => {[N]:W, [W]:S, [S]:E, [E]:N }[M];
+let nextMove = () => {
+    let prefer = [N, E, S, W];
+    return prefer.find(d => !blocked.includes(d));
+}
+let step = 0;
+
+
+/*
+
+
+    */
+
+
+while(true) {
+    // if(step > 8) {
+    //     break;
+    // }
+    let [result] = prg.run([move]);
+    let [x,y] = pos;
+    let block = [
+        move === W? x - 1 : move === E? x + 1 : x,
+        move === N? y + 1 : move === S? y - 1 : y
+    ];
+    console.log({move,result, block});
+    if(result === 0) { //wall
+        map[block] = '#';
+        blocked.push(move);
+        move = nextMove();
+    }
+    if(result === 1) {
+        map[block] = '.';
+        pos = block;
+        blocked = [];
+        move = nextMove();
+    }
+    if(result === 2) {
+        map[block] = 'O';
+        pos = block;
+        break;
+    }
+    console.log(draw(map, pos));
+    step++;
+}
+
+function draw(map, [x,y]) {
+    let e = Object.entries(map);
+    if(!e.length) {
+        return '';
+    }
+    let pts = e.map(([k]) => toIntList(k));
+    let minx = Math.min(...pts.map(p => p[0]));
+    let maxx = Math.max(...pts.map(p => p[0]));
+    let miny = Math.min(...pts.map(p => p[1]));
+    let maxy = Math.max(...pts.map(p => p[1]));
+    let result = [];
+    for(let j=maxy; j>=miny; j--) {
+        let str = '';
+        for(let i=minx; i<=maxx; i++) {
+            if(x === i && y === j) {
+                str += 'X';
+            } else {
+                str += (map[[i,j]] || ' ');
+            }
+        }
+        result.push(str);
+    }
+    return result.join('\n');
+};
+console.log(draw(map));
+console.log(pos);
 
 
 
