@@ -36,18 +36,9 @@ function getNeighbors(s) {
     return getKeys(toIntList(s).map(i => [i-1, i+1])).filter(a => a !== s);
 }
 
-
 function cycle(map) {
     let _map = new Set();
-    let s = [];
-    map.forEach((k) => {
-        toIntList(k).forEach((n, i) => {
-            s[i] = s[i] ?? [];
-            s[i].push(n);
-        });
-    });
-    let ranges = s.map((a, i) => [ Math.min(...a) - 1, Math.max(...a) +1 ] );
-    let keys = getKeys(ranges);
+    let keys = new Set([...map].map(s => getNeighbors(s)).flat());
     keys.forEach(k => {
         let neighbors = getNeighbors(k);
         let actives = neighbors.filter(n => map.has(n)).length;
@@ -65,15 +56,15 @@ function cycle(map) {
     return _map;
 }
 
-
 function simulate(str, d = 3) {
+    let t0 = Date.now();
     let map = parse(str, d);
     let i = 0;
     while(i < 6) {
         map = cycle(map);
         i++;
     }
-    return map.size;
+    return `${map.size} (${(Date.now() - t0)/1000}s)`;
 }
 
 console.log(simulate(data()));
