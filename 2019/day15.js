@@ -6,55 +6,66 @@
 const N = 1, E = 4, S = 2, W = 3;
 let prg = createProgram(data(), 1);
 let map = {};
-let pos = [0, 0];
-map[pos] = '.';
-let blocked = [];
-let facing = N;
-let move = N;
-let turnRight = M => {[N]:E, [E]:S, [S]:W, [W]:N }[M];
-let turnLeft = M => {[N]:W, [W]:S, [S]:E, [E]:N }[M];
-let nextMove = () => {
-    let prefer = [N, E, S, W];
-    return prefer.find(d => !blocked.includes(d));
-}
-let step = 0;
+let turnRight = M => ({ [N]:E, [E]:S, [S]:W, [W]:N }[M]);
+let turnLeft = M => ({ [N]:W, [W]:S, [S]:E, [E]:N }[M]);
 
-
-/*
-
-
-    */
-
-
-while(true) {
-    // if(step > 8) {
-    //     break;
-    // }
-    let [result] = prg.run([move]);
-    let [x,y] = pos;
-    let block = [
-        move === W? x - 1 : move === E? x + 1 : x,
-        move === N? y + 1 : move === S? y - 1 : y
-    ];
-    console.log({move,result, block});
-    if(result === 0) { //wall
-        map[block] = '#';
-        blocked.push(move);
-        move = nextMove();
+function run(isTurnRight = true) {
+    let pos = [0, 0];
+    map[pos] = 'S';
+    let blocked = [];
+    let facing = N;
+    let move = isTurnRight? turnRight(facing) : turnLeft(facing);
+    let nextMove = () => {
+        let prefer = isTurnRight? [
+            turnRight(facing),
+            facing,
+            turnLeft(facing),
+            turnLeft(turnLeft(facing))
+        ] : [
+            turnLeft(facing),
+            facing,
+            turnRight(facing),
+            turnRight(turnRight(facing))
+        ];
+        return prefer.find(d => !blocked.includes(d));
     }
-    if(result === 1) {
-        map[block] = '.';
-        pos = block;
-        blocked = [];
-        move = nextMove();
+
+    let step = 0;
+    let dest;
+
+    while(true) {
+        // if(step++ == 2167) {
+        //     console.log('===' + (step - 1) + `f:${facing},m:${move},blk:${blocked}`);
+        //     console.log(draw(map, pos));
+        //     break;
+        // }
+        let [result] = prg.run([move]);
+        let [x,y] = pos;
+        let block = [
+            move === W? x - 1 : move === E? x + 1 : x,
+            move === N? y + 1 : move === S? y - 1 : y
+        ];
+        if(result === 0) { //wall
+            map[block] = '#';
+            blocked.push(move);
+            move = nextMove();
+        }
+        if(result === 1) {
+            map[block] = '.';
+            pos = block;
+            facing = move;
+            blocked = [];
+            move = nextMove();
+        }
+        if(result === 2) {
+            map[block] = 'O';
+            console.log('found', {isTurnRight});
+            pos = block;
+            dest = pos;
+            break;
+        }
     }
-    if(result === 2) {
-        map[block] = 'O';
-        pos = block;
-        break;
-    }
-    console.log(draw(map, pos));
-    step++;
+    return dest;
 }
 
 function draw(map, [x,y]) {
@@ -71,7 +82,9 @@ function draw(map, [x,y]) {
     for(let j=maxy; j>=miny; j--) {
         let str = '';
         for(let i=minx; i<=maxx; i++) {
-            if(x === i && y === j) {
+            if(x === 0 && y === 0) {
+                str += 'S';
+            } else if(x === i && y === j && map[[i,j]] !== 'O') {
                 str += 'X';
             } else {
                 str += (map[[i,j]] || ' ');
@@ -81,17 +94,49 @@ function draw(map, [x,y]) {
     }
     return result.join('\n');
 };
-console.log(draw(map));
-console.log(pos);
+
+let dest1 = run();
+prg.reset();
+let dest2 = run(false);
+// console.log(dest2);
+// console.log(dest1, dest2);
+// console.log(draw(map, dest2));
 
 
+function shortestPath() {
+    let visited = new Set();
+    let queue = [ { p:[0,0], dist:0 } ];
+    while(queue.length !== 0) {
+        if(queue.length % 10000 === 0) {
+            console.log(queue.length);
+        }
+        let pos = queue.shift();
+        if(pos.p+'' === dest1+'') {
+            return pos.dist;
+        }
+        let [x,y] = pos.p;
+        let points = [
+            [x-1,y],
+            [x+1,y],
+            [x,y-1],
+            [x,y+1]
+        ]
+            .filter(p => map[p] !== '#' && !visited.has(p+''))
+            .map(p => ({ p, dist: pos.dist + 1 }))
+        points.forEach(p => visited.add(p.p+''));
+        queue = [...queue, ...points];
+    }
+    return -1;
+}
+
+console.log(shortestPath());
 
 function toIntList(str, sep =',') { 
     return (str+'').split(sep).map(s => parseInt(s,10)); 
 }
 
 function createProgram(str, outputCount = -1, debug = false){
-    const list = toIntList(str);
+    let list = toIntList(str);
     let pos = 0;
     let output = [];
     let halted = false;
@@ -105,6 +150,15 @@ function createProgram(str, outputCount = -1, debug = false){
         let v = list[pos + (mode === 2? base: 0)];
         return v === undefined? 0 : v;
     }
+
+    const reset = () => {
+         list = toIntList(str);
+         pos = 0;
+         output = [];
+         halted = false;
+         firstRun = true;
+         base = 0;
+    };
 
     const run = (input) => {
         halted = false;
@@ -188,7 +242,8 @@ function createProgram(str, outputCount = -1, debug = false){
     return { 
         run,
         halted: () => halted,
-        output: () => output
+        output: () => output,
+        reset
     }
 }
 
