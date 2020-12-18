@@ -48,7 +48,7 @@ function evaluate2(_str) {
         str = str.substring(0, from-1) + evaluate2(_expr) + str.substring(to+1);
     }
     return str.split('*').reduce((a, c) => { 
-        return a * c.split('+').reduce((_a, _c) => _a + parseInt(_c, 10), 0);
+        return a * eval(c)
     }, 1)
 }
 
