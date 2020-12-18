@@ -1,15 +1,16 @@
 //AOC2020 D18
 
-function getExpression(str) {
+function getExpr(str) {
     var parens = 0, from, to;
     for(let i=0; i<str.length; i++) {
         if(str[i] === '(') {
-            if(parens++ == 0) {
+            if(parens == 0) {
                 from = i;
             }
+            parens +=  1;
         } 
         if(str[i] === ')') {
-            parens--;
+            parens -= 1;
             if(parens === 0) {
                 return [str.substring(from + 1, i), from + 1, i];
             }
@@ -17,17 +18,21 @@ function getExpression(str) {
     }
 }
 
-function evaluate(_str) {
-    var str = _str.split('').filter(c => c.trim()).join('');
+function evaluateAllExpr(str, fn) {
     while(true) {
-        var expr = getExpression(str);
+        var expr = getExpr(str);
         if(!expr)  break; 
         let [_expr, from, to] = expr;
-        str = str.substring(0, from-1) + evaluate(_expr) + str.substring(to+1);
+        str = str.substring(0, from-1) + fn(_expr) + str.substring(to+1);
     }
-    var initial = parseInt(str.match(/^\d+/)[0], 10);
-    return str.match(/([\+\*])\d+/g).reduce((a, c) => a = eval(a+c), initial);
+    return str;
+}
 
+function evaluate(_str) {
+    var str = _str.split('').filter(c => c.trim()).join('');
+    str = evaluateAllExpr(str, evaluate);
+    var initial = parseInt(str.match(/^\d+/)[0], 10);
+    return str.match(/([\+\*])\d+/g).reduce((a, c) => eval(a+c), initial);
 }
 
 // console.log(evaluate('2 + 3 * 4 + 5')); //25
@@ -41,12 +46,7 @@ console.log(data().split('\n').reduce((a, c) => a + evaluate(c), 0));
 
 function evaluate2(_str) {
     var str = _str.split('').filter(n => n.trim()).join('')
-    while(true) {
-        var expr = getExpression(str);
-        if(!expr)  break; 
-        let [_expr, from, to] = expr;
-        str = str.substring(0, from-1) + evaluate2(_expr) + str.substring(to+1);
-    }
+    str = evaluateAllExpr(str, evaluate2);
     return str.split('*').reduce((a, c) => a * eval(c), 1)
 }
 
@@ -58,6 +58,11 @@ function evaluate2(_str) {
 // console.log(evaluate2('((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6) + 2 + 4 * 2')); //23340.
 
 console.log(data().split('\n').reduce((a, c) => a + evaluate2(c), 0));
+
+
+
+
+
 
 function data(){
     return `6 * 7 * 8 * 9 * ((8 * 3 * 9) * 7 + 2 + 4 * 8 + 2) + 5
