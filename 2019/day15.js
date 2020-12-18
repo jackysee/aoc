@@ -41,7 +41,7 @@ function run(isTurnRight = true) {
             move === N? y + 1 : move === S? y - 1 : y
         ];
         if(result === 0) { //wall
-            map[block] = '#';
+            map[block] = '\u2588';
             blocked.push(move);
             move = nextMove();
         }
