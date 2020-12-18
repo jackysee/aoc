@@ -34,11 +34,6 @@ function run(isTurnRight = true) {
     let dest;
 
     while(true) {
-        // if(step++ == 2167) {
-        //     console.log('===' + (step - 1) + `f:${facing},m:${move},blk:${blocked}`);
-        //     console.log(draw(map, pos));
-        //     break;
-        // }
         let [result] = prg.run([move]);
         let [x,y] = pos;
         let block = [
@@ -59,7 +54,6 @@ function run(isTurnRight = true) {
         }
         if(result === 2) {
             map[block] = 'O';
-            console.log('found', {isTurnRight});
             pos = block;
             dest = pos;
             break;
@@ -95,12 +89,10 @@ function draw(map, [x,y]) {
     return result.join('\n');
 };
 
-let dest1 = run();
+run();
 prg.reset();
-let dest2 = run(false);
-// console.log(dest2);
-// console.log(dest1, dest2);
-// console.log(draw(map, dest2));
+let dest = run(false);
+console.log(draw(map, dest));
 
 
 function shortestPath() {
@@ -111,7 +103,7 @@ function shortestPath() {
             console.log(queue.length);
         }
         let pos = queue.shift();
-        if(pos.p+'' === dest1+'') {
+        if(pos.p+'' === dest+'') {
             return pos.dist;
         }
         let [x,y] = pos.p;
@@ -130,6 +122,38 @@ function shortestPath() {
 }
 
 console.log(shortestPath());
+
+function getSpaces() {
+    return Object.values(map).filter(x => x === '.' || x === 'S').length;
+}
+function spreadOxygen(map) {
+    let minutes = 0;
+    while(true) {
+        let space = getSpaces();
+        if(space === 0) {
+            break;
+        }
+        Object.entries(map)
+            .filter(([k, v]) => v === 'O')
+            .forEach(([k]) => {
+                let [x,y] = toIntList(k);
+                [
+                    [x-1,y],
+                    [x+1,y],
+                    [x,y-1],
+                    [x,y+1]
+                ].forEach(a => {
+                    if(map[a] === '.' || map[a] === 'S')  {
+                        map[a] = 'O';
+                    }
+                });
+            })
+        minutes++;
+    }
+    return minutes;
+}
+
+console.log(spreadOxygen(map));
 
 function toIntList(str, sep =',') { 
     return (str+'').split(sep).map(s => parseInt(s,10)); 
