@@ -47,9 +47,7 @@ function evaluate2(_str) {
         let [_expr, from, to] = expr;
         str = str.substring(0, from-1) + evaluate2(_expr) + str.substring(to+1);
     }
-    return str.split('*').reduce((a, c) => { 
-        return a * eval(c)
-    }, 1)
+    return str.split('*').reduce((a, c) => a * eval(c), 1)
 }
 
 // console.log(evaluate2('2 + 3 * 4 + 5')); //5 * 9 = 45
