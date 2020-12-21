@@ -178,21 +178,39 @@ function part2(_data) {
     }
     console.log(puzzleResult.length);
 
-    let puzzle = [];
-
-    console.log('---');
     //concat the puzzle...
+    let puzzle = [];
     let j = 0;
     for(let i=0; i<puzzleResult.length; i++) {
-        for(let k=0; k<10; k++) {
+        for(let k=1; k<=8; k++) {
             puzzle[j++] = puzzleResult[i].flatMap(p => {
                 let _tile = orient(p.tile.tile, p.ori);
-                return _tile[k];
+                return _tile[k].slice(1,-1);
             });
         }
     }
-    console.log('---');
-    console.log(puzzle[0].length, puzzle.length, puzzle);
+    console.log(puzzle.length, puzzle[0].length);
+
+    //define the dragon into set of [x,y]
+    const dragonStr = `                  # 
+#    ##    ##    ###
+ #  #  #  #  #  #   `;
+    const dragonMap = dragonStr.split('\n').map(l => l.split(''));
+    const dragon = [];
+    for(let i=0; i<dragonMap.length; i++) {
+        for(let j=0; j<dragonMap[i].length; j++) {
+            if(dragonMap[i][j] === '#') {
+                dragon.push([j,i]);
+            }
+        }
+    }
+    const dragonHeight = 3, dragonWidth = 20;
+
+    //find the dragon!
+    console.log(dragon);
+
+
+
 }
 
 
