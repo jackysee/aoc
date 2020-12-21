@@ -1,112 +1,39 @@
 //AOC2020 D19
-//
-
-function parse(str) {
-    let [ rules, records ] = str.split('\n\n');
-    rules = Object.fromEntries(
-        rules.split('\n').map(l => {
-            return l
-                .split(':')
-                .map(s => {
-                    if(/"\w+"/.test(s)) {
-                        return eval(s);
-                    } else {
-                        return s.split('|').map(s => s.trim().split(' '))
-                    }
-                });
-        })
-    );
-    records = records.split('\n');
-    return { rules, records }
-}
-
-function maxlength(records) {
-    let max = -1;
-    for(let i=0; i<records.length; i++) {
-        if(records[i].length > max) {
-            max = records[i].length;
-        }
-    }
-    return max;
-}
 
 function part1(str) {
-    let { rules, records } = parse(str);
-    let max = maxlength(records);
-
-    function find(r, arr = ['']) {
-        let arrMax = maxlength(arr);
-        if(arrMax > max) {
-            return arr;
-        }
-        let result = rules[r];
-        if(typeof result === 'string') {
-            return arr.map(i => i + result);
-        }
-        console.log({ max, arrMax, len:arr.length, rule:r, ruleLen:result});
-        return result.map(list => { //4 1 5
-            return list.reduce((a, c) => {
-                return find(c, a).flat();
-            }, arr);
-        });
-    }
-    let result = find(0).flat();
-    return records.filter(r => result.includes(r)).length;
-}
-/*
-0: 4 1 5
-1: 2 3 | 3 2
-2: a a | 5 5
-3: a 5 | 5 a
-4: "a"
-5: "b"
-*/
-function part1_2(str) {
     let [ rulesStr, records ] = str.split('\n\n');
     records = records.split('\n');
     let rules = Object.fromEntries(
         rulesStr.split('\n').map(l => l.split(':').map(s => s.trim()))
     );
-    var usedRules = new Set();
-    // var i = 0;
+    let maxlen = Math.max(...records.map(s => s.length));
+    var i = 0;
+    // while(i++ <= 10000) {
     while(true) {
-    // while(i++ < 1) {
         if(!/\d/.test(rules['0'])) {
             break;
         }
         for (let rule in rules) {
             let value = rules[rule];
-            if(!usedRules.has(rule) && !/\d/.test(value)) {
-                for(let _rule in rules) {
-                    let arr = rules[_rule].split(' ');
-                    if(arr.includes(rule)){
-                        let hasQuote = /"/.test(value);
-                        let replacement = value.replace(/"/g, '').trim();
-                        if(!hasQuote) {
-                            replacement = '(' + replacement + ')'
-                        }
-                        rules[_rule] = arr.map(a => a === rule? replacement : a).join(' ')
-                    }
+            rules[rule] = value.replace(/\d+/g, function(m) {
+                let target = rules[m];
+                if(/\"[ab]\"/.test(target)) {
+                    return target.replace(/"/g, '');
                 }
-                usedRules.add(rule);
-            }
+                //rough count of regex matching len
+                let _m = target.match(/\([^\)|]*\)/g); 
+                if(_m && _m.length > maxlen) {
+                    return ''; //stop here
+                }
+                return '('+target+')';
+            });
         }
-        // console.log(rules);
     }
-    let rule0Re = '^'+rules['0'].split('').filter(s => s.trim() !== '').join('')+'$';
-    let validRe = new RegExp(rule0Re);
+    let validRe = new RegExp('^'+rules['0'].replace(/\s*/g, '')+'$');
     return records.filter(s => validRe.test(s)).length;
 }
 
-// console.log(part1_2(sample()));
-console.log(part1_2(data()));
-// console.log(part1(data()));
-
-/*
- * replacement:
-8: 42 | 42 8
-11: 42 31 | 42 11 31
-* */
+console.log(part1(data()));
 
 function part2(str) {
     str = str.replace(/\n8:[^\n]*/, '\n8: 42 | 42 8');
@@ -115,6 +42,7 @@ function part2(str) {
 }
 
 // console.log(part2(sample2()));
+console.log(part2(data()));
 
 
 function sample() {
