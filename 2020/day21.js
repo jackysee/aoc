@@ -12,6 +12,19 @@ function parse(str) {
 
 console.log(parse(sample()));
 
+function part1(str) {
+    let data = parse(str);
+    let map = {};
+    data.forEach(d => {
+        d.allerg.forEach(a => {
+            map[a] = map[a] || new Set();
+            d.ingred.forEach(i => {
+
+            });
+        });
+    });
+}
+
 
 function sample() {
     return `mxmxvkd kfcds sqjhc nhms (contains dairy, fish)
