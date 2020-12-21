@@ -21,9 +21,12 @@ function part1(str) {
                     return target.replace(/"/g, '');
                 }
                 //rough count of regex matching len
-                let _m = target.match(/\([^\)|]*\)/g); 
-                if(_m && _m.length > maxlen) {
-                    return ''; //stop here
+                let _m = target.match(/\([ab\s]*/g); 
+                if(_m) {
+                    let match = [..._m].join('').replace(/[\(\s]*/g, '')
+                    if(match.length > maxlen) {
+                        return ''; //stop here
+                    }
                 }
                 return '('+target+')';
             });
