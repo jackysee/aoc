@@ -17,32 +17,6 @@ function getEdges(tile) {
     return {top, bottom, left, right};
 }
 
-//ORI: 1:N, 2:E, 3:S, 4:W, Filpped: 5:N, 6:E, 7:S, 8:W
-/*
-..##.#..#.
-##..#.....
-#...##..#.
-####.#...#
-##.##.###.
-##...#.###
-.#.#.#..##
-..#....#..
-###...#.#.
-..###..###
-
-.#..#.##..
-.....#..##
-.#..##...#
-#...#.####
-.###.##.##
-###.#...##
-##..#.#.#.
-..#....#..
-.#.#...###
-###..###..
- */
-
-
 function orient(tile , ori = 1) {
     let len = tile[0].length;
     let _tile = [];
@@ -173,10 +147,8 @@ function part2(_data) {
             }
             puzzleResult[i].push(t[0]);
             used.add(t[0].tile.id);
-            // console.log('t', t);
         }
     }
-    console.log(puzzleResult.length);
 
     //concat the puzzle...
     let puzzle = [];
@@ -189,9 +161,8 @@ function part2(_data) {
             });
         }
     }
-    console.log(puzzle.length, puzzle[0].length);
 
-    //define the dragon into set of [x,y]
+    //define the dragon into set of [y,x]
     const dragonStr = `                  # 
 #    ##    ##    ###
  #  #  #  #  #  #   `;
@@ -200,25 +171,32 @@ function part2(_data) {
     for(let i=0; i<dragonMap.length; i++) {
         for(let j=0; j<dragonMap[i].length; j++) {
             if(dragonMap[i][j] === '#') {
-                dragon.push([j,i]);
+                dragon.push([i,j]);
             }
         }
     }
-    const dragonHeight = 3, dragonWidth = 20;
 
     //find the dragon!
-    console.log(dragon);
-
-
-
+    for(let k=1; k<=8; k++) {
+        let _puzzle = orient(puzzle, k);
+        for(let i=0; i<_puzzle.length - 1; i++) {
+            for(let j=0; j<_puzzle[i].length - 20; j++) {
+                let _dragon = dragon.map(([_i,_j]) => [ i+_i, j+_j]);
+                if(_dragon.every(([_i,_j]) => _puzzle[_i][_j] === '#')) {
+                    _dragon.forEach(([_i,_j]) => _puzzle[_i][_j] = 'O')
+                }
+            }
+        }
+        if(_puzzle.flat().includes('O')) {
+            console.log(_puzzle.flat().filter(x => x==='#').length);
+            break;
+        }
+    }
 }
 
 
-//part 1: find corners ( 2 adj edge that won't match any id)
-// let d = part1(data());
-// part2(d);
-
-part2(part1(sample()));
+// part2(part1(sample()));
+part2(part1(data()));
 
 
 
