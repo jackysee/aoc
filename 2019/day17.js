@@ -82,18 +82,15 @@ function next([i,j], facing) {
 
 
 let pos = toIntList(Object.entries(map).find(([k,v]) => /[\^<>v]/.test(v))[0]);
-console.log({pos});
+// console.log({pos});
 
 let ins = ['L'];
 let facing = 'W';
 let steps = 0;
-let i = 0;
+// let i = 0;
 while(true) {
-    i++;
+    // i++;
     let n = next(pos, facing);
-    if(i > 356) {
-        console.log({pos, facing, n});
-    }
     if(n === false) {
         ins.push(steps)
         break;
@@ -109,8 +106,9 @@ while(true) {
         facing = n.facing;
     }
 }
-console.log(i, ins.length);
-console.log(ins.join(','));
+
+// console.log(i, ins.length);
+// console.log(ins.join(','));
 
 // L,10,R,8,R,8,
 // L,10,R,8,R,8,
@@ -127,7 +125,6 @@ console.log(ins.join(','));
 // L,10,R,8,R,8
 // L,10,L,12,R,8,R,10
 //
-console.log('=-====');
 let stats = [];
 for(let j=4; j<=10; j+=2) {
     for(let i=0; i<ins.length - j; i+=2) {
@@ -138,18 +135,16 @@ for(let j=4; j<=10; j+=2) {
         });
     }
 }
-// // console.log(stats.sort((s1, s2) => s1.count - s2.count).map(s => `${s.part} :: ${s.count}`).join('\n'));
-// 
 stats.sort((s1, s2) => {
     return s2.count * s2.part.length - s1.count * s1.part.length;
 })
-console.log(stats.slice(0, 15).map(s => `${s.part} :: ${s.count}`).join('\n'));
+// console.log(stats.slice(0, 15).map(s => `${s.part} :: ${s.count}`).join('\n'));
 
 let A = 'R,10,L,12,R,10';
 let B = 'L,10,R,8,R,8';
 let C = 'L,10,L,12,R,8,R,10';
 let main = 'B,B,C,A,C,A,C,A,A,B';
-console.log([B,B,C,A,C,A,C,A,A,B].join(',') === ins.join(','));
+// console.log([B,B,C,A,C,A,C,A,A,B].join(',') === ins.join(','));
 
 function toAsciiInput(str) {
     let arr = str.split('').map(c => c.charCodeAt(0));
@@ -158,19 +153,15 @@ function toAsciiInput(str) {
 }
 
 let prg = createProgram(data().replace(/^\d+/, '2'));
-console.log('run');
-prg.run([]);
-console.log('1');
-prg.run(toAsciiInput(main));
-console.log('2');
-prg.run(toAsciiInput(A));
-console.log('3');
-prg.run(toAsciiInput(B));
-console.log('4');
-prg.run(toAsciiInput(C));
-console.log('5');
-let dust = prg.run(toAsciiInput('n'))
-console.log(dust);
+let output = prg.run([
+    ...toAsciiInput(main),
+    ...toAsciiInput(A),
+    ...toAsciiInput(B),
+    ...toAsciiInput(C),
+    ...toAsciiInput('n'),
+]);
+// console.log(output);
+console.log(output.slice(-1)[0]);
 
 
 
@@ -207,9 +198,7 @@ function createProgram(str, outputCount = -1, debug = false){
         halted = false;
         output = [];
         debug && console.log('run', input, list);
-        let step = 0;
         while(!halted) {
-            step++;
             if(halted) {
                 return output;
             }
@@ -223,7 +212,7 @@ function createProgram(str, outputCount = -1, debug = false){
             if(m1 === 2) p1 += base;
             if(m2 === 2) p2 += base;
             if(m3 === 2) p3 += base;
-            step === 1 && debug && console.log(' >>>> ' , { pos, op, p1, p2, p3, v1, v2, input, output });
+            // console.log(' >>>> ' , { pos, op, p1, p2, p3, v1, v2, input, output });
             if(op === 1) {
                 if(debug) console.log(`1:(${m1}|${p1},${m2}|${p2},${p3}) add, write address ${p3} (${list[p3]}) with ${v1} + ${v2} = ${v1 + v2}`)
                 list[p3] = v1 + v2;
