@@ -126,7 +126,7 @@ while(true) {
 // L,10,L,12,R,8,R,10
 //
 let stats = [];
-for(let j=4; j<=10; j+=2) {
+for(let j=2; j<=10; j+=2) {
     for(let i=0; i<ins.length - j; i+=2) {
         let part = ins.slice(i, i+j).join(',');
         stats.push({
@@ -138,7 +138,7 @@ for(let j=4; j<=10; j+=2) {
 stats.sort((s1, s2) => {
     return s2.count * s2.part.length - s1.count * s1.part.length;
 })
-// console.log(stats.slice(0, 15).map(s => `${s.part} :: ${s.count}`).join('\n'));
+console.log(stats.slice(0, 15).map(s => `${s.part} :: ${s.count}`).join('\n'));
 
 let A = 'R,10,L,12,R,10';
 let B = 'L,10,R,8,R,8';
