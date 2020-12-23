@@ -45,20 +45,6 @@ function insert(map, v, next) {
     return map;
 }
 
-function toArr(map) {
-    let start = 1;
-    let curr = map.get(start);
-    let result = [start];
-    while(true) {
-        if(curr === start) {
-            break;
-        }
-        result.push(curr);
-        curr = map.get(curr);
-    }
-    return result;
-}
-
 function game(str, moves = 100, end) {
     let { min, max, map, curr, len } = getInfo(str, end);
     let i = 0;
@@ -75,7 +61,6 @@ function game(str, moves = 100, end) {
             if(v === curr || next.includes(v)) {
                 continue;
             }
-            // memo.set([curr, ...next].join(','), v);
             curr = map.get(curr);
             insert(map, v, next);
             break;
