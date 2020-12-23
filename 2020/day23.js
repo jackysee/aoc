@@ -9,7 +9,7 @@ function createMap(arr) {
 }
 function parse(str) {
 	let arr = str.split('').map(s => parseInt(s, 10));
-	let map = cerateMap(arr);
+	let map = createMap(arr);
 	return { map, curr:arr[0], arr };
 }
 
@@ -23,35 +23,66 @@ function getNext(map, n, count = 1) {
     return result;
 }
 
+function insert(map, v, next) {
+    let end = map[v];
+    next.forEach(n => {
+        map[v] = n;
+        v = n;
+    });
+    map[v] = end;
+    return map;
+}
+
+function toArr(map) {
+    let start = parseInt(Object.keys(map)[0], 10);
+    let curr = map[start];
+    let result = [start];
+    while(true) {
+        if(curr === start) {
+            break;
+        }
+        result.push(curr);
+        curr = map[curr];
+    }
+    return result;
+}
+
 function game(str) {
     let { map, curr, arr } = parse(str);
     let i = 0;
-    console.log(arr);
-    while(i++ < 1) {
+    let min = Math.min(...arr);
+    let max = Math.max(...arr);
+    // console.log('ori', arr.join(', '));
+    while(i < 100) {
+        i++;
         let next = getNext(map, curr, 3);
-        console.log(next);
+        // console.log('while', curr, next);
+        map[curr] = map[next.slice(-1)[0]];
+        next.forEach(n => delete map[n]);
+        // console.log('----', next, map);
         let left = arr.filter(n => n !== curr && !next.includes(n));
-        let min = Math.min(...arr);
-        let max = Math.max(...arr);
-        console.log(left);
+        // console.log('left', left);
         let v = curr;
-        do {
+        while(true) {
             v -= 1; 
-            if(left.find(v)) {
-                insert(map, v, next);
-            }
-
-        } while()
-
-        
+            if(v < min) v = max;
+            // console.log('v = ', v);
+            if(left.includes(v)) {
+                // console.log('insert after', v);
+                curr = getNext(map, curr)[0];
+                map = insert(map, v, next);
+                break;
+            } 
+        }
+        // console.log({ pick:next, dest:v, arr:toArr(map).join(', ') });
     }
+    // console.log('final -===');
+    return getNext(map, 1, arr.length - 1).join('');
 }
 
+// console.log(game('389125467'));
 console.log(game(data()));
 
-function sample() {
-	return `32415`;
-}
 
 function data() {
 	return `643719258`;
