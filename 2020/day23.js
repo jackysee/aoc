@@ -1,11 +1,15 @@
 //AOC2020 D22
 
-function parse(str) {
-	let arr = str.split('').map(s => parseInt(s, 10));
+function createMap(arr) {
 	let map = {};
 	arr.forEach((n, i) => {
 	   map[n] =  arr[i+1 === arr.length? 0 : i+1]
 	});
+	return map;
+}
+function parse(str) {
+	let arr = str.split('').map(s => parseInt(s, 10));
+	let map = cerateMap(arr);
 	return { map, curr:arr[0], arr };
 }
 
@@ -27,10 +31,15 @@ function game(str) {
         let next = getNext(map, curr, 3);
         console.log(next);
         let left = arr.filter(n => n !== curr && !next.includes(n));
+        let min = Math.min(...arr);
+        let max = Math.max(...arr);
         console.log(left);
         let v = curr;
         do {
             v -= 1; 
+            if(left.find(v)) {
+                insert(map, v, next);
+            }
 
         } while()
 
