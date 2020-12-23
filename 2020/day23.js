@@ -1,37 +1,30 @@
 //AOC2020 D22
 
-function createMap(str) {
-    let arr = parse(str);
-	let map = new Map();
-	arr.forEach((n, i) => {
-	    map.set(n, arr[i+1 === arr.length? 0 : i+1]);
-    });
-	return map;
-}
-
-function createMap2(str, until) {
-    let arr = parse(arr);
+function getInfo(str, end) {
+    let arr = str.split('').map(s => parseInt(s, 10));
+    let min = Math.min(...arr);
     let max = Math.max(...arr);
-    let map = new Map();
-	arr.forEach((n, i) => {
-	    map.set(n, arr[i+1 === arr.length? max : i+1]);
+    let _map = new Map();
+    arr.forEach((n, i) => {
+        _map.set(n, i + 1 === arr.length? (end? max + 1 : arr[0]) : arr[i+1]);
     });
-    map.set(until, arr[0]);
-    return {
+    if(end) {
+        max = end;
+        _map.set(end, arr[0]);
+    }
+    let map = {
         get(i) {
-            return map.get(i) || i+1;
+            return _map.get(i) || i+1;
         },
         set(i, val) {
-            map.set(i, val);
+            _map.set(i, val);
+        },
+        get size() {
+            return _map.size; 
         }
     }
-    
+    return { map, min, max, curr: arr[0], len: end || arr.length };
 }
-
-function parse(str) {
-	return str.split('').map(s => parseInt(s, 10));
-}
-
 
 function getNext(map, n, count = 1) {
     let result = [], idx = n;
@@ -66,79 +59,39 @@ function toArr(map) {
     return result;
 }
 
-function game(arr, moves = 100, min, max, resultNext) {
-    let map = createMap(arr);
-    curr = arr[0];
+function game(str, moves = 100, end) {
+    let { min, max, map, curr, len } = getInfo(str, end);
     let i = 0;
-    min = min === undefined? Math.min(...arr) : min;
-    max = max === undefined? Math.max(...arr) : max;
-    // console.log('ori', arr.join(', '));
     let t = Date.now();
-    let memo = new Map();
     while(i < moves) {
-        if(i % 1000000 === 0) {
-            let _t = Date.now();
-            console.log(`progress ${i}, t:${(_t - t)}`);
-            t = _t;
-        }
         i++;
         let next = getNext(map, curr, 3);
-        // console.log('while', curr, next);
-        map.set(curr, map.get(next.slice(-1)[0]));
-        //next.forEach(n => map.delete(n));
+        map.set(curr, map.get(next[2]));
 
-        let mem = memo.get([curr, ...next].join(','));
-        if(mem) {
-            curr = map.get(curr);
-            insert(map, mem, next);
-            continue;
-        }
-
-        // console.log('----', next, map);
-        // let left = arr.filter(n => n !== curr && !next.includes(n));
-        // console.log('left', left);
         let v = curr;
         while(true) {
             v -= 1; 
-            if(v < min){
-                // console.log('v move to max', { v, max});
-                v = max;
-            }
-            // console.log('v = ', v);
+            if(v < min) v = max; 
             if(v === curr || next.includes(v)) {
                 continue;
             }
-            memo.set([curr, ...next].join(','), v)
+            // memo.set([curr, ...next].join(','), v);
             curr = map.get(curr);
             insert(map, v, next);
             break;
         }
-        // console.log({ pick:next, dest:v, arr:toArr(map).join(', ') });
     }
-    // console.log('final -===');
-    resultNext = resultNext || arr.length - 1;
-    return getNext(map, 1, resultNext);
+    console.log(`time: ${Date.now() - t}ms, map:${map.size}`);
+    return {
+        getArr: _len => getNext(map, 1, _len || (len - 1))
+    };
 }
 
-console.log(game(parse('389125467')).join(''));
-console.log(game(parse(data())).join(''));
+// console.log(game('389125467').getArr().join(''));
+console.log(game(data()).getArr().join(''));
 
-
-let arr = parse('389125467'); //934001 * 159792 = 149245887792
-// let arr = parse(data());
-let min = Math.min(...arr);
-let max = Math.max(...arr);
-let len = 1000000 - arr.length;
-for(let i=1; i<=len; i++) {
-    arr.push(max + i);
-}
-console.log(arr.slice(-1));
-console.log(game(arr, 10000000, min, 1000000, 10));
-
-
-
-
-
+// console.log(game('389125467', 10000000, 1000000).getArr(2).reduce((a,c) => a * c, 1)); //934001 * 159792 = 149245887792
+console.log(game(data(), 10000000, 1000000).getArr(2).reduce((a,c) => a *c, 1));
 
 function data() {
 	return `643719258`;
