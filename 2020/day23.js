@@ -4,23 +4,24 @@ function getInfo(str, end) {
     let arr = str.split('').map(s => parseInt(s, 10));
     let min = Math.min(...arr);
     let max = Math.max(...arr);
-    let _map = new Map();
+    let _map = []; 
     arr.forEach((n, i) => {
-        _map.set(n, i + 1 === arr.length? (end? max + 1 : arr[0]) : arr[i+1]);
+        let val = i + 1 === arr.length? (end? max + 1 : arr[0]) : arr[i+1];
+        _map[n] = val;
     });
     if(end) {
         max = end;
-        _map.set(end, arr[0]);
+        _map[end] = arr[0];
     }
     let map = {
         get(i) {
-            return _map.get(i) || i+1;
+            return _map[i] || i + 1; 
         },
         set(i, val) {
-            _map.set(i, val);
+            _map[i] = val;
         },
         get size() {
-            return _map.size; 
+            return _map.length; 
         }
     }
     return { map, min, max, curr: arr[0], len: end || arr.length };
