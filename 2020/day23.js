@@ -6,30 +6,42 @@ function parse(str) {
 	arr.forEach((n, i) => {
 	   map[n] =  arr[i+1 === arr.length? 0 : i+1]
 	});
-	return { map, curr:arr[0] };
+	return { map, curr:arr[0], arr };
 }
 
 
-function next(map, n, count = 1) {
-    let result = [];
+function getNext(map, n, count = 1) {
+    let result = [], idx = n;
     for(let i=0; i<count; i++) {
-        
+        result.push(map[idx]);
+        idx = map[idx];
     }
+    return result;
 }
 
 function game(str) {
-    let { map, curr } = parse(str);
+    let { map, curr, arr } = parse(str);
     let i = 0;
-    while(i++ < 100) {
-        let next = []
+    console.log(arr);
+    while(i++ < 1) {
+        let next = getNext(map, curr, 3);
+        console.log(next);
+        let left = arr.filter(n => n !== curr && !next.includes(n));
+        console.log(left);
+        let v = curr;
+        do {
+            v -= 1; 
+
+        } while()
+
         
     }
 }
 
-console.log(parse(data()));
+console.log(game(data()));
 
 function sample() {
-	return ``;
+	return `32415`;
 }
 
 function data() {
