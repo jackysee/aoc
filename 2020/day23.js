@@ -1,11 +1,31 @@
 //AOC2020 D22
 
-function createMap(arr) {
+function createMap(str) {
+    let arr = parse(str);
 	let map = new Map();
 	arr.forEach((n, i) => {
 	    map.set(n, arr[i+1 === arr.length? 0 : i+1]);
     });
 	return map;
+}
+
+function createMap2(str, until) {
+    let arr = parse(arr);
+    let max = Math.max(...arr);
+    let map = new Map();
+	arr.forEach((n, i) => {
+	    map.set(n, arr[i+1 === arr.length? max : i+1]);
+    });
+    map.set(until, arr[0]);
+    return {
+        get(i) {
+            return map.get(i) || i+1;
+        },
+        set(i, val) {
+            map.set(i, val);
+        }
+    }
+    
 }
 
 function parse(str) {
