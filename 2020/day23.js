@@ -65,7 +65,7 @@ function game(arr, moves = 100, min, max, resultNext) {
         let next = getNext(map, curr, 3);
         // console.log('while', curr, next);
         map.set(curr, map.get(next.slice(-1)[0]));
-        next.forEach(n => map.delete(n));
+        //next.forEach(n => map.delete(n));
 
         let mem = memo.get([curr, ...next].join(','));
         if(mem) {
@@ -108,10 +108,12 @@ let arr = parse('389125467'); //934001 * 159792 = 149245887792
 // let arr = parse(data());
 let min = Math.min(...arr);
 let max = Math.max(...arr);
-for(let i=1; i<=1000000; i++) {
+let len = 1000000 - arr.length;
+for(let i=1; i<=len; i++) {
     arr.push(max + i);
 }
-console.log(game(arr, 10000000, min, max+1000000, 10));
+console.log(arr.slice(-1));
+console.log(game(arr, 10000000, min, 1000000, 10));
 
 
 
