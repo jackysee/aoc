@@ -20,7 +20,7 @@ function transform(key, loopSize) {
     return val;
 }
 
-// console.log(transform(17807724, findLoopSize(5764801))); //14897079
+// console.log(transform(17807724, loopSize(5764801))); //14897079
 console.log(transform(door, loopSize(card)));
 
 
