@@ -61,7 +61,6 @@ function flip2(str) {
                 }
             }
         })
-        // console.log(`day ${i+1}, ${_black.size}`);
         black = _black;
     }
     return black.size;
