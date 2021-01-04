@@ -3,25 +3,118 @@
 function parse(str) {
     str = str.replace(/^\n*|\n*$/g, '');
     let grid = str.split('\n').map(l => l.split(''));
-    return grid;
+    let portals = [];
+    grid.forEach((l, i) => {
+        l.forEach((v, j) => {
+            if(v === '.') {
+                if(/[A-Z]/.test(grid[i-1][j])) { //up
+                    let name = grid[i-2][j] + grid[i-1][j];
+                    portals.push({ name, pos: [i-1,j] });
+                }
+                if(/[A-Z]/.test(grid[i+1][j])) { //down
+                    let name = grid[i+1][j] + grid[i+2][j];
+                    portals.push({ name, pos: [i+1,j] });
+                }
+                if(/[A-Z]/.test(grid[i][j-1])) { //left
+                    let name = grid[i][j-2] + grid[i][j-1];
+                    portals.push({ name, pos: [i,j-1] });
+                }
+                if(/[A-Z]/.test(grid[i][j+1])) { //right
+                    let name = grid[i][j+1] + grid[i][j+2];
+                    portals.push({ name, pos: [i,j+1] });
+                }
+            }
+        });
+    });
+    return { grid, portals };
 }
 
-console.log(parse(sample1()));
+function walkable(pos, grid) {
+    let [i,j] = pos;
+    let p = grid[i][j];
+    if(p === '.') return true;
+    if(/[A-Z]/.test(p)) {
+        return [ [-1,0], [1,0], [0,-1], [0,1] ].some(([di, dj]) => {
+            return grid[i+di] && grid[i+di][j+dj] === '.';
+        })
+    }
+    return false;
+}
 
+function walk(start, dest, grid) {
+    let visited = new Set();
+    let queue = [ { p:start.pos, name:start.name, dist:0 } ];
+    while(queue.length !== 0) {
+        // if(queue.length % 10000 === 0) {
+        //     console.log(queue.length);
+        // }
+        let pos = queue.shift();
+        if(pos.p+'' === dest.pos+'') {
+            return pos.dist - 1;
+        }
+        let [x,y] = pos.p;
+        let points = [ [x-1,y], [x+1,y], [x,y-1], [x,y+1] ]
+            .filter(p => walkable(p, grid) && !visited.has(p+''))
+            .map(p => {
+                return { p, dist: pos.dist + 1 };
+            });
+        points.forEach(p => visited.add(p.p+''));
+        queue = [...queue, ...points];
+    }
+    return -1;
+}
 
+function graph({ grid, portals }) {
+    let graph = {};
+    portals.forEach((p, i) => {
+        portals.forEach((_p, j) => {
+            if(i !== j) {
+                graph[p.name] = graph[p.name] || [];
+                let dist = walk(p, _p, grid);
+                if(dist !== -1) {
+                    graph[p.name].push({ name: _p.name, dist }); 
+                }
+            }
+        });
+    });
+    return graph;
+}
 
+function shortest(graph, start, dest) {
+    let visited = new Set();
+    let dist = {};
+    let prev = {};
+    for (const v in graph) {
+        dist[v] = Number.MAX_VALUE;
+        prev[v] = undefined;
+    }
+    dist[start] = 0;
+    while (true) {
+        // ... find the node with the currently shortest distance from the start node...
+        var shortestDist = Number.MAX_VALUE;
+        var shortestNode = -1;
+        for (const v in graph) {
+            if(dist[v] < shortestDist && !visited.has(v)) {
+                shortestDist = dist[v];
+                shortestNode = v;
+            }
+        }
+        if (shortestNode === -1) {
+            break;
+        }
+        
+        graph[shortestNode].forEach((n) => {
+            if(dist[n.name] > dist[shortestNode] + n.dist) {
+                dist[n.name] = dist[shortestNode] + n.dist;
+            }
+        });
+        visited.add(shortestNode);
+    }
+    return dist[dest] - 1;
+}
 
-
-
-
-
-
-
-
-
-
-
-
+let G = graph(parse(data()));
+console.log(shortest(G, 'AA', 'ZZ'));
 
 
 
@@ -48,6 +141,49 @@ FG..#########.....#
              Z       
              Z       
 `;
+}
+
+function sample2() {
+    return `
+                   A               
+                   A               
+  #################.#############  
+  #.#...#...................#.#.#  
+  #.#.#.###.###.###.#########.#.#  
+  #.#.#.......#...#.....#.#.#...#  
+  #.#########.###.#####.#.#.###.#  
+  #.............#.#.....#.......#  
+  ###.###########.###.#####.#.#.#  
+  #.....#        A   C    #.#.#.#  
+  #######        S   P    #####.#  
+  #.#...#                 #......VT
+  #.#.#.#                 #.#####  
+  #...#.#               YN....#.#  
+  #.###.#                 #####.#  
+DI....#.#                 #.....#  
+  #####.#                 #.###.#  
+ZZ......#               QG....#..AS
+  ###.###                 #######  
+JO..#.#.#                 #.....#  
+  #.#.#.#                 ###.#.#  
+  #...#..DI             BU....#..LF
+  #####.#                 #.#####  
+YN......#               VT..#....QG
+  #.###.#                 #.###.#  
+  #.#...#                 #.....#  
+  ###.###    J L     J    #.#.###  
+  #.....#    O F     P    #.#...#  
+  #.###.#####.#.#####.#####.###.#  
+  #...#.#.#...#.....#.....#.#...#  
+  #.#####.###.###.#.#.#########.#  
+  #...#.#.....#...#.#.#.#.....#.#  
+  #.###.#####.###.###.#.#.#######  
+  #.#.........#...#.............#  
+  #########.###.###.#############  
+           B   J   C               
+           U   P   P               
+`;
+
 }
 
 function data() {
