@@ -3,25 +3,27 @@
 function parse(str) {
     str = str.replace(/^\n*|\n*$/g, '');
     let grid = str.split('\n').map(l => l.split(''));
+    let height = grid.length;
+    let width = grid[0].length;
     let portals = [];
     grid.forEach((l, i) => {
         l.forEach((v, j) => {
             if(v === '.') {
                 if(/[A-Z]/.test(grid[i-1][j])) { //up
                     let name = grid[i-2][j] + grid[i-1][j];
-                    portals.push({ name, pos: [i-1,j] });
+                    portals.push({ name, pos: [i-1,j], inner:(i-3 > 0) });
                 }
                 if(/[A-Z]/.test(grid[i+1][j])) { //down
                     let name = grid[i+1][j] + grid[i+2][j];
-                    portals.push({ name, pos: [i+1,j] });
+                    portals.push({ name, pos: [i+1,j], inner:(i+3 < height) });
                 }
                 if(/[A-Z]/.test(grid[i][j-1])) { //left
                     let name = grid[i][j-2] + grid[i][j-1];
-                    portals.push({ name, pos: [i,j-1] });
+                    portals.push({ name, pos: [i,j-1], inner:(j-3 > 0) });
                 }
                 if(/[A-Z]/.test(grid[i][j+1])) { //right
                     let name = grid[i][j+1] + grid[i][j+2];
-                    portals.push({ name, pos: [i,j+1] });
+                    portals.push({ name, pos: [i,j+1], inner:(j+3 < width) });
                 }
             }
         });
@@ -117,6 +119,8 @@ let G = graph(parse(data()));
 console.log(shortest(G, 'AA', 'ZZ'));
 
 
+console.log(parse(sample1()));
+
 
 
 function sample1() {
@@ -184,6 +188,48 @@ YN......#               VT..#....QG
            U   P   P               
 `;
 
+}
+
+function sample3() {
+    return `
+             Z L X W       C                 
+             Z P Q B       K                 
+  ###########.#.#.#.#######.###############  
+  #...#.......#.#.......#.#.......#.#.#...#  
+  ###.#.#.#.#.#.#.#.###.#.#.#######.#.#.###  
+  #.#...#.#.#...#.#.#...#...#...#.#.......#  
+  #.###.#######.###.###.#.###.###.#.#######  
+  #...#.......#.#...#...#.............#...#  
+  #.#########.#######.#.#######.#######.###  
+  #...#.#    F       R I       Z    #.#.#.#  
+  #.###.#    D       E C       H    #.#.#.#  
+  #.#...#                           #...#.#  
+  #.###.#                           #.###.#  
+  #.#....OA                       WB..#.#..ZH
+  #.###.#                           #.#.#.#  
+CJ......#                           #.....#  
+  #######                           #######  
+  #.#....CK                         #......IC
+  #.###.#                           #.###.#  
+  #.....#                           #...#.#  
+  ###.###                           #.#.#.#  
+XF....#.#                         RF..#.#.#  
+  #####.#                           #######  
+  #......CJ                       NM..#...#  
+  ###.#.#                           #.###.#  
+RE....#.#                           #......RF
+  ###.###        X   X       L      #.#.#.#  
+  #.....#        F   Q       P      #.#.#.#  
+  ###.###########.###.#######.#########.###  
+  #.....#...#.....#.......#...#.....#.#...#  
+  #####.#.###.#######.#######.###.###.#.#.#  
+  #.......#.......#.#.#.#.#...#...#...#.#.#  
+  #####.###.#####.#.#.#.#.###.###.#.###.###  
+  #.......#.....#.#...#...............#...#  
+  #############.#.#.###.###################  
+               A O F   N                     
+               A A D   M                     
+`;
 }
 
 function data() {
