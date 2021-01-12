@@ -18,17 +18,14 @@ function react(s) {
 }
 
 function findShortest(s) {
-    let a = 'a'.charCodeAt(0);
-    let z = 'z'.charCodeAt(0);
+    let letters = new Set(s.toLowerCase().split(''));
     let len = Infinity;
-    for(let i=a; i<=z; i++) {
-        let c = String.fromCharCode(i);
-        let _s = s.replace(new RegExp(c, 'gi'), "");
-        _s = react(_s);
+    letters.forEach(c => {
+        let _s = react(s.replace(new RegExp(c, 'gi'), ""));
         if(_s.length < len) {
             len = _s.length;
         }
-    }
+    });
     return len;
 }
 
