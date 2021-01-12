@@ -14,7 +14,7 @@ function react(s) {
             buf.push(s[i]);
         }
     }
-    return buf.join('');
+    return buf;
 }
 
 function findShortest(s) {
