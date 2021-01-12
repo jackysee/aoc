@@ -1,26 +1,20 @@
 //AOC2018 D5
 
 function isPair(c1, c2) {
-    let _c1 = c1.charCodeAt(0);
-    let _c2 = c2.charCodeAt(0);
-    return Math.abs(_c1 - _c2) === 32;
+    return Math.abs(c1.charCodeAt(0) - c2.charCodeAt(0)) === 32;
 }
 
 function react(s) {
-    while(true) {
-        let hasPair = false;
-        for(let i=0; i<s.length; i++) {
-            if(s[i+1] !== undefined && isPair(s[i], s[i+1])) {
-                hasPair = true;
-                let _s = s.slice(0, i) + s.slice(i + 2);
-                s = _s;
-                break;
-            } 
-        }
-        if(!hasPair) {
-            return s;
+    let buf = [];
+    for(let i=0; i<s.length; i++) {
+        let last = buf.slice(-1)[0];
+        if(last && isPair(last, s[i])) {
+            buf.pop();
+        } else {
+            buf.push(s[i]);
         }
     }
+    return buf.join('');
 }
 
 function findShortest(s) {
@@ -29,7 +23,6 @@ function findShortest(s) {
     let len = Infinity;
     for(let i=a; i<=z; i++) {
         let c = String.fromCharCode(i);
-        // console.log('current letter', c);
         let _s = s.replace(new RegExp(c, 'gi'), "");
         _s = react(_s);
         if(_s.length < len) {
@@ -39,11 +32,9 @@ function findShortest(s) {
     return len;
 }
 
+// console.log(react('dabAcCaCBAcCcaDA').length);
 console.log(react(data()).length);
 console.log(findShortest(data()));
-
-
-// dabAcCaCBAcCcaDA
 
 function data() {
     return `
