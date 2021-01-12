@@ -1,27 +1,49 @@
 //AOC2018 D5
 
-
-function solve(s) {
-    let _s = '';
-    for(let i=0; i<s.length - 1; i++) {
-        let c1 = s.charCodeAt(i);
-        let c2 = s.charCodeAt(i+1);
-        if(Math.abs(c1 - c2) === 32){
-            i += 1;
-            _s = _s.slice(0, -1);
-            continue;
-        } 
-        _s += s[i];
-        if(i === s.length - 2) {
-            _s += s[i+1];
-        }
-    }
-    console.log(_s.length);
+function isPair(c1, c2) {
+    let _c1 = c1.charCodeAt(0);
+    let _c2 = c2.charCodeAt(0);
+    return Math.abs(_c1 - _c2) === 32;
 }
 
-// solve('dabAcCaCBAcCcaDA');
-solve(data());
+function react(s) {
+    while(true) {
+        let hasPair = false;
+        for(let i=0; i<s.length; i++) {
+            if(s[i+1] !== undefined && isPair(s[i], s[i+1])) {
+                hasPair = true;
+                let _s = s.slice(0, i) + s.slice(i + 2);
+                s = _s;
+                break;
+            } 
+        }
+        if(!hasPair) {
+            return s;
+        }
+    }
+}
 
+function findShortest(s) {
+    let a = 'a'.charCodeAt(0);
+    let z = 'z'.charCodeAt(0);
+    let len = Infinity;
+    for(let i=a; i<=z; i++) {
+        let c = String.fromCharCode(i);
+        // console.log('current letter', c);
+        let _s = s.replace(new RegExp(c, 'gi'), "");
+        _s = react(_s);
+        if(_s.length < len) {
+            len = _s.length;
+        }
+    }
+    return len;
+}
+
+console.log(react(data()).length);
+console.log(findShortest(data()));
+
+
+// dabAcCaCBAcCcaDA
 
 function data() {
     return `
