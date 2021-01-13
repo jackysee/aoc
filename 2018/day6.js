@@ -1,24 +1,30 @@
 //AOC2018 D6
 
 function parse(s) {
-    return s.split('\n').map(l => l.split(', ').map(Number));
-}
-
-function part1(s) {
-    let pts = parse(s);
+    let pts = s.split('\n').map(l => l.split(', ').map(Number));
     let xs = pts.map(p => p[0]);
     let ys = pts.map(p => p[1]);
     let x1 = Math.min(...xs);
     let x2 = Math.max(...xs);
     let y1 = Math.min(...ys);
     let y2 = Math.max(...ys);
+    return { pts, x1, x2, y1, y2 };
+}
+
+function solve(s) {
+    let { pts, x1, x2, y1, y2 } = parse(s);
     let area = Array(pts.length).fill(0);
     let edges = new Set();
+    let region = 0;
     for(let y=y1; y<=y2; y++) {
         for(let x=x1; x<=x2; x++) {
             let dist = pts.map((p, i) => {
                 return Math.abs(p[0] - x) + Math.abs(p[1] - y);
             });
+            let sum = dist.reduce((a, c) => a + c, 0);
+            if(sum < 10000) {
+                region++;
+            }
             let minDist = Math.min(...dist);
             if(dist.filter(d => d === minDist).length > 1) {
                 continue;
@@ -40,11 +46,12 @@ function part1(s) {
                 idx = i;
             }
         });
-    return m;
+    console.log('part 1:', m);
+    console.log('part 2:', region);
 }
 
 // console.log(part1(sample()));
-console.log(part1(data()));
+solve(data());
 
 function sample() {
     return `
