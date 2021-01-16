@@ -1,5 +1,7 @@
 //AOC2018 D8
 
+const sum = list => list.reduce((a, b) => a + b, 0);
+
 function solve(s) {
     let list = s.split(' ').map(Number);
     // console.log(list);
@@ -37,14 +39,13 @@ function solve(s) {
         });
     }
     // console.log(result);
-    console.log('all metas = ', allMetas.reduce((a, c) => a + c, 0));
+    console.log('all metas = ', sum(allMetas));
 
     function getValue(id) {
         let node = result.find(r => r.id === id);
         if(!node) return 0;
-        if(node.childLen === 0) {
-            return node.metas.reduce((a,c) => a + c, 0);
-        }
+        if(node.childLen === 0) 
+            return sum(node.metas);
         return node.metas.reduce((a,c) => {
             return a + getValue(node.children[c-1]);
         }, 0);
