@@ -23,11 +23,9 @@ function getBounds(pts) {
 }
 
 function isLarger(b1, b2) {
-    let b1x = b1.maxX - b1.minX;
     let b1y = b1.maxY - b1.minY;
-    let b2x = b2.maxX - b2.minX;
     let b2y = b2.maxY - b2.minY;
-    return b2x > b1x || b2y > b2y;
+    return b2y > b1y;
 }
 
 let pts = parse(data());
