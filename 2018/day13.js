@@ -1,5 +1,10 @@
 //AOC2018 D13
 
+function parse(s) {
+    let map = s.split('\n').map(l => l.split(''));
+    return map;
+};
+
 
 function data() {
     return '' +
