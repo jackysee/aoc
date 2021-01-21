@@ -37,7 +37,7 @@ const TURN_LEFT = { L:'D', R:'U', U:'L', D:'R' };
 const TURN_RIGHT = { L:'U', R:'D', U:'R', D:'L' };
 const TURN_CORNER = {
     '/L': 'D',
-    '/U': 'L',
+    '/U': 'R',
     '\\R': 'D',
     '\\U': 'L',
     '/D': 'L',
@@ -55,6 +55,7 @@ function tick({ carts, map }) {
         let action = cart.action;
         let face = cart.face;
         //turn
+        // console.log(key, tile);
         if(tile === '+') {
             if(action === 0) face = TURN_LEFT[cart.face];
             if(action === 2) face = TURN_RIGHT[cart.face];
@@ -62,6 +63,7 @@ function tick({ carts, map }) {
             if(action === 3) action = 0;
         } else if(tile !== '-' && tile !== '|') {
             face = TURN_CORNER[tile+cart.face] || cart.face;
+            console.log('corner?', tile, cart.face, '=>', face);
         }
         if(face === 'L') x -= 1;
         if(face === 'R') x += 1;
@@ -72,11 +74,8 @@ function tick({ carts, map }) {
     let pts = _carts.map(c => c[0]);
     let s = new Set();
     pts.forEach(p => {
-        if(!s.has(p)) {
-            s.add(p);
-        } else {
-            throw new Error(p);
-        }
+        if(s.has(p)) { throw new Error(p); } 
+        s.add(p);
     })
     return Object.fromEntries(_carts);
 }
@@ -86,6 +85,7 @@ function collision(str) {
     while(true) {
         try {
             // console.log(carts);
+            // console.log('============= tick =================');
             carts = tick({ carts, map });
         } catch (e) {
             console.log(e.message);
