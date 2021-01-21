@@ -5,7 +5,6 @@ function parse(s) {
     let carts = {};
     let map = {};
     let w = arr[0].length;
-    console.log({w});
     for(let y=0; y<arr.length; y++) {
         for(let x=0; x<w; x++) {
             let c = arr[y][x];
@@ -13,19 +12,19 @@ function parse(s) {
                 map[[x,y]] = c;
             }
             if(c === '<') {
-                carts[[x,y]] = { face: 'L' };
+                carts[[x,y]] = { face: 'L', action:0 };
                 map[[x,y]] = '-';
             }
             if(c === '>') {
-                carts[[x,y]] = { face: 'R' };
+                carts[[x,y]] = { face: 'R', action:0 };
                 map[[x,y]] = '-';
             }
             if(c === '^') {
-                carts[[x,y]] = { face: 'U' };
+                carts[[x,y]] = { face: 'U', action:0 };
                 map[[x,y]] = '|';
             }
             if(c === 'v') {
-                carts[[x,y]] = { face: 'L' };
+                carts[[x,y]] = { face: 'D', action:0 };
                 map[[x,y]] = '|';
             }
 
@@ -34,8 +33,70 @@ function parse(s) {
     return { carts, map };
 };
 
-console.log(parse(sample()));
-console.log(parse(data()));
+const TURN_LEFT = { L:'D', R:'U', U:'L', D:'R' };
+const TURN_RIGHT = { L:'U', R:'D', U:'R', D:'L' };
+const TURN_CORNER = {
+    '/L': 'D',
+    '/U': 'L',
+    '\\R': 'D',
+    '\\U': 'L',
+    '/D': 'L',
+    '/R': 'U',
+    '\\L': 'U',
+    '\\D': 'R'
+};
+
+
+//left, straight, right
+function tick({ carts, map }) {
+    let _carts = Object.entries(carts).map(([key, cart]) => {
+        let [x,y] = key.split(',').map(Number);
+        let tile = map[[x,y]];
+        let action = cart.action;
+        let face = cart.face;
+        //turn
+        if(tile === '+') {
+            if(action === 0) face = TURN_LEFT[cart.face];
+            if(action === 2) face = TURN_RIGHT[cart.face];
+            action += 1;
+            if(action === 3) action = 0;
+        } else if(tile !== '-' && tile !== '|') {
+            face = TURN_CORNER[tile+cart.face] || cart.face;
+        }
+        if(face === 'L') x -= 1;
+        if(face === 'R') x += 1;
+        if(face === 'U') y -= 1;
+        if(face === 'D') y += 1;
+        return [ String([x,y]), { face, action } ];
+    });
+    let pts = _carts.map(c => c[0]);
+    let s = new Set();
+    pts.forEach(p => {
+        if(!s.has(p)) {
+            s.add(p);
+        } else {
+            throw new Error(p);
+        }
+    })
+    return Object.fromEntries(_carts);
+}
+
+function collision(str) {
+    let { carts, map } = parse(str);
+    while(true) {
+        try {
+            // console.log(carts);
+            carts = tick({ carts, map });
+        } catch (e) {
+            console.log(e.message);
+            break;
+        }
+    }
+}
+
+collision(sample());
+collision(data());
+
 
 
 
