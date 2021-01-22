@@ -2,9 +2,11 @@
 
 function parse(s) {
     let arr = s.split('\n').slice(1,-1).map(l => l.split(''));
-    let carts = {};
+    let carts = [];
     let map = {};
     let w = arr[0].length;
+    let h = arr.length;
+    let cartId = 1;
     for(let y=0; y<arr.length; y++) {
         for(let x=0; x<w; x++) {
             let c = arr[y][x];
@@ -12,80 +14,97 @@ function parse(s) {
                 map[[x,y]] = c;
             }
             if(c === '<') {
-                carts[[x,y]] = { face: 'L', action:0 };
+                carts.push({ pos:[x,y], face:'<', action:0, id: cartId++ });
                 map[[x,y]] = '-';
             }
             if(c === '>') {
-                carts[[x,y]] = { face: 'R', action:0 };
+                carts.push({ pos:[x,y], face: '>', action:0, id: cartId++  });
                 map[[x,y]] = '-';
             }
             if(c === '^') {
-                carts[[x,y]] = { face: 'U', action:0 };
+                carts.push({ pos:[x, y], face: '^', action:0, id: cartId++  });
                 map[[x,y]] = '|';
             }
             if(c === 'v') {
-                carts[[x,y]] = { face: 'D', action:0 };
+                carts.push({ pos:[x,y], face: 'v', action:0, id: cartId++  });
                 map[[x,y]] = '|';
             }
 
         }
     }
-    return { carts, map };
+    return { carts, map, w, h };
 };
 
-const TURN_LEFT = { L:'D', R:'U', U:'L', D:'R' };
-const TURN_RIGHT = { L:'U', R:'D', U:'R', D:'L' };
+const TURN_LEFT = { '<':'v', '>':'^', '^':'<', 'v':'>' };
+const TURN_RIGHT = { '<':'^', '>':'v', '^':'>', 'v':'<' };
 const TURN_CORNER = {
-    '/L': 'D',
-    '/U': 'R',
-    '\\R': 'D',
-    '\\U': 'L',
-    '/D': 'L',
-    '/R': 'U',
-    '\\L': 'U',
-    '\\D': 'R'
+    '/<': 'v',
+    '/^': '>',
+    '\\>': 'v',
+    '\\^': '<',
+    '/v': '<',
+    '/>': '^',
+    '\\<': '^',
+    '\\v': '>'
 };
+
+function move(cart, map) {
+    let [x,y] = cart.pos;
+    let action = cart.action;
+    let face = cart.face;
+    let tile = map[[x,y]];
+    //turn
+    if(tile === '+') {
+        if(action === 0) face = TURN_LEFT[cart.face];
+        if(action === 2) face = TURN_RIGHT[cart.face];
+        action = (action + 1) % 3;
+    } 
+    if(tile === '/' || tile === '\\') {
+        face = TURN_CORNER[tile+cart.face] || cart.face;
+    } 
+    if(face === '<') x -= 1;
+    if(face === '>') x += 1;
+    if(face === '^') y -= 1;
+    if(face === 'v') y += 1;
+    return { pos:[x,y], face, action, id: cart.id };
+}
 
 
 //left, straight, right
 function tick({ carts, map }) {
-    let _carts = Object.entries(carts).map(([key, cart]) => {
-        let [x,y] = key.split(',').map(Number);
-        let tile = map[[x,y]];
-        let action = cart.action;
-        let face = cart.face;
-        //turn
-        // console.log(key, tile);
-        if(tile === '+') {
-            if(action === 0) face = TURN_LEFT[cart.face];
-            if(action === 2) face = TURN_RIGHT[cart.face];
-            action += 1;
-            if(action === 3) action = 0;
-        } else if(tile !== '-' && tile !== '|') {
-            face = TURN_CORNER[tile+cart.face] || cart.face;
-            console.log('corner?', tile, cart.face, '=>', face);
-        }
-        if(face === 'L') x -= 1;
-        if(face === 'R') x += 1;
-        if(face === 'U') y -= 1;
-        if(face === 'D') y += 1;
-        return [ String([x,y]), { face, action } ];
+    let ys = [...new Set(carts.map(c=>c.pos[1]))].sort((a, b) => a - b)
+    let moved = new Set();
+    carts = carts.sort((a, b) => {
+        let [x1, y1] = a.pos;
+        let [x2, y2] = b.pos;
+        return (y1 === y2) ? x1 - x2 : y1 - y2;
     });
-    let pts = _carts.map(c => c[0]);
-    let s = new Set();
-    pts.forEach(p => {
-        if(s.has(p)) { throw new Error(p); } 
-        s.add(p);
-    })
-    return Object.fromEntries(_carts);
+    for (var i = 0, len = carts.length; i < len; i++) {
+        let _c = move(carts[i], map);
+        if(carts.find(c => c.pos+'' === _c.pos+'')) {
+            throw new Error(_c.pos);
+        }
+        carts[i] = _c;
+    }
+    return carts;
+}
+
+function printMap(carts, map, w, h) {
+    for(let y=0; y<h; y++) {
+        let str = '';
+        for(let x=0; x<w; x++) {
+            let c = carts.find(c => c.pos[0] === x && c.pos[1] === y)?.face;
+            str += c || map[[x,y]] || ' ';
+        }
+        console.log(str);
+    }
 }
 
 function collision(str) {
-    let { carts, map } = parse(str);
+    let { carts, map, w, h } = parse(str);
     while(true) {
+        // printMap(carts, map, w, h);
         try {
-            // console.log(carts);
-            // console.log('============= tick =================');
             carts = tick({ carts, map });
         } catch (e) {
             console.log(e.message);
@@ -94,8 +113,8 @@ function collision(str) {
     }
 }
 
-collision(sample());
-collision(data());
+// collision(sample());
+collision(data()); //8,3
 
 
 
