@@ -53,7 +53,7 @@ function move(cart, map) {
     let action = cart.action;
     let face = cart.face;
     let tile = map[[x,y]];
-    //turn
+    //turn : left, straight, right
     if(tile === '+') {
         if(action === 0) face = TURN_LEFT[cart.face];
         if(action === 2) face = TURN_RIGHT[cart.face];
@@ -70,8 +70,7 @@ function move(cart, map) {
 }
 
 
-//left, straight, right
-function tick({ carts, map }) {
+function tick(carts, map, logFirst) {
     let ys = [...new Set(carts.map(c=>c.pos[1]))].sort((a, b) => a - b)
     let moved = new Set();
     carts = carts.sort((a, b) => {
@@ -80,17 +79,23 @@ function tick({ carts, map }) {
         return (y1 === y2) ? x1 - x2 : y1 - y2;
     });
     for (var i = 0, len = carts.length; i < len; i++) {
+        if(carts[i].removed) {
+            continue;
+        }
         let _c = move(carts[i], map);
-        let idx = carts.findIndex(c => c.pos+'' === _c.pos+'');
+        let idx = carts.findIndex(c => c.pos+'' === _c.pos+'' && !c.removed);
         if(idx !== -1) {
             carts[i].removed = true;
             carts[idx].removed = true;
-            throw new Error(_c.pos);
-            // continue;
-        }
+            if(logFirst) {
+                console.log(_c.pos);
+                logFirst = false;
+            }
+            continue;
+        } 
         carts[i] = _c;
     }
-    return carts.filter(c => !c.removed);
+    return carts;
 }
 
 function printMap(carts, map, w, h) {
@@ -106,19 +111,23 @@ function printMap(carts, map, w, h) {
 
 function run(str) {
     let { carts, map, w, h } = parse(str);
+    let logFirst = true;
     while(true) {
         // printMap(carts, map, w, h);
-        try {
-            carts = tick({ carts, map });
-        } catch (e) {
-            console.log(e.message);
+        let _carts = tick(carts, map, logFirst);
+        carts = _carts.filter(c => !c.removed);
+        if(carts.length !== _carts.length) {
+            logFirst = false;
+        }
+        if(_carts.length === 1) {
+            console.log(carts[0].pos);
             break;
         }
     }
 }
 
-// collision(sample());
-run(data()); //8,3
+// run(sample2());
+run(data()); //8,3  72,121
 
 
 
@@ -157,6 +166,18 @@ function sample() {
 | | |  | v  |
 \\-+-/  \\-+--/
   \\------/   
+`;
+}
+
+function sample2() {
+    return `
+/>-<\\  
+|   |  
+| /<+-\\
+| | | v
+\\>+</ |
+  |   ^
+  \\<->/
 `;
 }
 
