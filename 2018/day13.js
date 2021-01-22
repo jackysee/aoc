@@ -81,12 +81,16 @@ function tick({ carts, map }) {
     });
     for (var i = 0, len = carts.length; i < len; i++) {
         let _c = move(carts[i], map);
-        if(carts.find(c => c.pos+'' === _c.pos+'')) {
+        let idx = carts.findIndex(c => c.pos+'' === _c.pos+'');
+        if(idx !== -1) {
+            carts[i].removed = true;
+            carts[idx].removed = true;
             throw new Error(_c.pos);
+            // continue;
         }
         carts[i] = _c;
     }
-    return carts;
+    return carts.filter(c => !c.removed);
 }
 
 function printMap(carts, map, w, h) {
@@ -100,7 +104,7 @@ function printMap(carts, map, w, h) {
     }
 }
 
-function collision(str) {
+function run(str) {
     let { carts, map, w, h } = parse(str);
     while(true) {
         // printMap(carts, map, w, h);
@@ -114,7 +118,7 @@ function collision(str) {
 }
 
 // collision(sample());
-collision(data()); //8,3
+run(data()); //8,3
 
 
 
