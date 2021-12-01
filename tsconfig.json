@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "declaration": true,
+        "allowJs": false,
+        "importHelpers": true,
+        "module": "commonjs",
+        "outDir": "build",
+        "sourceMap": true,
+        "strict": true,
+        "target": "ES2019",
+        "noEmit": false,
+        "plugins": []
+    },
+    "include": ["20*/**/*", "src/**/*"]
+}
