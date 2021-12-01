@@ -1,15 +1,6 @@
 {
     "compilerOptions": {
-        "declaration": true,
-        "allowJs": false,
-        "importHelpers": true,
-        "module": "commonjs",
-        "outDir": "build",
-        "sourceMap": true,
-        "strict": true,
-        "target": "ES2019",
-        "noEmit": false,
-        "plugins": []
+        "module":"esnext"
     },
     "include": ["20*/**/*", "src/**/*"]
 }

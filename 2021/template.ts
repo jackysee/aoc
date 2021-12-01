@@ -1,12 +1,8 @@
 export default {};
 
+import data from './day1_input.ts';
+
 let arr: Array<number> = data()
     .trim()
     .split('\n')
-    .map((s) => parseInt(s, 10));
-
-function data() {
-    return `
-
-`.trim();
-}
+    .map((s: string) => parseInt(s, 10));
