@@ -1,3 +1,5 @@
+export default {};
+
 let arr: Array<number> = data()
     .trim()
     .split('\n')

@@ -1,3 +1,5 @@
+export default {};
+
 const arr: Array<number> = data()
     .trim()
     .split('\n')
