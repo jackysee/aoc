@@ -1,5 +1,3 @@
-export default {};
-
 import data from './day2_input.ts';
 // import data from './day2_sample.ts';
 
@@ -19,9 +17,11 @@ let arr: Array<Instruction> = data()
 
 let x: number = 0;
 let y: number = 0;
+let z: number = 0;
 arr.forEach(({ motion, n }) => {
     if (motion === 'forward') {
         x += n;
+        z += y * n;
     }
     if (motion === 'down') {
         y += n;
@@ -30,21 +30,5 @@ arr.forEach(({ motion, n }) => {
         y -= n;
     }
 });
-console.log(x * y);
-
-x = 0;
-y = 0;
-let a: number = 0;
-arr.forEach(({ motion, n }) => {
-    if (motion === 'forward') {
-        x += n;
-        y += a * n;
-    }
-    if (motion === 'down') {
-        a += n;
-    }
-    if (motion === 'up') {
-        a -= n;
-    }
-});
-console.log(x * y);
+console.log('Part 1', x * y);
+console.log('Part 2', x * z);

@@ -1,4 +1,3 @@
-export default {};
 import data from './day1_input.ts';
 
 const arr: Array<number> = data()
