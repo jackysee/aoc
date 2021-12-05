@@ -7,7 +7,7 @@ let boards = lines
     .slice(2)
     .join('\n')
     .split('\n\n')
-    .map((s: string) => {
+    .map((s) => {
         return s.split('\n').map((r) => r.trim().split(/ +/).map(Number));
     });
 
@@ -32,7 +32,7 @@ function getScore(board: number[][], nums: number[]) {
 
 let hasWon: number[] = [];
 let scores: number[] = [];
-for (let i = 0; i < drawNumbers.length; i++) {
+drawNumbers.forEach((_, i) => {
     const nums = drawNumbers.slice(0, i + 1);
     boards.forEach((b, bi) => {
         if (!hasWon.includes(bi) && isWin(b, nums)) {
@@ -40,6 +40,6 @@ for (let i = 0; i < drawNumbers.length; i++) {
             hasWon.push(bi);
         }
     });
-}
+});
 console.log('Part 1', scores[0]);
 console.log('Part 2', scores[scores.length - 1]);
