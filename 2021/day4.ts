@@ -2,7 +2,7 @@ import data from './day4_input.ts';
 // import data from './day4_sample.ts';
 
 let lines = data().trim().split('\n');
-let drawNumbers = lines[0].split(',').map(Number);
+let numbers = lines[0].split(',').map(Number);
 let boards = lines
     .slice(2)
     .join('\n')
@@ -11,33 +11,26 @@ let boards = lines
         return s.split('\n').map((r) => r.trim().split(/ +/).map(Number));
     });
 
-function getRows(board: number[][]) {
-    const columns = [...Array(5)].map((_, i) =>
-        [...Array(5)].map((_, j) => board[j][i])
-    );
-    return [...board, ...columns];
-}
+const getRows = (board: number[][]) => [
+    ...board,
+    ...[...Array(5)].map((_, i) => [...Array(5)].map((_, j) => board[j][i]))
+];
 
-function isWin(board: number[][], markedNumbers: number[]) {
-    return getRows(board).some((row) =>
-        row.every((n) => markedNumbers.includes(n))
-    );
-}
+const mark = (board: number[][], n: number) =>
+    board.map((row) => row.map((_n) => (_n === n ? 0 : _n)));
 
-function getScore(board: number[][], nums: number[]) {
-    var unmarked: number[] = board.flat().filter((n) => !nums.includes(n));
-    var sum = unmarked.reduce((a, b) => a + b, 0);
-    return sum * nums[nums.length - 1];
-}
+const sum = (arr: number[]) => arr.reduce((a, b) => a + b, 0);
 
 let hasWon: number[] = [];
 let scores: number[] = [];
-drawNumbers.forEach((_, i) => {
-    const nums = drawNumbers.slice(0, i + 1);
+numbers.forEach((n) => {
     boards.forEach((b, bi) => {
-        if (!hasWon.includes(bi) && isWin(b, nums)) {
-            scores.push(getScore(b, nums));
-            hasWon.push(bi);
+        if (!hasWon.includes(bi)) {
+            let board = (boards[bi] = mark(b, n));
+            if (getRows(board).some((row) => sum(row) === 0)) {
+                scores.push(n * sum(board.flat()));
+                hasWon.push(bi);
+            }
         }
     });
 });
