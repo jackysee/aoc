@@ -24,13 +24,12 @@ const sum = (arr: number[]) => arr.reduce((a, b) => a + b, 0);
 let hasWon: number[] = [];
 let scores: number[] = [];
 numbers.forEach((n) => {
-    boards.forEach((b, bi) => {
-        if (!hasWon.includes(bi)) {
-            let board = (boards[bi] = mark(b, n));
-            if (getRows(board).some((row) => sum(row) === 0)) {
-                scores.push(n * sum(board.flat()));
-                hasWon.push(bi);
-            }
+    boards.forEach((board, bi) => {
+        if (hasWon.includes(bi)) return;
+        board = boards[bi] = mark(board, n);
+        if (getRows(board).some((row) => sum(row) === 0)) {
+            scores.push(n * sum(board.flat()));
+            hasWon.push(bi);
         }
     });
 });
