@@ -31,7 +31,7 @@ let arr: Array<Line> = data()
         return { dx, dy, points };
     });
 
-const getOverlaps = (lines: Line[], diagonal: boolean = false) => {
+const countOverlaps = (lines: Line[], diagonal: boolean = false) => {
     const scores: { [key: string]: number } = {};
     lines.forEach((line) => {
         if (!diagonal && line.dx != 0 && line.dy !== 0) return;
@@ -43,5 +43,5 @@ const getOverlaps = (lines: Line[], diagonal: boolean = false) => {
     return Object.values(scores).filter((s) => s >= 2).length;
 };
 
-console.log('Part 1:', getOverlaps(arr));
-console.log('Part 2:', getOverlaps(arr, true));
+console.log('Part 1:', countOverlaps(arr));
+console.log('Part 2:', countOverlaps(arr, true));
