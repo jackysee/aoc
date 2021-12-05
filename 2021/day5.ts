@@ -22,12 +22,12 @@ let arr: Array<Line> = data()
         const points: string[] = [];
         let x = x1;
         let y = y1;
-        while (x !== x2 || y !== y2) {
+        while (true) {
             points.push([x, y].join(','));
+            if (x === x2 && y === y2) break;
             x += dx;
             y += dy;
         }
-        points.push([x, y].join(','));
         return { dx, dy, points };
     });
 
