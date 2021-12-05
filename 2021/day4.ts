@@ -11,19 +11,15 @@ let boards = lines
         return s.split('\n').map((r) => r.trim().split(/ +/).map(Number));
     });
 
-function getColumns(board: number[][]) {
-    const columns: number[][] = [];
-    for (let i = 0; i < 5; i++) {
-        columns.push([]);
-        for (let j = 0; j < 5; j++) {
-            columns[i].push(board[j][i]);
-        }
-    }
-    return columns;
+function getRows(board: number[][]) {
+    const columns = [...Array(5)].map((_, i) =>
+        [...Array(5)].map((_, j) => board[j][i])
+    );
+    return [...board, ...columns];
 }
 
 function isWin(board: number[][], markedNumbers: number[]) {
-    return [...board, ...getColumns(board)].some((row) =>
+    return getRows(board).some((row) =>
         row.every((n) => markedNumbers.includes(n))
     );
 }
