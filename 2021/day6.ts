@@ -1,26 +1,18 @@
 import data from './day6_input.ts';
 // import data from './day6_sample.ts';
 
-let arr: Array<number> = data().trim().split(',').map(Number);
-let fishes = [...Array(9)].fill(0);
-arr.forEach((n) => (fishes[n] += 1));
+let fishes: number[] = new Array(9).fill(0);
+data().split(',').forEach((n) => (fishes[Number(n)] += 1));
 
 const spawn = (fishes: number[]) => {
-    return fishes.reduce((_fishes, count, i) => {
-        if (i === 0) {
-            _fishes[8] += count;
-            _fishes[6] += count;
-        } else {
-            _fishes[i - 1] += count;
-        }
-        return _fishes;
-    }, [...Array(9)].fill(0));
+    fishes[8] = fishes.shift() || 0;
+    fishes[6] += fishes[8];
 };
 
-const sum = (arr: number[]): number => arr.reduce((a, b) => a + b, 0);
+const sum = (a:number,b:number) => a + b;
 
 for (let i = 0; i < 256; i++) {
-    fishes = spawn(fishes);
-    if (i === 79) console.log('Part 1:', sum(fishes));
+    spawn(fishes);
+    if (i === 79) console.log('Part 1:', fishes.reduce(sum));
 }
-console.log('Part 2:', sum(fishes));
+console.log('Part 2:', fishes.reduce(sum));
