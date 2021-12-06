@@ -1,14 +1,13 @@
 import data from './day5_input.ts';
 // import data from './day5_sample.ts';
 
+const gcd = (a: number, b: number): number => (!b ? a : gcd(b, a % b));
+
 interface Line {
     dx: number;
     dy: number;
     points: string[];
 }
-
-const gcd = (a: number, b: number): number => (!b ? a : gcd(b, a % b));
-
 let arr: Array<Line> = data()
     .trim()
     .split('\n')
@@ -32,14 +31,14 @@ let arr: Array<Line> = data()
     });
 
 const countOverlaps = (lines: Line[], diagonal: boolean = false) => {
-    const scores: { [key: string]: number } = {};
-    lines.forEach((line) => {
-        if (!diagonal && line.dx != 0 && line.dy !== 0) return;
-        line.points.forEach((p) => {
-            if (!scores[p]) scores[p] = 1;
-            else scores[p] += 1;
-        });
-    });
+    const scores = lines
+        .filter((l) => diagonal || l.dx === 0 || l.dy === 0)
+        .flatMap((l) => l.points)
+        .reduce((scores: { [key: string]: number }, p) => {
+            scores[p] = scores[p] || 0;
+            scores[p] += 1;
+            return scores;
+        }, {});
     return Object.values(scores).filter((s) => s >= 2).length;
 };
 
