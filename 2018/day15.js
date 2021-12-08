@@ -1,153 +1,96 @@
 //AOC2018 D15
+// const data = require('./day15_input');
+const data = require('./day15_sample');
 
 function parse(s) {
-    let arr = s.split('\n').map(l => l.split(''));
-    let map = {}, units = [];
-    for(let y=0; y<arr.length; y++) {
-        for(let x=0; x<arr[y].length; x++) {
+    let arr = s.split('\n').map((l) => l.split(''));
+    let map = {},
+        units = [];
+    for (let y = 0; y < arr.length; y++) {
+        for (let x = 0; x < arr[y].length; x++) {
             let sq = arr[y][x];
-            if(sq !== '#') {
-                map[[x,y]] = '.';
+            if (sq !== '#') {
+                map[[x, y]] = '.';
             }
-            if(sq === 'G') {
-                units.push({ pos:[x,y], hp:300, elf:false });
+            if (sq === 'G') {
+                units.push({ pos: [x, y] + '', hp: 300, elf: false });
             }
-            if(sq === 'E') {
-                units.push({ pos:[x,y], hp:300, elf:true });
+            if (sq === 'E') {
+                units.push({ pos: [x, y] + '', hp: 300, elf: true });
             }
         }
     }
     return { map, units };
 }
 
-function order(units){
-    units.sort((a,b) => {
-        let [x1,y1] = a.pos;
-        let [x2,y2] = b.pos;
-        if(y1 === y2) return x1 - x2;
-        return y1 - y2;
-    });
-    return units;
+function toXY(pos) {
+    return pos.split(',').map(Number);
 }
 
-function shortestPath(source, dest, map, units) {
+function order(units) {
+    units.sort((a, b) => {
+        let [x1, y1] = toXY(a.pos);
+        let [x2, y2] = toXY(b.pos);
+        if (y1 === y2) return x1 - x2;
+        return y1 - y2;
+    });
+}
+
+function shortestPath(sourceUnit, destUnit, map, units) {
     let visited = new Set();
-    let queue = [ { pos:source, dist:0, trail:[] } ];
-    while(queue.length !== 0) {
-        // if(queue.length % 10000 === 0) {
-        //     console.log(queue.length);
-        // }
+    let queue = [{ pos: sourceUnit.pos, dist: 0, trail: [] }];
+    while (queue.length !== 0) {
         let pt = queue.shift();
-        if(''+pt.pos === dest+'') {
-            return pt;
+        if (pt.pos === destUnit.pos) {
+            return { dist: pt.dist, trail: pt.trail, dest: destUnit };
         }
-        let [x,y] = pt.pos;
-        let points = [ [x-1,y], [x+1,y], [x,y-1], [x,y+1] ]
-            .filter(p => {
-                return map[p] === '.'  &&
-                    !units.find(u => u.pos+'' === p+'')
-                    && !visited.has(p+'');
+        let [x, y] = toXY(pt.pos);
+        let points = [
+            [x - 1, y] + '',
+            [x + 1, y] + '',
+            [x, y - 1] + '',
+            [x, y + 1] + ''
+        ]
+            .filter((p) => {
+                return (
+                    map[p] === '.' &&
+                    !units.find((u) => u.pos === p && u.pos !== destUnit.pos) &&
+                    !visited.has(p)
+                );
             })
-            .map(p => ({ 
-                pos:p, 
-                dist: pos.dist + 1, 
-                trail:[...pt.trail, p] 
-            }))
-        points.forEach(p => visited.add(p.pos+''));
+            .map((p) => ({
+                pos: p,
+                dist: pt.dist + 1,
+                trail: [...pt.trail, p]
+            }));
+        points.forEach((p) => visited.add(p.pos));
         queue = [...queue, ...points];
     }
-    return -1;
+    return { dist: -1, trail: [], dest: destUnit };
 }
 
 function battle(s) {
     let { map, units } = parse(s);
-    order(units);
     let i = 0;
-    while(true) {
-        if(i < 1) { break; }
-
-        units.forEach(u => {
-            let enemies = units.filter(_u => u.elf !== _u.elf);
-
+    while (true) {
+        if (i === 1) {
+            break;
+        }
+        //round
+        order(units);
+        units.forEach((u, ui) => {
+            console.log('turn ' + ui, u);
+            let enemies = units
+                .filter((_u) => u.elf !== _u.elf)
+                .map((e) => shortestPath(u, e, map, units));
+            const reachable = enemies.filter((e) => e.dist > 0);
+            console.log('reachable', enemies);
+            const min = Math.min(...reachable.map((e) => e.dist));
+            const targets = reachable.filter((e) => e.dist === min);
+            console.log(min, targets);
         });
         i++;
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-
-#######       #######
-#G..#E#       #...#E#   E(200)
-#E#E.E#       #E#...#   E(197)
-#G.##.#  -->  #.E##.#   E(185)
-#...#E#       #E..#E#   E(200), E(200)
-#...E.#       #.....#
-#######       #######
-*/
-
-function sample1() {
-    return `
-#######
-#G..#E#
-#E#E.E#
-#G.##.#
-#...#E#
-#...E.#
-#######
-    `.trim();
-}
-
-
-
-
-function data() {
-    return `
-################################
-##########G###.#################
-##########..G#G.G###############
-##########G......#########...###
-##########...##.##########...###
-##########...##.#########G..####
-###########G....######....######
-#############...............####
-#############...G..G.......#####
-#############.............######
-############.............E######
-######....G..G.........E....####
-####..G..G....#####.E.G.....####
-#####...G...G#######........####
-#####.......#########........###
-####G.......#########.......####
-####...#....#########.#.....####
-####.#..#...#########E#..E#..###
-####........#########..E.#######
-###......#..G#######....########
-###.......G...#####.....########
-##........#............#########
-#...##.....G......E....#########
-#.#.###..#.....E.......###.#####
-#######................###.#####
-##########.......E.....###.#####
-###########...##........#...####
-###########..#####.............#
-############..#####.....#......#
-##########...######...........##
-#########....######..E#....#####
-################################
-    `.trim();
-}
+battle(data());
