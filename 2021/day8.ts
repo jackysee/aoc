@@ -52,7 +52,7 @@ const getPatternNumberMap = (patterns: string[]) => {
         return a;
     }, {});
 
-    let patternNumberMap = Object.fromEntries(
+    let M = Object.fromEntries(
         patterns.map((_e) => {
             let e = sortStr(_e);
             if (e.length === 2) return [e, 1];
@@ -66,15 +66,8 @@ const getPatternNumberMap = (patterns: string[]) => {
     //segment
     let S: { [key: string]: string } = {};
 
-    /* D7 diff D1 => T */
-    S.T = diff(L[3][0], L[2][0])[0];
-
     /* L6 not contains D1 is 6 */
-    let D6 =
-        L[6].find((p) => {
-            return !L[2][0].every((c) => p.includes(c));
-        }) || [];
-    patternNumberMap[D6.sort().join('')] = 6;
+    let D6 = L[6].find((p) => !L[2][0].every((c) => p.includes(c))) || [];
     L[6] = remove(L[6], D6);
 
     /* D1 not in D6 is R1 */
@@ -84,11 +77,7 @@ const getPatternNumberMap = (patterns: string[]) => {
     S.R2 = diff(L[2][0], [S.R1])[0];
 
     /* L5 no R2 is 2 */
-    let D2 =
-        L[5].find((p) => {
-            return !p.includes(S.R2);
-        }) || [];
-    patternNumberMap[D2.sort().join('')] = 2;
+    let D2 = L[5].find((p) => !p.includes(S.R2)) || [];
     L[5] = remove(L[5], D2);
 
     /* D4 diff [...D2, R2] = L1 */
@@ -96,24 +85,26 @@ const getPatternNumberMap = (patterns: string[]) => {
 
     /* L5 filter D2 has L1 = 5 */
     let D5 = L[5].filter((p) => p.includes(S.L1))[0];
-    patternNumberMap[D5.sort().join('')] = 5;
 
     /* L5 only one left is 3 */
     let D3 = remove(L[5], D5)[0];
-    patternNumberMap[D3.sort().join('')] = 3;
 
     /* D2 - D3 = L2 */
     S.L2 = D2.filter((c) => !D3.includes(c))[0];
 
     /* L6 no L2 = 9 */
     let D9 = L[6].filter((p) => !p.includes(S.L2))[0];
-    patternNumberMap[D9.sort().join('')] = 9;
 
     /* the remaining one is 0 */
     let D0 = remove(L[6], D9)[0];
-    patternNumberMap[D0.sort().join('')] = 0;
 
-    return patternNumberMap;
+    M[D6.sort().join('')] = 6;
+    M[D2.sort().join('')] = 2;
+    M[D5.sort().join('')] = 5;
+    M[D3.sort().join('')] = 3;
+    M[D9.sort().join('')] = 9;
+    M[D0.sort().join('')] = 0;
+    return M;
 };
 
 const getOutput = (e: Entry) => {
