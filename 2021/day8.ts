@@ -63,11 +63,14 @@ const getPatternNumberMap = (patterns: string[]) => {
         })
     );
 
+    let D1 = L[2][0].sort();
+    let D4 = L[4][0].sort();
+
     //segment
     let S: { [key: string]: string } = {};
 
     /* L6 not contains D1 is 6 */
-    let D6 = L[6].find((p) => !L[2][0].every((c) => p.includes(c))) || [];
+    let D6 = L[6].find((p) => !D1.every((c) => p.includes(c))) || [];
     L[6] = remove(L[6], D6);
 
     /* D1 not in D6 is R1 */
@@ -81,7 +84,7 @@ const getPatternNumberMap = (patterns: string[]) => {
     L[5] = remove(L[5], D2);
 
     /* D4 diff [...D2, R2] = L1 */
-    S.L1 = diff(L[4][0], [...D2, S.R2])[0];
+    S.L1 = diff(D4, [...D2, S.R2])[0];
 
     /* L5 filter D2 has L1 = 5 */
     let D5 = L[5].filter((p) => p.includes(S.L1))[0];
