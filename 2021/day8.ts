@@ -60,46 +60,25 @@ const getPatternNumberMap = (patterns: string[]) => {
         })
     );
 
-    //segment: T, L1, R1, M, L2, R2, B
-    let S: { [key: string]: string } = {};
-
     let D1 = L[2][0].sort();
     let D4 = L[4][0].sort();
 
-    /* L6 not contains D1 is 6 */
     let D6 = L[6].find((p) => substract(p, D1).length === 5) || [];
     L[6] = remove(L[6], D6);
-
-    /* D1 not in D6 is R1 */
-    S.R1 = D1.filter((c) => !D6.includes(c))[0];
-
-    /* D1 diff [R1] = R2 */
-    S.R2 = diff(D1, [S.R1])[0];
-
-    /* L5 no R2 is 2 */
-    let D2 = L[5].find((p) => !p.includes(S.R2)) || [];
-    L[5] = remove(L[5], D2);
-
-    /* D4 diff [...D2, R2] = L1 */
-    S.L1 = diff(D4, [...D2, S.R2])[0];
-
-    /* L5 filter D2 has L1 = 5, other 3 */
-    let D5 = L[5].filter((p) => p.includes(S.L1))[0];
-    let D3 = remove(L[5], D5)[0];
-
-    /* D2 - D3 = L2 */
-    S.L2 = D2.filter((c) => !D3.includes(c))[0];
-
-    /* L6 no L2 = 9, remain 0 */
-    let D9 = L[6].filter((p) => !p.includes(S.L2))[0];
+    let D9 = L[6].find((p) => substract(p, D4).length === 2) || [];
     let D0 = remove(L[6], D9)[0];
 
+    let D3 = L[5].find((p) => substract(p, D1).length === 3) || [];
+    L[5] = remove(L[5], D3);
+    let D2 = L[5].find((p) => substract(p, D4).length === 3) || [];
+    let D5 = remove(L[5], D2)[0];
+
+    M[D0.sort().join('')] = 0;
+    M[D9.sort().join('')] = 9;
     M[D6.sort().join('')] = 6;
     M[D2.sort().join('')] = 2;
-    M[D5.sort().join('')] = 5;
     M[D3.sort().join('')] = 3;
-    M[D9.sort().join('')] = 9;
-    M[D0.sort().join('')] = 0;
+    M[D5.sort().join('')] = 5;
     return M;
 };
 
