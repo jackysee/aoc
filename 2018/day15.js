@@ -1,6 +1,8 @@
 //AOC2018 D15
 // const data = require('./day15_input');
-const data = require('./day15_sample');
+// const data = require('./day15_sample');
+const data = require('./day15_sample2');
+// const data = require('./day15_sample3');
 
 function parse(s) {
     let arr = s.split('\n').map((l) => l.split(''));
@@ -9,18 +11,34 @@ function parse(s) {
     for (let y = 0; y < arr.length; y++) {
         for (let x = 0; x < arr[y].length; x++) {
             let sq = arr[y][x];
-            if (sq !== '#') {
-                map[[x, y]] = '.';
-            }
+            map[[x, y] + ''] = sq === '#' ? '#' : '.';
             if (sq === 'G') {
-                units.push({ pos: [x, y] + '', hp: 300, elf: false });
+                units.push({ pos: [x, y] + '', hp: 200, elf: false });
             }
             if (sq === 'E') {
-                units.push({ pos: [x, y] + '', hp: 300, elf: true });
+                units.push({ pos: [x, y] + '', hp: 200, elf: true });
             }
         }
     }
     return { map, units };
+}
+
+function render({ map, units }) {
+    let _map = { ...map };
+    units.forEach((u) => (_map[u.pos] = u.elf ? 'E' : 'G'));
+    const allPos = Object.keys(_map).map((s) => s.split(',').map(Number));
+    const maxX = Math.max(...allPos.map((p) => p[0]));
+    const maxY = Math.max(...allPos.map((p) => p[1]));
+    let lines = [];
+    for (let y = 0; y <= maxY; y++) {
+        let line = [];
+        for (let x = 0; x <= maxX; x++) {
+            line.push(_map[[x, y] + '']);
+        }
+        lines.push(line.join(''));
+    }
+    console.log(lines.join('\n'));
+    console.log(units.map((u) => (u.elf ? 'E' : 'G') + u.hp));
 }
 
 function toXY(pos) {
@@ -70,31 +88,43 @@ function getPaths(sourceUnit, destUnit, map, units) {
     return paths;
 }
 
+let debug = true;
+function log(...arg) {
+    debug && console.log(...arg);
+}
+
 function battle(s) {
     let { map, units } = parse(s);
     let i = 0;
     while (true) {
-        console.log('round', i);
+        log('--------- round', i, '--------------');
+        units.sort((a, b) => orderPos(a.pos, b.pos));
+        render({ map, units });
         if (
             units.filter((u) => u.elf).length === 0 ||
-            units.filter((u) => !u.elf) === 0
+            units.filter((u) => !u.elf).length === 0
         ) {
-            console.log('hasWon');
-            console.log({ round: i, hp: units.reduce((a, u) => a + u.hp, 0) });
+            log('hasWon');
+            let round = i;
+            let hp = units.reduce((a, u) => a + u.hp, 0);
+            log({ round, hp, ans: round * hp });
             break;
         }
         //round
-        units.sort((a, b) => orderPos(a.pos, b.pos));
         for (let ui = 0; ui < units.length; ui++) {
             let u = units[ui];
-            console.log('====== turn ' + ui, u);
+            log('====== turn ' + ui, u);
+            if (u.hp <= 0) {
+                log('died---', u.pos);
+                continue;
+            }
             let enemies = units
                 .filter((_u) => u.elf !== _u.elf)
                 .filter((u) => u.hp > 0)
                 .map((e) => getPaths(u, e, map, units))
                 .filter((a) => a.length);
 
-            console.log('reachable enemies', enemies);
+            log('reachable enemies', enemies);
 
             const min = Math.min(
                 ...enemies.flatMap((e) => e.map((s) => s.dist))
@@ -109,18 +139,23 @@ function battle(s) {
                         return d === 0 ? orderPos(e1.dest.pos, e2.dest.pos) : d;
                     })[0];
                 target.dest.hp -= 3;
-                console.log('attack', target.dest);
+                log('attack', target.dest);
             } else {
                 //move
                 if (enemies.length > 0) {
                     const target = enemies
                         .flat()
                         .filter((e) => e.dist === min)
-                        .map((p) => p.trail[0])
-                        .sort(orderPos)[0];
+                        .sort((a, b) => orderPos(a.trail[0], b.trail[0]));
 
-                    console.log('move', target);
-                    u.pos = target;
+                    log('move', target[0].trail[0]);
+                    u.pos = target[0].trail[0];
+
+                    if (min === 2) {
+                        //in-range and can attack
+                        target[0].dest.hp -= 3;
+                        log('attack immediate after move', target[0].dest);
+                    }
                 }
             }
         }
@@ -130,5 +165,6 @@ function battle(s) {
 }
 
 battle(data());
+// render(parse(data()));
 
 //sample : 47 round 590 hp
