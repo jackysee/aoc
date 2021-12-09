@@ -17,13 +17,12 @@ let arr = data().trim().split('\n').map(toEntry);
 
 console.log(
     'Part 1',
-    arr.flatMap((e) =>
-        e.outputs.filter((s) => [2, 4, 3, 7].includes(s.length))
-    ).length
+    arr.flatMap((e) => e.outputs.filter((s) => [2, 4, 3, 7].includes(s.length)))
+        .length
 );
 
-const substract = (s1: string[], s2: string[]) =>
-    s1.filter((c) => !s2.includes(c));
+const substractLen = (s1: string[], s2: string[]) =>
+    s1.filter((c) => !s2.includes(c)).length;
 
 const patternsArrByLen = (patterns: string[], len: number) =>
     patterns.filter((p) => p.length === len).map((e) => e.split(''));
@@ -36,22 +35,18 @@ const getPatternNumberMap = (patterns: string[]) => {
 
     let M6 = Object.fromEntries(
         patternsArrByLen(patterns, 6).map((p) => {
-            let D1_diff = substract(p, D1).length;
-            let D4_diff = substract(p, D4).length;
             let d = 0;
-            if (D1_diff === 5) d = 6;
-            else if (D4_diff === 2) d = 9;
+            if (substractLen(p, D1) === 5) d = 6;
+            else if (substractLen(p, D4) === 2) d = 9;
             return [p.join(''), d];
         })
     );
 
     let M5 = Object.fromEntries(
         patternsArrByLen(patterns, 5).map((p) => {
-            let D1_diff = substract(p, D1).length;
-            let D4_diff = substract(p, D4).length;
             let d = 5;
-            if (D1_diff === 3) d = 3;
-            else if (D4_diff === 3) d = 2;
+            if (substractLen(p, D1) === 3) d = 3;
+            else if (substractLen(p, D4) === 3) d = 2;
             return [p.join(''), d];
         })
     );
