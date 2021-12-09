@@ -27,16 +27,14 @@ function toXY(pos) {
     return pos.split(',').map(Number);
 }
 
-function order(units) {
-    units.sort((a, b) => {
-        let [x1, y1] = toXY(a.pos);
-        let [x2, y2] = toXY(b.pos);
-        if (y1 === y2) return x1 - x2;
-        return y1 - y2;
-    });
+function orderPos(a, b) {
+    let [x1, y1] = toXY(a);
+    let [x2, y2] = toXY(b);
+    if (y1 === y2) return x1 - x2;
+    return y1 - y2;
 }
 
-function shortestPath(sourceUnit, destUnit, map, units) {
+function getPaths(sourceUnit, destUnit, map, units) {
     let visited = new Set();
     let queue = [{ pos: sourceUnit.pos, dist: 0, trail: [] }];
     let paths = [];
@@ -55,7 +53,9 @@ function shortestPath(sourceUnit, destUnit, map, units) {
             .filter((p) => {
                 return (
                     map[p] === '.' &&
-                    !units.find((u) => u.pos === p && u.pos !== destUnit.pos) &&
+                    !units
+                        .filter((u) => u.hp > 0)
+                        .find((u) => u.pos === p && u.pos !== destUnit.pos) &&
                     !visited.has(p)
                 );
             })
@@ -74,37 +74,61 @@ function battle(s) {
     let { map, units } = parse(s);
     let i = 0;
     while (true) {
-        if (i === 1) {
+        console.log('round', i);
+        if (
+            units.filter((u) => u.elf).length === 0 ||
+            units.filter((u) => !u.elf) === 0
+        ) {
+            console.log('hasWon');
+            console.log({ round: i, hp: units.reduce((a, u) => a + u.hp, 0) });
             break;
         }
         //round
-        order(units);
-        units.forEach((u, ui) => {
+        units.sort((a, b) => orderPos(a.pos, b.pos));
+        for (let ui = 0; ui < units.length; ui++) {
+            let u = units[ui];
             console.log('====== turn ' + ui, u);
             let enemies = units
                 .filter((_u) => u.elf !== _u.elf)
-                .map((e) => shortestPath(u, e, map, units));
+                .filter((u) => u.hp > 0)
+                .map((e) => getPaths(u, e, map, units))
+                .filter((a) => a.length);
+
             console.log('reachable enemies', enemies);
+
             const min = Math.min(
                 ...enemies.flatMap((e) => e.map((s) => s.dist))
             );
-            const targets = enemies
-                .flat()
-                .filter((e) => e.dist === min)
-                .map((p) => p.trail[0])
-                .sort((a, b) => {
-                    let [x1, y1] = toXY(a);
-                    let [x2, y2] = toXY(b);
-                    if (y1 === y2) return x1 - x2;
-                    return y1 - y2;
-                });
-            console.log(min, targets);
             if (min === 1) {
-                //attack target!
+                //attack
+                const target = enemies
+                    .flat()
+                    .filter((p) => p.dist === 1)
+                    .sort((e1, e2) => {
+                        const d = e1.dest.hp - e2.dest.hp;
+                        return d === 0 ? orderPos(e1.dest.pos, e2.dest.pos) : d;
+                    })[0];
+                target.dest.hp -= 3;
+                console.log('attack', target.dest);
+            } else {
+                //move
+                if (enemies.length > 0) {
+                    const target = enemies
+                        .flat()
+                        .filter((e) => e.dist === min)
+                        .map((p) => p.trail[0])
+                        .sort(orderPos)[0];
+
+                    console.log('move', target);
+                    u.pos = target;
+                }
             }
-        });
+        }
+        units = units.filter((u) => u.hp > 0); //cleanup died enemies
         i++;
     }
 }
 
 battle(data());
+
+//sample : 47 round 590 hp
