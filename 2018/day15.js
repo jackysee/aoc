@@ -146,7 +146,12 @@ function battle(s) {
                     const target = enemies
                         .flat()
                         .filter((e) => e.dist === min)
-                        .sort((a, b) => orderPos(a.trail[0], b.trail[0]));
+                        .sort((a, b) => {
+                            let d = orderPos(a.dest.pos, b.dest.pos);
+                            return d === 0
+                                ? orderPos(a.trail[0], b.trail[0])
+                                : d;
+                        });
 
                     log('move', target[0].trail[0]);
                     u.pos = target[0].trail[0];
