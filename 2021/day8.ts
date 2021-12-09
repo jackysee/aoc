@@ -1,91 +1,75 @@
 import data from './day8_input.ts';
 // import data from './day8_sample.ts';
-//
 
 interface Entry {
     patterns: string[];
     outputs: string[];
 }
 
-function toEntry(s: string) {
-    let [patterns, outputs] = s.split(/\s*\|\s*/).map((s) => s.split(/\s+/));
+function toEntry(s: string): Entry {
+    let [patterns, outputs] = s
+        .split(/\s*\|\s*/)
+        .map((s) => s.split(/\s+/).map((s) => s.split('').sort().join('')));
     return { patterns, outputs };
 }
 
-let arr: Entry[] = data().trim().split('\n').map(toEntry);
+let arr = data().trim().split('\n').map(toEntry);
 
 console.log(
     'Part 1',
-    arr.reduce(
-        (a, e) =>
-            a + e.outputs.filter((s) => [2, 4, 3, 7].includes(s.length)).length,
-        0
-    )
+    arr.flatMap((e) =>
+        e.outputs.filter((s) => [2, 4, 3, 7].includes(s.length))
+    ).length
 );
-
-const diff = (p1: string[], p2: string[]) => {
-    let r: string[] = [];
-    p1.forEach((l) => {
-        if (!p2.includes(l)) r.push(l);
-    });
-    p2.forEach((l) => {
-        if (!p1.includes(l)) r.push(l);
-    });
-    return r;
-};
-
-const remove = (L: string[][], D: string[]) =>
-    L.filter((p) => p.join('') !== D.join(''));
-
-const sortStr = (s: string) => s.split('').sort().join('');
 
 const substract = (s1: string[], s2: string[]) =>
     s1.filter((c) => !s2.includes(c));
 
-const getPatternNumberMap = (patterns: string[]) => {
-    let L = patterns.reduce((a: { [key: number]: string[][] }, e) => {
-        a[e.length] = a[e.length] || [];
-        a[e.length].push(sortStr(e).split(''));
-        return a;
-    }, {});
+const patternsArrByLen = (patterns: string[], len: number) =>
+    patterns.filter((p) => p.length === len).map((e) => e.split(''));
 
-    let M = Object.fromEntries(
-        patterns.map((_e) => {
-            let e = sortStr(_e);
-            if (e.length === 2) return [e, 1];
-            else if (e.length === 4) return [e, 4];
-            else if (e.length === 3) return [e, 7];
-            else if (e.length === 7) return [e, 8];
-            else return [e, undefined];
+const getPatternNumberMap = (patterns: string[]) => {
+    let D1 = patternsArrByLen(patterns, 2)[0];
+    let D4 = patternsArrByLen(patterns, 4)[0];
+    let D7 = patternsArrByLen(patterns, 3)[0];
+    let D8 = patternsArrByLen(patterns, 7)[0];
+
+    let M6 = Object.fromEntries(
+        patternsArrByLen(patterns, 6).map((p) => {
+            let D1_diff = substract(p, D1).length;
+            let D4_diff = substract(p, D4).length;
+            let d = 0;
+            if (D1_diff === 5) d = 6;
+            else if (D4_diff === 2) d = 9;
+            return [p.join(''), d];
         })
     );
 
-    let D1 = L[2][0].sort();
-    let D4 = L[4][0].sort();
+    let M5 = Object.fromEntries(
+        patternsArrByLen(patterns, 5).map((p) => {
+            let D1_diff = substract(p, D1).length;
+            let D4_diff = substract(p, D4).length;
+            let d = 5;
+            if (D1_diff === 3) d = 3;
+            else if (D4_diff === 3) d = 2;
+            return [p.join(''), d];
+        })
+    );
 
-    let D6 = L[6].find((p) => substract(p, D1).length === 5) || [];
-    L[6] = remove(L[6], D6);
-    let D9 = L[6].find((p) => substract(p, D4).length === 2) || [];
-    let D0 = remove(L[6], D9)[0];
-
-    let D3 = L[5].find((p) => substract(p, D1).length === 3) || [];
-    L[5] = remove(L[5], D3);
-    let D2 = L[5].find((p) => substract(p, D4).length === 3) || [];
-    let D5 = remove(L[5], D2)[0];
-
-    M[D0.sort().join('')] = 0;
-    M[D9.sort().join('')] = 9;
-    M[D6.sort().join('')] = 6;
-    M[D2.sort().join('')] = 2;
-    M[D3.sort().join('')] = 3;
-    M[D5.sort().join('')] = 5;
-    return M;
+    return {
+        [D1.join('')]: 1,
+        [D4.join('')]: 4,
+        [D7.join('')]: 7,
+        [D8.join('')]: 8,
+        ...M6,
+        ...M5
+    };
 };
 
 const getOutput = (e: Entry) => {
     let { patterns, outputs } = e;
     let M = getPatternNumberMap(patterns);
-    let s = outputs.map((s) => M[s.split('').sort().join('')]).join('');
+    let s = outputs.map((s) => M[s]).join('');
     return parseInt(s, 10);
 };
 
