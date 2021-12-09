@@ -39,10 +39,11 @@ function order(units) {
 function shortestPath(sourceUnit, destUnit, map, units) {
     let visited = new Set();
     let queue = [{ pos: sourceUnit.pos, dist: 0, trail: [] }];
+    let paths = [];
     while (queue.length !== 0) {
         let pt = queue.shift();
         if (pt.pos === destUnit.pos) {
-            return { dist: pt.dist, trail: pt.trail, dest: destUnit };
+            paths.push({ dist: pt.dist, trail: pt.trail, dest: destUnit });
         }
         let [x, y] = toXY(pt.pos);
         let points = [
@@ -66,7 +67,7 @@ function shortestPath(sourceUnit, destUnit, map, units) {
         points.forEach((p) => visited.add(p.pos));
         queue = [...queue, ...points];
     }
-    return { dist: -1, trail: [], dest: destUnit };
+    return paths;
 }
 
 function battle(s) {
@@ -79,15 +80,28 @@ function battle(s) {
         //round
         order(units);
         units.forEach((u, ui) => {
-            console.log('turn ' + ui, u);
+            console.log('====== turn ' + ui, u);
             let enemies = units
                 .filter((_u) => u.elf !== _u.elf)
                 .map((e) => shortestPath(u, e, map, units));
-            const reachable = enemies.filter((e) => e.dist > 0);
-            console.log('reachable', enemies);
-            const min = Math.min(...reachable.map((e) => e.dist));
-            const targets = reachable.filter((e) => e.dist === min);
+            console.log('reachable enemies', enemies);
+            const min = Math.min(
+                ...enemies.flatMap((e) => e.map((s) => s.dist))
+            );
+            const targets = enemies
+                .flat()
+                .filter((e) => e.dist === min)
+                .map((p) => p.trail[0])
+                .sort((a, b) => {
+                    let [x1, y1] = toXY(a);
+                    let [x2, y2] = toXY(b);
+                    if (y1 === y2) return x1 - x2;
+                    return y1 - y2;
+                });
             console.log(min, targets);
+            if (min === 1) {
+                //attack target!
+            }
         });
         i++;
     }
