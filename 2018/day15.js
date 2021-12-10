@@ -52,7 +52,42 @@ function orderPos(a, b) {
     return y1 - y2;
 }
 
-function getPaths(sourceUnit, destUnit, map, units) {
+function getPaths(fromPos, toPos, map, units) {
+    let visited = new Set();
+    let queue = [{ pos: fromPos, dist: 0, trail: [] }];
+    let paths = [];
+    while (queue.length !== 0) {
+        let pt = queue.shift();
+        if (pt.pos === toPos) {
+            //paths.push({ dist: pt.dist, trail: pt.trail, dest: toPos });
+            return { dist: pt.dist, trail: pt.trail, dest: toPos };
+        }
+        let [x, y] = toXY(pt.pos);
+        let points = [
+            [x - 1, y] + '',
+            [x + 1, y] + '',
+            [x, y - 1] + '',
+            [x, y + 1] + ''
+        ]
+            .filter((p) => {
+                return (
+                    map[p] === '.' &&
+                    !units.filter((u) => u.hp > 0).find((u) => u.pos === p) &&
+                    !visited.has(p)
+                );
+            })
+            .map((p) => ({
+                pos: p,
+                dist: pt.dist + 1,
+                trail: [...pt.trail, p]
+            }));
+        points.forEach((p) => visited.add(p.pos));
+        queue = [...queue, ...points];
+    }
+    return [];
+}
+
+function getPaths2(sourceUnit, destUnit, map, units) {
     let visited = new Set();
     let queue = [{ pos: sourceUnit.pos, dist: 0, trail: [] }];
     let paths = [];
@@ -100,6 +135,11 @@ function noEnemies(units) {
     );
 }
 
+function getNeigbourCells(unit) {
+    let [x, y] = toXY(unit.pos);
+    return [[x - 1, y] + '', [x + 1, y] + '', [x, y - 1] + '', [x, y + 1] + ''];
+}
+
 function battle(s) {
     let { map, units } = parse(s);
     let i = 0;
@@ -116,6 +156,28 @@ function battle(s) {
                 log('died---', u.pos);
                 continue;
             }
+            let enemies = units
+                .filter((_u) => u.elf !== _u.elf)
+                .filter((u) => u.hp > 0);
+            let neigbourCells = getNeigbourCells(u);
+            let enemyPoss = enemies.map((u) => u.pos);
+
+            let enemyPossInRange = neigbourCells.filter((p) =>
+                enemyPoss.includes(p)
+            );
+            if (enemyPossInRange.length === 0) {
+                let enemyNeighborPoss = enemies.flatMap((e) => {
+                    return getNeigbourCells(e).filter((p) => {
+                        return (
+                            map[p] === '.' &&
+                            units.filter((u) => u.hp > 0 && u.pos == p)
+                                .length === 0
+                        );
+                    });
+                });
+                enemyNeighborPoss.map((p) => getPaths(u, p, map, units));
+            }
+
             let enemies = units
                 .filter((_u) => u.elf !== _u.elf)
                 .filter((u) => u.hp > 0)
