@@ -1,8 +1,7 @@
 //AOC2018 D15
 // const data = require('./day15_input');
-// const data = require('./day15_sample');
-const data = require('./day15_sample2');
-// const data = require('./day15_sample3');
+const data = () => require('./day15_sample')()[1];
+const debug = true;
 
 function parse(s) {
     let arr = s.split('\n').map((l) => l.split(''));
@@ -24,6 +23,7 @@ function parse(s) {
 }
 
 function render({ map, units }) {
+    if (!debug) return;
     let _map = { ...map };
     units.forEach((u) => (_map[u.pos] = u.elf ? 'E' : 'G'));
     const allPos = Object.keys(_map).map((s) => s.split(',').map(Number));
@@ -88,9 +88,16 @@ function getPaths(sourceUnit, destUnit, map, units) {
     return paths;
 }
 
-let debug = true;
 function log(...arg) {
     debug && console.log(...arg);
+}
+
+function noEnemies(units) {
+    let _units = units.filter((u) => u.hp > 0);
+    return (
+        _units.filter((u) => u.elf).length === 0 ||
+        _units.filter((u) => !u.elf).length === 0
+    );
 }
 
 function battle(s) {
@@ -100,17 +107,8 @@ function battle(s) {
         log('--------- round', i, '--------------');
         units.sort((a, b) => orderPos(a.pos, b.pos));
         render({ map, units });
-        if (
-            units.filter((u) => u.elf).length === 0 ||
-            units.filter((u) => !u.elf).length === 0
-        ) {
-            log('hasWon');
-            let round = i;
-            let hp = units.reduce((a, u) => a + u.hp, 0);
-            log({ round, hp, ans: round * hp });
-            break;
-        }
         //round
+        let hasWon = false;
         for (let ui = 0; ui < units.length; ui++) {
             let u = units[ui];
             log('====== turn ' + ui, u);
@@ -124,7 +122,7 @@ function battle(s) {
                 .map((e) => getPaths(u, e, map, units))
                 .filter((a) => a.length);
 
-            log('reachable enemies', enemies);
+            log('reachable enemies path', enemies);
 
             const min = Math.min(
                 ...enemies.flatMap((e) => e.map((s) => s.dist))
@@ -148,9 +146,13 @@ function battle(s) {
                         .filter((e) => e.dist === min)
                         .sort((a, b) => {
                             let d = orderPos(a.dest.pos, b.dest.pos);
-                            return d === 0
-                                ? orderPos(a.trail[0], b.trail[0])
-                                : d;
+                            if (d !== 0) return d;
+                            d = orderPos(
+                                a.trail[a.trail.length - 2],
+                                b.trail[b.trail.length - 2]
+                            );
+                            if (d !== 0) return d;
+                            return orderPos(a.trail[0], b.trail[0]);
                         });
 
                     log('move', target[0].trail[0]);
@@ -163,8 +165,30 @@ function battle(s) {
                     }
                 }
             }
+
+            if (noEnemies(units)) {
+                log('hasWon');
+                let round = i;
+                if (ui === units.length - 1) {
+                    //last units
+                    round += 1;
+                }
+                let hp = units
+                    .filter((u) => u.hp > 1)
+                    .reduce((a, u) => a + u.hp, 0);
+                console.log({ round, hp, ans: round * hp });
+                console.log(round * hp);
+                hasWon = true;
+                break;
+            }
         }
         units = units.filter((u) => u.hp > 0); //cleanup died enemies
+        if (hasWon) {
+            log('final map');
+            // render({ map, units });
+            break;
+        }
+
         i++;
     }
 }
