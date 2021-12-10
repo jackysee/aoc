@@ -11,13 +11,7 @@ const brackets: { [key: string]: string } = {
 };
 const openBrackets = Object.keys(brackets);
 const closeBrackets = Object.values(brackets);
-const counts: { [key: string]: number } = {
-    '}': 0,
-    ']': 0,
-    '>': 0,
-    ')': 0
-};
-let parsedLines = arr.map((line) => {
+const parsedLines = arr.map((line) => {
     var stack: string[] = [];
     let illegal = line.split('').find((c) => {
         if (openBrackets.includes(c)) {
@@ -29,9 +23,6 @@ let parsedLines = arr.map((line) => {
             }
         }
     });
-    if (illegal !== undefined) {
-        counts[illegal] += 1;
-    }
     return { illegal, stack };
 });
 
@@ -41,12 +32,9 @@ const illegalScoreMap: { [key: string]: number } = {
     '}': 1197,
     '>': 25137
 };
-
 console.log(
     'Part 1',
-    Object.entries(counts)
-        .map(([b, n]) => illegalScoreMap[b] * n)
-        .reduce((a, c) => a + c)
+    parsedLines.reduce((a, c) => a + (illegalScoreMap[c.illegal || ''] || 0), 0)
 );
 
 const autoCompleteScoreMap: { [key: string]: number } = {
