@@ -18,8 +18,8 @@ echo "Data file written to $1/day$2_input.ts"
 tee $1/day$2.ts << EOF
 import data from './day${2}_input.ts';
 // import data from './day${2}_sample.ts';
-//
-let arr: Array<number> = data().trim().split('\n').map(Number);
+
+let arr: number[] = data().trim().split('\n').map(Number);
 
 EOF
 
