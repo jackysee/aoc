@@ -15,15 +15,8 @@ let G = data()
 const isSmall = (s: string) => s.toLowerCase() === s;
 
 const hasTwiceVisitedNode = (paths: string[]) => {
-    let count: { [key: string]: number } = {};
-    paths
-        .slice(1)
-        .filter(isSmall)
-        .forEach((n) => {
-            count[n] = count[n] || 0;
-            count[n] += 1;
-        });
-    return Object.values(count).some((n) => n > 1);
+    let nodes = paths.slice(1).filter(isSmall);
+    return nodes.length !== new Set(nodes).size;
 };
 
 const findPaths = (
