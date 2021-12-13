@@ -1,61 +1,43 @@
 import data from './day12_input.ts';
 // import data from './day12_sample.ts';
 
-let G = data()
+let G: { [key: string]: string[] } = {};
+data()
     .split('\n')
-    .reduce((a: { [key: string]: string[] }, s) => {
+    .forEach((s) => {
         let [n1, n2] = s.split('-');
-        a[n1] = a[n1] || [];
-        a[n2] = a[n2] || [];
-        a[n1].push(n2);
-        a[n2].push(n1);
-        return a;
-    }, {});
+        G[n1] = G[n1] || [];
+        G[n2] = G[n2] || [];
+        G[n1].push(n2);
+        G[n2].push(n1);
+    });
 
-const isSmall = (s: string) => s.toLowerCase() === s;
-
-const hasTwiceVisitedNode = (paths: string[]) => {
-    let nodes = paths.slice(1).filter(isSmall);
-    return nodes.length !== new Set(nodes).size;
-};
-
-const findPaths = (
-    from: string,
-    to: string,
-    allowTwiceVisitSingleNode = false
-) => {
-    const queue = [{ node: from, paths: [from] }];
-    const paths = [];
+const findPaths = (from: string, to: string, allowTwice = false) => {
+    const queue = [{ node: from, nodes: new Set(), canVisit: true }];
+    let allPaths = 0;
     while (queue.length) {
-        let q = queue.shift();
-        if (q?.node === to) {
-            paths.push(q.paths);
+        let q = queue.pop()!;
+        if (q.node === to) {
+            allPaths++;
             continue;
         }
-        let _paths = q?.paths || [];
-        let nodes = G[q?.node || ''].filter((n) => {
-            if (isSmall(n)) {
-                if (n === from) return false;
-                let len = _paths.filter((_n) => _n === n).length;
-                if (
-                    allowTwiceVisitSingleNode &&
-                    !hasTwiceVisitedNode(_paths) &&
-                    len === 1
-                )
-                    return true;
-                return len === 0;
+        G[q.node].forEach((node) => {
+            if (node === from) return;
+            let canVisit = q.canVisit;
+            if (node.toLowerCase() === node) {
+                let hasNode = q.nodes.has(node);
+                if (hasNode && allowTwice && canVisit) {
+                    canVisit = false;
+                } else if (hasNode) {
+                    return;
+                }
             }
-            return true;
+            let nodes = new Set([...q.nodes, node]);
+            queue.push({ node, nodes, canVisit });
         });
-        queue.push(
-            ...nodes.map((n) => ({
-                node: n,
-                paths: [...(q?.paths || []), n]
-            }))
-        );
     }
-    return paths;
+    return allPaths;
 };
 
-console.log('Part 1', findPaths('start', 'end', false).length);
-console.log('Part 2', findPaths('start', 'end', true).length);
+console.log('Part 1', findPaths('start', 'end', false));
+console.log('Part 2', findPaths('start', 'end', true));
