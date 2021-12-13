@@ -47,7 +47,7 @@ points.forEach((s) => {
 let s = '';
 for (let y = 0; y <= my; y++) {
     for (let x = 0; x <= mx; x++) {
-        s += points.has([x, y] + '') ? '#' : ' ';
+        s += points.has([x, y] + '') ? '█' : ' ';
     }
     s += '\n';
 }
