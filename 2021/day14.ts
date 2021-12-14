@@ -9,8 +9,7 @@ let instructions: string[][] = _ins.split('\n').map((s) => s.split(' -> '));
 let D: Stats = {};
 tmpl.split('').forEach((c, i) => {
     if (i !== tmpl.length - 1) {
-        D[c + tmpl[i + 1]] = D[c + tmpl[i + 1]] || 0;
-        D[c + tmpl[i + 1]] += 1;
+        D[c + tmpl[i + 1]] = (D[c + tmpl[i + 1]] || 0) + 1;
     }
 });
 
