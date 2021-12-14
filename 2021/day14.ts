@@ -13,7 +13,7 @@ tmpl.split('').forEach((c, i) => {
     }
 });
 
-function insert(_D: Stats, instructions: string[][]) {
+function insert(_D: Stats) {
     let D = { ..._D };
     instructions.forEach(([s, c]) => {
         let [a, b] = s.split('');
@@ -29,21 +29,16 @@ function insert(_D: Stats, instructions: string[][]) {
 
 function count(D: Stats, tmpl: string) {
     let stats: Stats = {};
-    stats[tmpl[0]] = 1;
-    stats[tmpl.at(-1)!] = 1;
-    for (const key in D) {
-        key.split('').forEach((c) => (stats[c] = (stats[c] || 0) + D[key]));
-    }
+    stats[tmpl[0]] = stats[tmpl.at(-1)!] = 1;
+    Object.keys(D).forEach((s) =>
+        s.split('').forEach((c) => (stats[c] = (stats[c] || 0) + D[s]))
+    );
     let r = Object.entries(stats).sort((a, b) => a[1] - b[1]);
     return (r.at(-1)![1] - r[0][1]) / 2;
 }
 
-for (let i = 0; i < 10; i++) {
-    D = insert(D, instructions);
-}
-console.log('Part 1', count(D, tmpl));
-
-for (let i = 0; i < 30; i++) {
-    D = insert(D, instructions);
+for (let i = 0; i < 40; i++) {
+    D = insert(D);
+    if (i === 9) console.log('Part 1', count(D, tmpl));
 }
 console.log('Part 2', count(D, tmpl));
