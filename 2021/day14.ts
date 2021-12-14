@@ -36,7 +36,7 @@ function count(D: Stats, tmpl: string) {
         key.split('').forEach((c) => (stats[c] = (stats[c] || 0) + D[key]));
     }
     let r = Object.entries(stats).sort((a, b) => a[1] - b[1]);
-    return (r[r.length - 1][1] - r[0][1]) / 2;
+    return (r.at(-1)![1] - r[0][1]) / 2;
 }
 
 for (let i = 0; i < 10; i++) {
