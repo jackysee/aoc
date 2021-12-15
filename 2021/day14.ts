@@ -33,8 +33,8 @@ function count(D: Stats, tmpl: string) {
     Object.keys(D).forEach((s) =>
         s.split('').forEach((c) => (stats[c] = (stats[c] || 0) + D[s]))
     );
-    let r = Object.entries(stats).sort((a, b) => a[1] - b[1]);
-    return (r.at(-1)![1] - r[0][1]) / 2;
+    let r = Object.values(stats).sort((a, b) => a - b);
+    return (r.at(-1)! - r[0]) / 2;
 }
 
 for (let i = 0; i < 40; i++) {
