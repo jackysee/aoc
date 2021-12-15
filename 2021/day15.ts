@@ -9,7 +9,6 @@ let map: ValueMap = {};
 let mx = 0;
 let my = 0;
 data()
-    .trim()
     .split('\n')
     .forEach((line, y) =>
         line.split('').forEach((n, x) => {
@@ -62,22 +61,26 @@ let t = performance.now();
 let p1 = dij2('0,0', `${mx},${my}`, map);
 console.log('Part 1', p1, `(took ${performance.now() - t}ms)`);
 
-let _map2 = Object.entries(map)
-    .map(([k, v]) => {
-        let [x, y] = k.split(',').map(Number);
-        let points = [];
-        for (let i = 0; i < 5; i++) {
-            for (let j = 0; j < 5; j++) {
-                let _v = v + i + j;
-                if (_v > 9) _v = (_v + 1) % 10;
-                points.push([[x + (mx + 1) * i, y + (my + 1) * j] + '', _v]);
+let map2 = Object.fromEntries(
+    Object.entries(map)
+        .map(([k, v]) => {
+            let [x, y] = k.split(',').map(Number);
+            let points = [];
+            for (let i = 0; i < 5; i++) {
+                for (let j = 0; j < 5; j++) {
+                    let _v = v + i + j;
+                    if (_v > 9) _v = (_v + 1) % 10;
+                    points.push([
+                        [x + (mx + 1) * i, y + (my + 1) * j] + '',
+                        _v
+                    ]);
+                }
             }
-        }
-        return points;
-    })
-    .flat();
+            return points;
+        })
+        .flat()
+);
 
-let map2 = Object.fromEntries(_map2);
 t = performance.now();
 let p2 = dij2('0,0', `${(mx + 1) * 5 - 1},${(my + 1) * 5 - 1}`, map2);
 console.log('Part 2', p2, `(took ${performance.now() - t}ms)`);
