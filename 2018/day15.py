@@ -167,10 +167,10 @@ def printMap(_data, units):
 _, score = solve(3, False)
 print("Part 1", score)
 
-i = 3
-while True:
-    no_elves_died, score = solve(i, True)
-    if no_elves_died:
-        print("Part 2", score)
-        break
-    i += 1
+# i = 3
+# while True:
+#     no_elves_died, score = solve(i, True)
+#     if no_elves_died:
+#         print("Part 2", score)
+#         break
+#     i += 1
