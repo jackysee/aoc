@@ -30,30 +30,61 @@ function getNeigbours(pos: string, map: ValueMap, visited: Set<string>) {
         .filter((p) => map[p] !== undefined && !visited.has(p));
 }
 
+function createPriorityQueue(){
+    let items: [string, number][]  = [];
+    const add = (e:string, p:number) => {
+        let added = false;
+        for(let i=0; i<items.length; i++) {
+            if(p > items[i][1]) {
+                items.splice(i, 0,  [e, p]);
+                added = true;
+                break;
+            }
+        }
+        if(!added) items.push([e,p]);
+    }
+    const last = () => items.at(-1);
+    const remove = (e:string) => {
+        let i =items.findIndex(([_e]) => e === _e);
+        if(i !== -1) items.splice(i, 1);
+    }
+    const get = (e:string) => {
+        let i =items.findIndex(([_e]) => e === _e);
+        if(i !== -1) return items[i][1];
+    }
+    const getIndex = (e:string) => {
+        return items.findIndex(([_e]) => e === _e);
+    }
+    const setByIndex = (i:number, n:number) => items[i][1] = n;
+    const getByIndex = (i:number) => items[i][1];
+    return { add, last, remove, get, getIndex, setByIndex, getByIndex }
+}
+
 function dij(from: string, to: string, map: ValueMap) {
     let mapLen = Object.keys(map).length;
     console.log('map length = ',  mapLen);
     let visited = new Set<string>();
-    let D: ValueMap = {};
-    D[from] = 0;
+    let D = createPriorityQueue();
+    D.add(from, 0);
     let current = from;
     while (current !== to) {
         if(visited.size % Math.floor(mapLen / 10) === 0) {
             console.log('visited', visited.size);
         }
         getNeigbours(current, map, visited).forEach((p) => {
-            let d = D[current] + map[p];
-            if (D[p] === undefined || d < D[p]) {
-                D[p] = d;
+            let i = D.getIndex(p);
+            let d = D.get(current)! + map[p];
+            if(i === -1) {
+                D.add(p, d);
+            } else if(d < D.getByIndex(i)!){
+                D.setByIndex(i, d);
             }
         });
         visited.add(current);
-        delete D[current];
-        current = Object.entries(D)
-            .filter(([a]) => !visited.has(a))
-            .sort((a, b) => a[1] - b[1])[0][0];
+        D.remove(current);
+        current = D.last()![0];
     }
-    return D[to];
+    return D.get(to);
 }
 
 let t = performance.now();
@@ -68,14 +99,6 @@ let _map2 = Object.entries(map)
             for (let j = 0; j < 5; j++) {
                 let _v = v + i + j;
                 if (_v > 9) _v = (_v + 1) % 10;
-                // if (y === 9) {
-                //     console.log(
-                //         { x, y, i, j, mx, my },
-                //         x + (mx + 1) * i,
-                //         y + (my + 1) * j,
-                //         _v
-                //     );
-                // }
                 points.push([[x + (mx + 1) * i, y + (my + 1) * j] + '', _v]);
             }
         }
