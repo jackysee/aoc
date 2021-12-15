@@ -1,5 +1,6 @@
 import data from './day15_input.ts';
 // import data from './day15_sample.ts';
+import { BinaryHeap } from 'https://deno.land/x/collections@0.11.2/mod.ts';
 
 interface ValueMap {
     [key: string]: number;
@@ -30,66 +31,36 @@ function getNeigbours(pos: string, map: ValueMap, visited: Set<string>) {
         .filter((p) => map[p] !== undefined && !visited.has(p));
 }
 
-function createPriorityQueue() {
-    let items: [string, number][] = [];
-    const add = (e: string, p: number) => {
-        let added = false;
-        for (let i = 0; i < items.length; i++) {
-            if (p > items[i][1]) {
-                items.splice(i, 0, [e, p]);
-                added = true;
-                break;
-            }
-        }
-        if (!added) items.push([e, p]);
-    };
-    const last = () => items.at(-1);
-    const remove = (e: string) => {
-        let i = items.findIndex(([_e]) => e === _e);
-        if (i !== -1) items.splice(i, 1);
-    };
-    const get = (e: string) => {
-        let i = items.findIndex(([_e]) => e === _e);
-        if (i !== -1) return items[i][1];
-    };
-    const getIndex = (e: string) => {
-        return items.findIndex(([_e]) => e === _e);
-    };
-    const setByIndex = (i: number, n: number) => (items[i][1] = n);
-    const getByIndex = (i: number) => items[i][1];
-    return { add, last, remove, get, getIndex, setByIndex, getByIndex };
+interface Node {
+    pos: string;
+    value: number;
 }
 
-function dij(from: string, to: string, map: ValueMap) {
-    let mapLen = Object.keys(map).length;
-    console.log('map length = ', mapLen);
+function dij2(from: string, to: string, map: ValueMap) {
     let visited = new Set<string>();
-    let D = createPriorityQueue();
-    D.add(from, 0);
-    let current = from;
-    while (current !== to) {
-        if (visited.size % Math.floor(mapLen / 10) === 0) {
-            console.log('visited', visited.size);
-        }
-        getNeigbours(current, map, visited).forEach((p) => {
-            let i = D.getIndex(p);
-            let d = D.get(current)! + map[p];
-            if (i === -1) {
-                D.add(p, d);
-            } else if (d < D.getByIndex(i)!) {
-                D.setByIndex(i, d);
+    let D: ValueMap = {};
+    D[from] = 0;
+    let PQ: BinaryHeap<Node> = new BinaryHeap<Node>(
+        (a: Node, b: Node) => a.value - b.value
+    );
+    PQ.push({ pos: from, value: 0 });
+    while (!PQ.isEmpty()) {
+        let u = PQ.pop()!;
+        getNeigbours(u.pos, map, visited).forEach((p) => {
+            let d = D[u.pos] + map[p];
+            if (d < (D[p] || Infinity)) {
+                D[p] = d;
+                PQ.push({ pos: p, value: d });
             }
         });
-        visited.add(current);
-        D.remove(current);
-        current = D.last()![0];
+        visited.add(u.pos);
     }
-    return D.get(to);
+    return D[to];
 }
 
 let t = performance.now();
-console.log(dij('0,0', `${mx},${my}`, map));
-console.log(performance.now() - t + 'ms');
+let p1 = dij2('0,0', `${mx},${my}`, map);
+console.log('Part 1', p1, `(took ${performance.now() - t}ms)`);
 
 let _map2 = Object.entries(map)
     .map(([k, v]) => {
@@ -108,5 +79,5 @@ let _map2 = Object.entries(map)
 
 let map2 = Object.fromEntries(_map2);
 t = performance.now();
-console.log(dij('0,0', `${(mx + 1) * 5 - 1},${(my + 1) * 5 - 1}`, map2));
-console.log(performance.now() - t + 'ms');
+let p2 = dij2('0,0', `${(mx + 1) * 5 - 1},${(my + 1) * 5 - 1}`, map2);
+console.log('Part 2', p2, `(took ${performance.now() - t}ms)`);
