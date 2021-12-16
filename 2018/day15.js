@@ -52,6 +52,77 @@ function orderPos(a, b) {
     return y1 - y2;
 }
 
+function log(...arg) {
+    debug && console.log(...arg);
+}
+
+function findClosest(from, targets, map, units) {
+    let visited = new Set();
+    let queue = [{pos: from, dist: 0}];
+    let foundDist = undefined;
+    let closest = [];
+    let unitPos = units.filter(u => u.hp > 0 && u.pos !== from).map(u => u.pos);
+    while(queue.length) {
+        let pt = queue.pop();
+        if (foundDist !== undefined && pt.dist > foundDist) {
+            return { closest, dist: foundDist };
+        }
+        if(visited.has(pt.pos) || unitPos.includes(pt.pos)){
+            continue;
+        }
+        visited.add(pt.pos);
+        if(targets.includes(pt.pos)) {
+            foundDist = pt.dist;
+            closest.push(pt.pos);
+        }
+        getNeigbourCells(pt, map, units).forEach(p => {
+            if(visited.has(p)) return;
+            queue.push({ pos: p, dist: pt.dist  + 1  });
+        });
+    }
+    return  { closest, dist: foundDist };
+}
+
+function getNeigbourCells(unit, map, units) {
+    let [x, y] = toXY(unit.pos);
+    return [[x - 1, y] + '', [x + 1, y] + '', [x, y - 1] + '', [x, y + 1] + '']
+        .filter((p) => {
+            return (
+                map[p] === '.' &&
+                !units.find((u) => u.hp > 0 && u.pos == p)
+            );
+        });
+}
+
+
+function battle(s) {
+    let { map, units } = parse(s);
+    let i = 0;
+    while (true) {
+        units.sort((a, b) => orderPos(a.pos, b.pos));
+        for (let ui = 0; ui < units.length; ui++) {
+            const u = units[ui];
+            if(u.hp <= 0) {
+                continue;
+            }
+            let enemies = units.filter(e => e.hp > 0 && e.elf != u.elf);
+            let enemyPositions = enemies.map(e => e.pos);
+            let nearByCells = getNeigbourCells(u, map, units);
+            let inRange = nearByCells.filter(c => enemyPositions.include(c));
+
+            if(!inRange.length) {
+                let surrounding = enemies.flatMap(e => getNeigbourCells(e, map, units));
+            }
+            
+        }
+
+    }
+}
+
+
+battle(data());
+
+/*
 function getPaths(fromPos, toPos, map, units) {
     let visited = new Set();
     let queue = [{ pos: fromPos, dist: 0, trail: [] }];
@@ -134,9 +205,15 @@ function noEnemies(units) {
     );
 }
 
-function getNeigbourCells(unit) {
+function getNeigbourCells(unit, map, units) {
     let [x, y] = toXY(unit.pos);
-    return [[x - 1, y] + '', [x + 1, y] + '', [x, y - 1] + '', [x, y + 1] + ''];
+    return [[x - 1, y] + '', [x + 1, y] + '', [x, y - 1] + '', [x, y + 1] + '']
+                    .filter((p) => {
+                        return (
+                            map[p] === '.' &&
+                            !units.find((u) => u.hp > 0 && u.pos == p)
+                        );
+                    });
 }
 
 function battle(s) {
@@ -158,7 +235,7 @@ function battle(s) {
             let enemies = units
                 .filter((_u) => u.elf !== _u.elf)
                 .filter((u) => u.hp > 0);
-            let neigbourCells = getNeigbourCells(u);
+            let neigbourCells = getNeigbourCells(u, map, units);
             let enemyPositions = enemies.map((u) => u.pos);
 
             let enemyPositionsInRange = neigbourCells.filter((p) =>
@@ -166,35 +243,25 @@ function battle(s) {
             );
             if (enemyPositionsInRange.length === 0) {
                 let enemyNeighborPositions = enemies.flatMap((e) => {
-                    return getNeigbourCells(e).filter((p) => {
-                        return (
-                            map[p] === '.' &&
-                            !units.find((u) => u.hp > 0 && u.pos == p)
-                        );
-                    });
+                    return getNeigbourCells(e, map, units);
                 });
-                let paths = enemyNeighborPositions
-                    .map((p) => getPaths(u.pos, p, map, units))
-                    .filter((p) => !!p);
-                let dest = paths.sort((p1, p2) => {
-                    let d = p1.dist - p2.dist;
-                    if (d !== 0) return d;
-                    return orderPos(p1.trail[0], p2.trail[0]);
-                })[0];
-                if (dest) {
+                let {closest, dist} = findClosest(u.pos, enemyNeighborPositions, map, units);
+
+                if(closest.length) {
+                    let target = closest.sort(orderPos)[0];
                     for (let i = 0; i < neigbourCells.length; i++) {
                         const c = neigbourCells[i];
-                        let p = getPaths(c, dest.dest, map, units);
-                        if(p && p.dist == dest.dist - 1) {
-                            u.pos = c;
+                        let { dist:d } = findClosest(c, [target], map, units);
+                        if( d == dist - 1) {
+                            u.pos= c;
                             break;
                         }
                     }
                 }
             }
-
+                    
             //check again
-            neigbourCells = getNeigbourCells(u);
+            neigbourCells = getNeigbourCells(u, map, units);
             enemyPositionsInRange = neigbourCells.filter((p) =>
                 enemyPositions.includes(p)
             );
@@ -239,3 +306,4 @@ battle(data());
 // render(parse(data()));
 
 //sample : 47 round 590 hp
+*/
