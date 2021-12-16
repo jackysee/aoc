@@ -2,10 +2,10 @@ import data from './day15_input.ts';
 // import data from './day15_sample.ts';
 import { BinaryHeap } from 'https://deno.land/x/collections@0.11.2/mod.ts';
 
-interface ValueMap {
+interface Map {
     [key: string]: number;
 }
-let map: ValueMap = {};
+let map: Map = {};
 let mx = 0;
 let my = 0;
 data()
@@ -18,7 +18,7 @@ data()
         })
     );
 
-function getNeigbours(pos: string, map: ValueMap, visited: Set<string>) {
+function getNeigbours(pos: string, map: Map, visited: Set<string>) {
     let [x, y] = pos.split(',').map(Number);
     return [
         [x - 1, y],
@@ -30,17 +30,17 @@ function getNeigbours(pos: string, map: ValueMap, visited: Set<string>) {
         .filter((p) => map[p] !== undefined && !visited.has(p));
 }
 
-interface Node {
+interface Dist {
     pos: string;
     value: number;
 }
 
-function dij2(from: string, to: string, map: ValueMap) {
+function dij2(from: string, to: string, map: Map) {
     let visited = new Set<string>();
-    let D: ValueMap = {};
+    let D: Map = {};
     D[from] = 0;
-    let PQ: BinaryHeap<Node> = new BinaryHeap<Node>(
-        (a: Node, b: Node) => a.value - b.value
+    let PQ: BinaryHeap<Dist> = new BinaryHeap<Dist>(
+        (a: Dist, b: Dist) => a.value - b.value
     );
     PQ.push({ pos: from, value: 0 });
     while (!PQ.isEmpty()) {
