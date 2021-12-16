@@ -1,6 +1,6 @@
 //AOC2018 D15
-const data = require('./day15_input');
-// const data = () => require('./day15_sample')()[5];
+// const data = require('./day15_input');
+const data = () => require('./day15_sample')()[0];
 const debug = true;
 
 function parse(s) {
@@ -56,69 +56,139 @@ function log(...arg) {
     debug && console.log(...arg);
 }
 
+const isAlive = (u) => u.hp > 0;
+
 function findClosest(from, targets, map, units) {
     let visited = new Set();
-    let queue = [{pos: from, dist: 0}];
+    let queue = [{ pos: from, dist: 0 }];
     let foundDist = undefined;
     let closest = [];
-    let unitPos = units.filter(u => u.hp > 0 && u.pos !== from).map(u => u.pos);
-    while(queue.length) {
-        let pt = queue.pop();
+    let unitPos = units
+        .filter((u) => isAlive(u) && u.pos !== from)
+        .map((u) => u.pos);
+    while (queue.length) {
+        let pt = queue.shift();
         if (foundDist !== undefined && pt.dist > foundDist) {
             return { closest, dist: foundDist };
         }
-        if(visited.has(pt.pos) || unitPos.includes(pt.pos)){
+        if (visited.has(pt.pos) || unitPos.includes(pt.pos)) {
             continue;
         }
         visited.add(pt.pos);
-        if(targets.includes(pt.pos)) {
+        if (targets.includes(pt.pos)) {
             foundDist = pt.dist;
             closest.push(pt.pos);
         }
-        getNeigbourCells(pt, map, units).forEach(p => {
-            if(visited.has(p)) return;
-            queue.push({ pos: p, dist: pt.dist  + 1  });
+        getNeigbourCells(pt, map, units).forEach((p) => {
+            if (visited.has(p)) return;
+            queue.push({ pos: p, dist: pt.dist + 1 });
         });
     }
-    return  { closest, dist: foundDist };
+    return { closest, dist: foundDist };
 }
 
 function getNeigbourCells(unit, map, units) {
     let [x, y] = toXY(unit.pos);
-    return [[x - 1, y] + '', [x + 1, y] + '', [x, y - 1] + '', [x, y + 1] + '']
-        .filter((p) => {
-            return (
-                map[p] === '.' &&
-                !units.find((u) => u.hp > 0 && u.pos == p)
-            );
-        });
+    return [
+        [x - 1, y] + '',
+        [x + 1, y] + '',
+        [x, y - 1] + '',
+        [x, y + 1] + ''
+    ].filter((p) => {
+        return map[p] === '.' && !units.find((u) => isAlive(u) && u.pos == p);
+    });
 }
 
+function noEnemies(units) {
+    let _units = units.filter(isAlive);
+    return (
+        _units.filter((u) => u.elf).length === 0 ||
+        _units.filter((u) => !u.elf).length === 0
+    );
+}
 
 function battle(s) {
     let { map, units } = parse(s);
     let i = 0;
     while (true) {
+        console.log(
+            'round',
+            i,
+            'Elfs',
+            units
+                .filter((u) => u.elf && isAlive(u))
+                .reduce((a, c) => a + c.hp, 0),
+            'Globins',
+            units
+                .filter((u) => !u.elf && isAlive(u))
+                .reduce((a, c) => a + c.hp, 0)
+        );
+
         units.sort((a, b) => orderPos(a.pos, b.pos));
         for (let ui = 0; ui < units.length; ui++) {
             const u = units[ui];
-            if(u.hp <= 0) {
+            if (u.hp <= 0) {
                 continue;
             }
-            let enemies = units.filter(e => e.hp > 0 && e.elf != u.elf);
-            let enemyPositions = enemies.map(e => e.pos);
-            let nearByCells = getNeigbourCells(u, map, units);
-            let inRange = nearByCells.filter(c => enemyPositions.include(c));
+            let enemies = units.filter((e) => isAlive(e) && e.elf != u.elf);
+            let enemyPositions = enemies.map((e) => e.pos);
+            let nearByCells = getNeigbourCells(u, map, []);
+            let inRange = nearByCells.filter((c) => enemyPositions.includes(c));
 
-            if(!inRange.length) {
-                let surrounding = enemies.flatMap(e => getNeigbourCells(e, map, units));
+            // console.log({ nearByCells, inRange });
+            if (!inRange.length) {
+                let surroundings = enemies.flatMap((e) =>
+                    getNeigbourCells(e, map, units)
+                );
+                let { closest, dist } = findClosest(
+                    u.pos,
+                    surroundings,
+                    map,
+                    units
+                );
+                if (closest.length) {
+                    let target = closest.sort(orderPos)[0];
+                    nearByCells.sort(orderPos);
+                    for (let i = 0; i < nearByCells.length; i++) {
+                        const s = nearByCells[i];
+                        let { dist: d } = findClosest(s, [target], map, units);
+                        if (d === dist - 1) {
+                            // console.log('move', u.pos, s);
+                            u.pos = s;
+                            break;
+                        }
+                    }
+                }
+                inRange = nearByCells.filter((c) => enemyPositions.includes(c));
             }
-            
-        }
 
+            if (inRange.length) {
+                let target = enemies
+                    .filter((e) => inRange.includes(e.pos))
+                    .sort((a, b) => {
+                        let d = a.hp - b.hp;
+                        return d === 0 ? orderPos(a.pos, b.pos) : d;
+                    })[0];
+                console.log('attack', target);
+                target.hp -= 3;
+
+                if (noEnemies(units)) {
+                    if (ui === units.length - 1) {
+                        console.log('last');
+                        i += 1;
+                    }
+                    let totalHp = units
+                        .filter(isAlive)
+                        .reduce((a, c) => a + c.hp, 0);
+                    console.log(i, totalHp, i * totalHp);
+                    return i * totalHp;
+                }
+            }
+        }
+        i += 1;
+        // if (i === 4) break;
     }
 }
-
 
 battle(data());
 
