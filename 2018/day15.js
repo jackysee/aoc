@@ -169,8 +169,7 @@ function battle(s) {
                     return getNeigbourCells(e).filter((p) => {
                         return (
                             map[p] === '.' &&
-                            units.filter((u) => u.hp > 0 && u.pos == p)
-                                .length === 0
+                            !units.find((u) => u.hp > 0 && u.pos == p)
                         );
                     });
                 });
@@ -183,8 +182,14 @@ function battle(s) {
                     return orderPos(p1.trail[0], p2.trail[0]);
                 })[0];
                 if (dest) {
-                    //move
-                    u.pos = dest.trail[0];
+                    for (let i = 0; i < neigbourCells.length; i++) {
+                        const c = neigbourCells[i];
+                        let p = getPaths(c, dest.dest, map, units);
+                        if(p && p.dist == dest.dist - 1) {
+                            u.pos = c;
+                            break;
+                        }
+                    }
                 }
             }
 
@@ -205,62 +210,11 @@ function battle(s) {
                 log('attack', target);
             }
 
-            //let enemies = units
-            //    .filter((_u) => u.elf !== _u.elf)
-            //    .filter((u) => u.hp > 0)
-            //    .map((e) => getPaths(u, e, map, units))
-            //    .filter((a) => a.length);
-
-            //log('reachable enemies path', enemies);
-
-            //const min = Math.min(
-            //    ...enemies.flatMap((e) => e.map((s) => s.dist))
-            //);
-            //if (min === 1) {
-            //    //attack
-            //    const target = enemies
-            //        .flat()
-            //        .filter((p) => p.dist === 1)
-            //        .sort((e1, e2) => {
-            //            const d = e1.dest.hp - e2.dest.hp;
-            //            return d === 0 ? orderPos(e1.dest.pos, e2.dest.pos) : d;
-            //        })[0];
-            //    target.dest.hp -= 3;
-            //    log('attack', target.dest);
-            //} else {
-            //    //move
-            //    if (enemies.length > 0) {
-            //        const target = enemies
-            //            .flat()
-            //            .filter((e) => e.dist === min)
-            //            .sort((a, b) => {
-            //                let d = orderPos(a.dest.pos, b.dest.pos);
-            //                if (d !== 0) return d;
-            //                d = orderPos(
-            //                    a.trail[a.trail.length - 2],
-            //                    b.trail[b.trail.length - 2]
-            //                );
-            //                if (d !== 0) return d;
-            //                return orderPos(a.trail[0], b.trail[0]);
-            //            });
-
-            //        log('move', target[0].trail[0]);
-            //        u.pos = target[0].trail[0];
-
-            //        if (min === 2) {
-            //            //in-range and can attack
-            //            target[0].dest.hp -= 3;
-            //            log('attack immediate after move', target[0].dest);
-            //        }
-            //    }
-            //}
-
             if (noEnemies(units)) {
                 log('hasWon');
                 let round = i;
-                if (units.slice(ui + 1).filter((u) => u.hp > 0).length === 0) {
-                    //last units
-                    round += 1;
+                if(ui == units.length - 1) {
+                    round += 1
                 }
                 let hp = units
                     .filter((u) => u.hp > 1)
@@ -271,13 +225,12 @@ function battle(s) {
                 break;
             }
         }
-        units = units.filter((u) => u.hp > 0); //cleanup died enemies
+
         if (hasWon) {
             log('final map');
             render({ map, units });
             break;
         }
-
         i++;
     }
 }
