@@ -7,13 +7,12 @@ const toBitStr = (s: string) => s.split('').map(hexToBit).join('');
 type Packet = {
     version: number;
     typeId: number;
-    lengthTypeId: string | undefined;
     value: number | undefined;
     packets: Packet[];
     packetLen: number;
 };
 
-const parsePacket = (s: string): Packet | undefined => {
+const parsePacket = (s: string): Packet => {
     let version = toInt(s.slice(0, 3));
     let typeId = toInt(s.slice(3, 6));
     let value = undefined;
@@ -32,14 +31,12 @@ const parsePacket = (s: string): Packet | undefined => {
         value = toInt(val.join(''));
         packetLen = i;
     } else {
-        //operator
         lengthTypeId = s.slice(6, 6 + 1);
         if (lengthTypeId === '0') {
             let totalLen = toInt(s.slice(7, 7 + 15));
             let i = 7 + 15;
-            let a = 0;
             while (true) {
-                let p = parsePacket(s.slice(i))!;
+                let p = parsePacket(s.slice(i));
                 packets.push(p);
                 i += p.packetLen;
                 if (i === totalLen + 7 + 15) break;
@@ -50,7 +47,7 @@ const parsePacket = (s: string): Packet | undefined => {
             let n = toInt(s.slice(7, 7 + 11));
             let i = 7 + 11;
             while (true) {
-                let p = parsePacket(s.slice(i))!;
+                let p = parsePacket(s.slice(i));
                 packets.push(p);
                 i += p.packetLen;
                 if (packets.length === n) break;
@@ -58,45 +55,26 @@ const parsePacket = (s: string): Packet | undefined => {
             packetLen = i;
         }
     }
-    return {
-        version,
-        typeId,
-        value,
-        packetLen,
-        lengthTypeId,
-        packets
-    };
+    return { version, typeId, value, packetLen, packets };
 };
 
-const versionSum = (p: Packet): number => {
-    return p.version + p.packets.reduce((a, c) => a + versionSum(c), 0);
-};
+const versionSum = (p: Packet): number =>
+    p.version + p.packets.reduce((a, c) => a + versionSum(c), 0);
 
-console.log('Part 1', versionSum(parsePacket(toBitStr(data()))!));
+let packet = parsePacket(toBitStr(data()));
+console.log('Part 1', versionSum(packet));
 
-const evaluate = (p:Packet) :number => {
-    if(p.typeId === 0) {
-        return p.packets.reduce((a, c) => a + evaluate(c), 0);
-    }
-    if(p.typeId === 1) {
-        return p.packets.reduce((a, c) => a * evaluate(c), 1);
-    }
-    if(p.typeId === 2) {
-        return Math.min(...p.packets.map(evaluate));
-    }
-    if(p.typeId === 3) {
-        return Math.max(...p.packets.map(evaluate));
-    }
-    if(p.typeId === 5) {
-        return evaluate(p.packets[0]) > evaluate(p.packets[1]) ? 1 : 0;
-    }
-    if(p.typeId === 6) {
-        return evaluate(p.packets[0]) < evaluate(p.packets[1]) ? 1 : 0;
-    }
-    if(p.typeId === 7) {
-        return evaluate(p.packets[0]) == evaluate(p.packets[1]) ? 1 : 0;
-    }
-    if(p.typeId === 4) return p.value!;
+const evaluate = (p: Packet): number => {
+    if (p.typeId === 0) return p.packets.reduce((a, c) => a + evaluate(c), 0);
+    if (p.typeId === 1) return p.packets.reduce((a, c) => a * evaluate(c), 1);
+    if (p.typeId === 2) return Math.min(...p.packets.map(evaluate));
+    if (p.typeId === 3) return Math.max(...p.packets.map(evaluate));
+    if (p.typeId === 4) return p.value!;
+    let v1 = evaluate(p.packets[0]);
+    let v2 = evaluate(p.packets[1]);
+    if (p.typeId === 5) return v1 > v2 ? 1 : 0;
+    if (p.typeId === 6) return v1 < v2 ? 1 : 0;
+    if (p.typeId === 7) return v1 == v2 ? 1 : 0;
     return 0;
-}
-console.log('Part 2', evaluate(parsePacket(toBitStr(data()))!));
+};
+console.log('Part 2', evaluate(packet));
