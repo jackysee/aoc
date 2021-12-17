@@ -23,7 +23,7 @@ const probe = (vx: number, vy: number): [boolean, number] => {
 };
 
 let heights = [];
-for (let vx = 0; vx < x2 + 1; vx++) {
+for (let vx = 0; vx <= x2; vx++) {
     for (let vy = y1; vy < -1 * y1; vy++) {
         let [success, h] = probe(vx, vy);
         if (success) heights.push(h);
