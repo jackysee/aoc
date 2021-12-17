@@ -58,7 +58,8 @@ def reading_order(pos):
 
 def solve(d, no_elves_die):
     print("==== begin ====")
-    input_data = open("day15.txt").read()
+    # input_data = open("day15.txt").read()
+    input_data = open("day15_sample4.txt").read()
     data = [list(line) for line in input_data.split("\n") if len(line) > 0]
 
     # extract characters/units from the grid and replace with dots
@@ -83,9 +84,13 @@ def solve(d, no_elves_die):
     while True:
         order = sorted(units, key=lambda c: reading_order(c.pos()))
 
-        print("Round " + str(round))
-        printMap(data, [e for e in units if e.is_alive])
+        print("Round " + str(round) + 
+            " Elfs " + str(sum([e.hp for e in units if e.is_alive and e.unit_type == 'E'])) +
+            " Globins " + str(sum([e.hp for e in units if e.is_alive and e.unit_type == 'G']))
+        )
+        # printMap(data, [e for e in units if e.is_alive])
 
+        print([e.pos() for e in order])
         for idx, c in enumerate(order):
             if not c.is_alive:
                 continue
@@ -120,6 +125,7 @@ def solve(d, no_elves_die):
                     for s in sorted(nearby_cells, key=reading_order):
                         _, d = find_closest(G, excluded_nodes, s, [choice])
                         if d == dist - 1:
+                            print('move ' + str(c.x) + ',' + str(c.y) + ' -> ' + str(s))
                             c.x, c.y = s
                             break
 
@@ -133,6 +139,7 @@ def solve(d, no_elves_die):
                 # find the lowest health and attack
                 lowest_health = min(enemies, key=lambda e: (e.hp, reading_order(e.pos())))
                 lowest_health.attack(c.attack_damage)
+                print('attack ' + str(c.x) + ',' + str(c.y) + ' -> ' + str(lowest_health.x) + ',' + str(lowest_health.y) + ' hp ' + str(lowest_health.hp))
 
                 # if part 2, return early if an elf dies
                 if no_elves_die and lowest_health.unit_type == "E" and not lowest_health.is_alive:
@@ -142,11 +149,13 @@ def solve(d, no_elves_die):
                 alive = set(e.unit_type for e in units if e.is_alive)
                 if len(alive) == 1:
                     # handle edge case when last enemy dies at end of turn
+                    print(str(idx) +','+str(len(order)))
                     if idx == len(order) - 1:
+                        print('last')
                         round += 1
                     totalHp = sum(e.hp for e in units if e.is_alive)
                     print(round, totalHp)
-                    printMap(data, [e for e in units if e.is_alive])
+                    # printMap(data, [e for e in units if e.is_alive])
                     return True, round * totalHp
         round += 1
 
