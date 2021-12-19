@@ -63,9 +63,7 @@ function reduce(s: string) {
     return s;
 }
 
-function add(a: string, b: string) {
-    return reduce(`[${a},${b}]`);
-}
+const add = (a: string, b: string) => reduce(`[${a},${b}]`);
 
 function getMagnitude(s: string) {
     while (true) {
@@ -81,9 +79,20 @@ function getMagnitude(s: string) {
         }
         break;
     }
-    return s;
+    return parseInt(s, 10);
 }
 
 let lines = data().split('\n');
 let r = lines.reduce((a, c, i) => (i === 0 ? c : add(a, c)), '');
 console.log('Part 1', getMagnitude(r));
+
+let maxMagnitude = -Infinity;
+for (let i = 0; i < lines.length; i++) {
+    for (let j = 0; j < lines.length; j++) {
+        if (i === j) continue;
+        let m1 = getMagnitude(add(lines[i], lines[j]));
+        let m2 = getMagnitude(add(lines[j], lines[i]));
+        maxMagnitude = Math.max(m1, m2, maxMagnitude);
+    }
+}
+console.log('Part 2', maxMagnitude);
