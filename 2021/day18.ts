@@ -26,12 +26,10 @@ function explode(s: string, m: RegExpMatchArray | undefined) {
     if (m === undefined) return s;
     let [x, y] = JSON.parse(m[0]);
     let leftStr = s.slice(0, m.index);
-    leftStr = leftStr.replace(/\d+(?=[^\d]*$)/, function (m) {
-        if (m) return parseInt(m, 10) + x;
-    });
-    let rightStr = s.slice(m.index! + m[0].length).replace(/\d+/, function (m) {
-        if (m) return parseInt(m, 10) + y;
-    });
+    leftStr = leftStr.replace(/\d+(?=[^\d]*$)/, (m) => parseInt(m, 10) + x);
+    let rightStr = s
+        .slice(m.index! + m[0].length)
+        .replace(/\d+/, (m) => parseInt(m, 10) + y);
     s = leftStr + '0' + rightStr;
     return s;
 }
@@ -67,16 +65,13 @@ const add = (a: string, b: string) => reduce(`[${a},${b}]`);
 
 function getMagnitude(s: string) {
     while (true) {
-        let m = s.match(/\[\d+,\d+\]/);
-        if (m) {
-            let [x, y] = JSON.parse(m[0]);
-            s =
-                s.slice(0, m.index) +
-                (3 * parseInt(x, 10) + 2 * parseInt(y, 10)) +
-                '' +
-                s.slice(m.index! + m[0].length);
-            continue;
-        }
+        let replaced = false;
+        s = s.replace(/\[\d+,\d+\]/, (m) => {
+            replaced = true;
+            let [x, y] = JSON.parse(m);
+            return 3 * parseInt(x, 10) + 2 * parseInt(y, 10) + '';
+        });
+        if (replaced) continue;
         break;
     }
     return parseInt(s, 10);
@@ -86,13 +81,15 @@ let lines = data().split('\n');
 let r = lines.reduce((a, c, i) => (i === 0 ? c : add(a, c)), '');
 console.log('Part 1', getMagnitude(r));
 
-let maxMagnitude = -Infinity;
+let max = -Infinity;
 for (let i = 0; i < lines.length; i++) {
     for (let j = 0; j < lines.length; j++) {
         if (i === j) continue;
-        let m1 = getMagnitude(add(lines[i], lines[j]));
-        let m2 = getMagnitude(add(lines[j], lines[i]));
-        maxMagnitude = Math.max(m1, m2, maxMagnitude);
+        max = Math.max(
+            getMagnitude(add(lines[i], lines[j])),
+            getMagnitude(add(lines[j], lines[i])),
+            max
+        );
     }
 }
-console.log('Part 2', maxMagnitude);
+console.log('Part 2', max);
