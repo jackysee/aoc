@@ -1,5 +1,5 @@
-import data from './day19_input.ts';
-// import data from './day19_sample.ts';
+// import data from './day19_input.ts';
+import data from './day19_sample.ts';
 
 interface Signal {
     pos: number[];
@@ -9,60 +9,54 @@ interface Scanner {
     id: number;
     signals: Signal[];
 }
+
 let scanners = data()
-    .trim()
     .split('\n\n')
-    .map((s) => {
+    .map((s, si) => {
         let lines = s.split('\n');
-        let id = Number(lines[0].match(/\d+/));
-        let signalPos = lines
-            .slice(1)
-            .map((s: string) => s.split(',').map(Number));
-        let signals: Signal[] = [];
-        for (let i = 0; i < signalPos.length; i++) {
-            const s1 = signalPos[i];
+        let pos = lines.slice(1).map((s) => s.split(',').map(Number));
+        let signals = [];
+        for (let i = 0; i < pos.length; i++) {
             let fingerPrint = [];
-            for (let j = 0; j < signalPos.length; j++) {
+            for (let j = 0; j < pos.length; j++) {
                 if (i === j) continue;
-                const s2 = signalPos[j];
-                const dx = Math.abs(s1[0] - s2[0]);
-                const dy = Math.abs(s1[1] - s2[1]);
-                const dz = Math.abs(s1[2] - s2[2]);
+                const dx = Math.abs(pos[i][0] - pos[j][0]);
+                const dy = Math.abs(pos[i][1] - pos[j][1]);
+                const dz = Math.abs(pos[i][2] - pos[j][2]);
                 fingerPrint[j] = [
                     Math.hypot(dx, dy, dz).toFixed(5),
                     Math.min(dx, dy, dz),
                     Math.max(dx, dy, dz)
                 ].join(',');
             }
-            signals.push({
-                pos: s1,
-                fingerPrint
-            });
+            signals.push({ pos: pos[i], fingerPrint });
         }
-        return { id, signals };
+        return { id: si, signals };
     });
 
-function compareSignals(s1: Signal, s2: Signal) {
-    const result = [];
+function compareSignal(s1: Signal, s2: Signal) {
+    let intersections = [];
     for (let idx1 = 0; idx1 < s1.fingerPrint.length; idx1++) {
         let idx2 = s2.fingerPrint.indexOf(s1.fingerPrint[idx1]);
         if (idx2 !== -1) {
-            result.push([s1.fingerPrint[idx1], idx1, idx2]);
+            intersections.push([s1.fingerPrint[idx1], idx1, idx2]);
         }
     }
-    return result;
+    return intersections;
 }
 
-interface ScannerIntersection {
+interface CompareSignalResult {
     sig1: Signal;
     sig2: Signal;
-    intersections: string[];
+    intersections: [string, number, number][];
 }
 
-function compareScanners(s1: Scanner, s2: Scanner) {
-    for (let sig1 of s1.signals) {
-        for (let sig2 of s2.signals) {
-            const intersections = compareSignals(sig1, sig2);
+function compareScanner(scanner1: Scanner, scanner2: Scanner) {
+    for (let i = 0; i < scanner1.signals.length; i++) {
+        const sig1 = scanner1.signals[i];
+        for (let j = 0; j < scanner2.signals.length; j++) {
+            const sig2 = scanner2.signals[j];
+            const intersections = compareSignal(sig1, sig2);
             if (intersections.length >= 11) {
                 return { sig1, sig2, intersections };
             }
@@ -70,16 +64,28 @@ function compareScanners(s1: Scanner, s2: Scanner) {
     }
 }
 
-// function alignScanner(s1: Scanner, s2:Scanner, si:ScannerIntersection) {
-//     for(let [_, idx1, idx2] of si.intersections) {
-//         const sig1 = s1.signals[idx1];
-//         const sig2 = s2.signals[idx2];
-//         const relativeHere = this.signals[line[2]]
-//         const dx0 = data.here.x - relativeHere.x
-//         const dy0 = data.here.y - relativeHere.y
-//         const dz0 = data.here.z - relativeHere.z
-//     }
+function alignScanner(
+    scanner1: Scanner,
+    scanner2: Scanner,
+    compareResult: any
+) {
+    let { sig1, sig2, intersections } = compareResult;
+    for (let [_, idx1, idx2] of intersections) {
+        let sig1To = scanner1.signals[idx1];
+        const dx0 = sig1.pos[0] - sig1To.pos[0];
+        const dy0 = sig1.pos[1] - sig1To.pos[1];
+        const dz0 = sig1.pos[2] - sig1To.pos[2];
+        console.log({ dx0, dy0, dz0 });
 
-// }
+        let sig2To = scanner2.signals[idx2];
+        const dx1 = sig2.pos[0] - sig2To.pos[0];
+        const dy1 = sig2.pos[1] - sig2To.pos[1];
+        const dz1 = sig2.pos[2] - sig2To.pos[2];
+        console.log({ dx1, dy1, dz1 });
+    }
+}
 
-console.log(compareScanners(scanners[0], scanners[1]));
+let r = compareScanner(scanners[0], scanners[1]);
+if (r) {
+    console.log(alignScanner(scanners[0], scanners[1], r));
+}
