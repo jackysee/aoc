@@ -1,47 +1,37 @@
 import data from './day18_input.ts';
 
 function findLevel4(s: string) {
-    let idx = 0;
-    while (true) {
-        let m = s.slice(idx).match(/\[\d+,\d+\]/);
-        if (m) {
-            let level = 0;
-            let _s = s.slice(0, idx + m.index!);
-            for (let i = 0; i < _s.length; i++) {
-                if (_s[i] === '[') level += 1;
-                if (_s[i] === ']') level -= 1;
-            }
-            if (level > 3) {
-                m.index = idx + m.index!;
-                return m;
-            }
-            idx = idx + m.index! + m[0].length;
-            continue;
+    let matches = s.matchAll(/\[\d+,\d+\]/g);
+    for (const m of matches) {
+        let _s = s.slice(0, m.index);
+        let level =
+            (_s.match(/\[/g) || []).length - (_s.match(/\]/g) || []).length;
+        if (level > 3) {
+            return m;
         }
-        break;
     }
 }
 
-function explode(s: string, m: RegExpMatchArray | undefined) {
-    if (m === undefined) return s;
-    let [x, y] = JSON.parse(m[0]);
-    let leftStr = s.slice(0, m.index);
-    leftStr = leftStr.replace(/\d+(?=[^\d]*$)/, (m) => parseInt(m, 10) + x);
-    let rightStr = s
-        .slice(m.index! + m[0].length)
-        .replace(/\d+/, (m) => parseInt(m, 10) + y);
-    s = leftStr + '0' + rightStr;
-    return s;
+const splitStr = (s: string, m: RegExpMatchArray) => [
+    s.slice(0, m.index),
+    m[0],
+    s.slice(m.index! + m[0].length)
+];
+
+function explode(s: string, m: RegExpMatchArray) {
+    let [left, middle, right] = splitStr(s, m);
+    let [x, y] = JSON.parse(middle);
+    return (
+        left.replace(/\d+(?=[^\d]*$)/, (m) => parseInt(m, 10) + x) +
+        '0' +
+        right.replace(/\d+/, (m) => parseInt(m, 10) + y)
+    );
 }
 
-function split(s: string, m: RegExpMatchArray | undefined) {
-    if (m === undefined) return s;
-    let n = parseInt(m[0], 10);
-    let x = Math.floor(n / 2);
-    let y = Math.ceil(n / 2);
-    return (
-        s.slice(0, m.index) + `[${x},${y}]` + s.slice(m.index! + m[0].length)
-    );
+function split(s: string, m: RegExpMatchArray) {
+    let [left, middle, right] = splitStr(s, m);
+    let n = parseInt(middle, 10);
+    return left + `[${Math.floor(n / 2)},${Math.ceil(n / 2)}]` + right;
 }
 
 function reduce(s: string) {
@@ -66,7 +56,7 @@ const add = (a: string, b: string) => reduce(`[${a},${b}]`);
 function getMagnitude(s: string) {
     while (true) {
         let replaced = false;
-        s = s.replace(/\[\d+,\d+\]/, (m) => {
+        s = s.replace(/\[\d+,\d+\]/g, (m) => {
             replaced = true;
             let [x, y] = JSON.parse(m);
             return 3 * parseInt(x, 10) + 2 * parseInt(y, 10) + '';
