@@ -57,7 +57,6 @@ const playQuantum = (p1: Player, p2: Player) => {
                     [1, 2, 3].forEach((d3) => {
                         delete states[e];
                         let s = e.split(',').map(Number);
-                        //[p1Pos, p1Score, p2Pos, p2Score, turn]
                         let [posIdx, scoreIdx] = s[4] === 1 ? [0, 1] : [2, 3];
                         s[posIdx] = ((s[posIdx] - 1 + (d1 + d2 + d3)) % 10) + 1;
                         s[scoreIdx] += s[posIdx];
