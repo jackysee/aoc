@@ -8,11 +8,10 @@ let [start1, start2]: number[] = data()
 interface Player {
     pos: number;
     score: number;
-    id: number;
 }
 
-let p1 = { pos: start1, score: 0, id: 1 };
-let p2 = { pos: start2, score: 0, id: 2 };
+let p1 = { pos: start1, score: 0 };
+let p2 = { pos: start2, score: 0 };
 
 const moves = (p: Player, step: number) => {
     p.pos = ((p.pos - 1 + step) % 10) + 1;
@@ -46,30 +45,27 @@ console.log(
     (result.p1.score >= 1000 ? result.p2.score : result.p1.score) * result.dice
 );
 
+let rolls = [[3,1], [4,3], [5,6], [6,7], [7,6], [8,3], [9,1]];
 let won: { [key: number]: number } = { 1: 0, 2: 0 };
 const playQuantum = (p1: Player, p2: Player) => {
     let states: { [key: string]: number } = {};
     states[`${p1.pos},0,${p2.pos},0,1`] = 1;
     while (Object.keys(states).length) {
         Object.entries(states).forEach(([e, c]) => {
-            [1, 2, 3].forEach((d1) => {
-                [1, 2, 3].forEach((d2) => {
-                    [1, 2, 3].forEach((d3) => {
-                        delete states[e];
-                        let s = e.split(',').map(Number);
-                        let [posIdx, scoreIdx] = s[4] === 1 ? [0, 1] : [2, 3];
-                        s[posIdx] = ((s[posIdx] - 1 + (d1 + d2 + d3)) % 10) + 1;
-                        s[scoreIdx] += s[posIdx];
-                        if (s[scoreIdx] >= 21) {
-                            won[s[4]] += c;
-                            return;
-                        }
-                        s[4] = s[4] === 1 ? 2 : 1;
-                        let _e = s.join(',');
-                        if (states[_e] === undefined) states[_e] = 0;
-                        states[_e] += c;
-                    });
-                });
+            rolls.forEach(([n, f]) => {
+                delete states[e];
+                let s = e.split(',').map(Number);
+                let [posIdx, scoreIdx] = s[4] === 1 ? [0, 1] : [2, 3];
+                s[posIdx] = ((s[posIdx] - 1 + n) % 10) + 1;
+                s[scoreIdx] += s[posIdx];
+                if (s[scoreIdx] >= 21) {
+                    won[s[4]] += c * f;
+                    return;
+                }
+                s[4] = s[4] === 1 ? 2 : 1;
+                let _e = s.join(',');
+                if (states[_e] === undefined) states[_e] = 0;
+                states[_e] += c *f;
             });
         });
     }
