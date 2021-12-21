@@ -28,12 +28,9 @@ const playDeterministic = (_p1: Player, _p2: Player) => {
         return r;
     };
     while (true) {
-        let step = roll();
-        moves(p1, step);
+        moves(p1, roll());
         if (p1.score >= 1000) break;
-
-        step = roll();
-        moves(p2, step);
+        moves(p2, roll());
         if (p2.score >= 1000) break;
     }
     return { p1, p2, dice };
