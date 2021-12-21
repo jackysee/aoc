@@ -1,13 +1,13 @@
 // let data = require('./day16_sample.js');
 let data = require('./day16_input.js');
 
-let [sampleStr, program] = data().split('\n\n\n')
-let samples = sampleStr.split('\n\n').map(s => {
+let [sampleStr, program] = data().split('\n\n\n');
+let samples = sampleStr.split('\n\n').map((s) => {
     let lines = s.split('\n');
     let before = JSON.parse(lines[0].replace(/Before: /, ''));
     let after = JSON.parse(lines[2].replace(/After: /, ''));
     let [op, a, b, c] = lines[1].split(' ').map(Number);
-    return { before, after, op, a, b, c }
+    return { before, after, op, a, b, c };
 });
 console.log(samples, program);
 
@@ -73,49 +73,70 @@ function seti(_registers, a, b, c) {
 
 function gtir(_registers, a, b, c) {
     let registers = [..._registers];
-    registers[c] = a > registers[b]? 1 : 0;
+    registers[c] = a > registers[b] ? 1 : 0;
     return registers;
 }
 
 function gtri(_registers, a, b, c) {
     let registers = [..._registers];
-    registers[c] = registers[a] > b? 1 : 0;
+    registers[c] = registers[a] > b ? 1 : 0;
     return registers;
 }
 
 function gtrr(_registers, a, b, c) {
     let registers = [..._registers];
-    registers[c] = registers[a] > registers[b]? 1 : 0;
+    registers[c] = registers[a] > registers[b] ? 1 : 0;
     return registers;
 }
 
 function eqir(_registers, a, b, c) {
     let registers = [..._registers];
-    registers[c] = a == registers[b]? 1 : 0;
+    registers[c] = a == registers[b] ? 1 : 0;
     return registers;
 }
 
 function eqri(_registers, a, b, c) {
     let registers = [..._registers];
-    registers[c] = registers[a] == b? 1 : 0;
+    registers[c] = registers[a] == b ? 1 : 0;
     return registers;
 }
 
 function eqrr(_registers, a, b, c) {
     let registers = [..._registers];
-    registers[c] = registers[a] == registers[b]? 1 : 0;
+    registers[c] = registers[a] == registers[b] ? 1 : 0;
     return registers;
 }
-let ops = { addr, addi, mulr, muli, banr, bani, borr, bori, setr, seti, gtir, gtri, gtrr, eqir, eqri, eqrr };
+let ops = {
+    addr,
+    addi,
+    mulr,
+    muli,
+    banr,
+    bani,
+    borr,
+    bori,
+    setr,
+    seti,
+    gtir,
+    gtri,
+    gtrr,
+    eqir,
+    eqri,
+    eqrr
+};
 
 let likeThreeOrMore = 0;
-samples.forEach(s => {
+let M = {};
+samples.forEach((s) => {
     let possibleOps = [];
     Object.entries(ops).forEach(([name, f]) => {
-        if(s.after.join(',') === f(s.before, s.a, s.b, s.c).join(',')) {
+        if (s.after.join(',') === f(s.before, s.a, s.b, s.c).join(',')) {
             possibleOps.push(name);
         }
     });
-    if(possibleOps.length >= 3) likeThreeOrMore++;
+    if (possibleOps.length >= 3) likeThreeOrMore++;
+    M[s.op] = M[s.op] || new Set();
+    possibleOps.forEach((op) => M[s.op].add(op));
 });
-console.log(likeThreeOrMore);
+console.log('Part 1', likeThreeOrMore);
+console.log(M);
