@@ -42,29 +42,37 @@ console.log(
     (result.p1.score >= 1000 ? result.p2.score : result.p1.score) * result.dice
 );
 
-let rolls = [[3,1], [4,3], [5,6], [6,7], [7,6], [8,3], [9,1]];
-let won: { [key: number]: number } = { 1: 0, 2: 0 };
-const playQuantum = (p1: Player, p2: Player) => {
+let rolls = [
+    [3, 1],
+    [4, 3],
+    [5, 6],
+    [6, 7],
+    [7, 6],
+    [8, 3],
+    [9, 1]
+];
+let won = [0, 0];
+const playQuantum = ({ pos: p1 }: Player, { pos: p2 }: Player) => {
     let states: { [key: string]: number } = {};
-    states[`${p1.pos},0,${p2.pos},0,1`] = 1;
+    states[[p1, 0, p2, 0].join(',')] = 1;
+    let turn = 0;
     while (Object.keys(states).length) {
-        Object.entries(states).forEach(([e, c]) => {
+        let newStates: { [key: string]: number } = {};
+        Object.entries(states).forEach(([k, c]) => {
             rolls.forEach(([n, f]) => {
-                delete states[e];
-                let s = e.split(',').map(Number);
-                let [posIdx, scoreIdx] = s[4] === 1 ? [0, 1] : [2, 3];
-                s[posIdx] = ((s[posIdx] - 1 + n) % 10) + 1;
-                s[scoreIdx] += s[posIdx];
-                if (s[scoreIdx] >= 21) {
-                    won[s[4]] += c * f;
+                let [p1, s1, p2, s2] = k.split(',').map(Number);
+                p1 = ((p1 - 1 + n) % 10) + 1;
+                s1 += p1;
+                if (s1 >= 21) {
+                    won[turn] += c * f;
                     return;
                 }
-                s[4] = s[4] === 1 ? 2 : 1;
-                let _e = s.join(',');
-                if (states[_e] === undefined) states[_e] = 0;
-                states[_e] += c *f;
+                let _k = [p2, s2, p1, s1].join(',');
+                newStates[_k] = (newStates[_k] || 0) + c * f;
             });
         });
+        turn = turn === 0 ? 1 : 0;
+        states = newStates;
     }
     return Math.max(...Object.values(won));
 };
