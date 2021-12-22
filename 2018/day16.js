@@ -1,4 +1,3 @@
-// let data = require('./day16_sample.js');
 let data = require('./day16_input.js');
 
 let [sampleStr, program] = data().split('\n\n\n');
@@ -9,121 +8,32 @@ let samples = sampleStr.split('\n\n').map((s) => {
     let [op, a, b, c] = lines[1].split(' ').map(Number);
     return { before, after, op, a, b, c };
 });
-console.log(samples, program);
 
-function addr(_registers, a, b, c) {
-    let registers = [..._registers];
-    registers[c] = registers[a] + registers[b];
-    return registers;
-}
-
-function addi(_registers, a, b, c) {
-    let registers = [..._registers];
-    registers[c] = registers[a] + b;
-    return registers;
-}
-
-function mulr(_registers, a, b, c) {
-    let registers = [..._registers];
-    registers[c] = registers[a] * registers[b];
-    return registers;
-}
-
-function muli(_registers, a, b, c) {
-    let registers = [..._registers];
-    registers[c] = registers[a] * b;
-    return registers;
-}
-
-function banr(_registers, a, b, c) {
-    let registers = [..._registers];
-    registers[c] = registers[a] & registers[b];
-    return registers;
-}
-
-function bani(_registers, a, b, c) {
-    let registers = [..._registers];
-    registers[c] = registers[a] & b;
-    return registers;
-}
-
-function borr(_registers, a, b, c) {
-    let registers = [..._registers];
-    registers[c] = registers[a] | registers[b];
-    return registers;
-}
-
-function bori(_registers, a, b, c) {
-    let registers = [..._registers];
-    registers[c] = registers[a] | b;
-    return registers;
-}
-
-function setr(_registers, a, b, c) {
-    let registers = [..._registers];
-    registers[c] = registers[a];
-    return registers;
-}
-
-function seti(_registers, a, b, c) {
-    let registers = [..._registers];
-    registers[c] = a;
-    return registers;
-}
-
-function gtir(_registers, a, b, c) {
-    let registers = [..._registers];
-    registers[c] = a > registers[b] ? 1 : 0;
-    return registers;
-}
-
-function gtri(_registers, a, b, c) {
-    let registers = [..._registers];
-    registers[c] = registers[a] > b ? 1 : 0;
-    return registers;
-}
-
-function gtrr(_registers, a, b, c) {
-    let registers = [..._registers];
-    registers[c] = registers[a] > registers[b] ? 1 : 0;
-    return registers;
-}
-
-function eqir(_registers, a, b, c) {
-    let registers = [..._registers];
-    registers[c] = a == registers[b] ? 1 : 0;
-    return registers;
-}
-
-function eqri(_registers, a, b, c) {
-    let registers = [..._registers];
-    registers[c] = registers[a] == b ? 1 : 0;
-    return registers;
-}
-
-function eqrr(_registers, a, b, c) {
-    let registers = [..._registers];
-    registers[c] = registers[a] == registers[b] ? 1 : 0;
-    return registers;
-}
-let ops = {
-    addr,
-    addi,
-    mulr,
-    muli,
-    banr,
-    bani,
-    borr,
-    bori,
-    setr,
-    seti,
-    gtir,
-    gtri,
-    gtrr,
-    eqir,
-    eqri,
-    eqrr
+let ops = {};
+const createOp = (name, cb) => {
+    let f = (_registers, a, b, c) => {
+        let registers = [..._registers];
+        cb(registers, a, b, c);
+        return registers;
+    };
+    ops[name] = f;
 };
+createOp('addr', (r, a, b, c) => (r[c] = r[a] + r[b]));
+createOp('addi', (r, a, b, c) => (r[c] = r[a] + b));
+createOp('mulr', (r, a, b, c) => (r[c] = r[a] * r[b]));
+createOp('muli', (r, a, b, c) => (r[c] = r[a] * b));
+createOp('banr', (r, a, b, c) => (r[c] = r[a] & r[b]));
+createOp('bani', (r, a, b, c) => (r[c] = r[a] & b));
+createOp('borr', (r, a, b, c) => (r[c] = r[a] | r[b]));
+createOp('bori', (r, a, b, c) => (r[c] = r[a] | b));
+createOp('setr', (r, a, b, c) => (r[c] = r[a]));
+createOp('seti', (r, a, b, c) => (r[c] = a));
+createOp('gtir', (r, a, b, c) => (r[c] = a > r[b] ? 1 : 0));
+createOp('gtri', (r, a, b, c) => (r[c] = r[a] > b ? 1 : 0));
+createOp('gtrr', (r, a, b, c) => (r[c] = r[a] > r[b] ? 1 : 0));
+createOp('eqir', (r, a, b, c) => (r[c] = a == r[b] ? 1 : 0));
+createOp('eqri', (r, a, b, c) => (r[c] = r[a] == b ? 1 : 0));
+createOp('eqrr', (r, a, b, c) => (r[c] = r[a] == r[b] ? 1 : 0));
 
 let likeThreeOrMore = 0;
 let M = {};
@@ -139,4 +49,24 @@ samples.forEach((s) => {
     possibleOps.forEach((op) => M[s.op].add(op));
 });
 console.log('Part 1', likeThreeOrMore);
-console.log(M);
+
+let opCode = {};
+while (Object.keys(opCode).length <= 15) {
+    let opStrArr = Object.values(opCode);
+    Object.entries(M).forEach(([op, set]) => {
+        if (opCode[op] !== undefined) return;
+        if (set.size === 1) {
+            opCode[op] = [...set][0];
+        } else {
+            opStrArr.forEach((s) => set.delete(s));
+        }
+    });
+}
+
+let r = [0, 0, 0, 0];
+program.split('\n').map((s) => {
+    let [op, a, b, c] = s.split(' ').map(Number);
+    r = ops[opCode[op]](r, a, b, c);
+});
+
+console.log('Part 2', r[0]);
