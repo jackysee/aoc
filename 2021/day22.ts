@@ -2,12 +2,8 @@ import data from './day22_input.ts';
 // import data from './day22_sample.ts';
 
 interface Cube {
-    x1: number;
-    x2: number;
-    y1: number;
-    y2: number;
-    z1: number;
-    z2: number;
+    edges: number[];
+    negatives: Cube[];
 }
 interface Step {
     cube: Cube;
@@ -15,94 +11,70 @@ interface Step {
 }
 
 const cubeFromArr = (m: (Number | String)[]) => ({
-    x1: Number(m![0]),
-    x2: Number(m![1]),
-    y1: Number(m![2]),
-    y2: Number(m![3]),
-    z1: Number(m![4]),
-    z2: Number(m![5])
+    edges: m!.map(Number),
+    negatives: []
 });
 
-let arr: Step[] = data()
+let steps: Step[] = data()
     .split('\n')
     .map((s) => {
-        let m = s.match(/-?\d+/g);
         return {
             on: /^on/.test(s),
-            cube: cubeFromArr([...m!])
+            cube: cubeFromArr([...s.match(/-?\d+/g)!])
         };
     });
 
 const M: { [key: string]: boolean } = {};
-
-arr.forEach(({ on, cube }: Step) => {
-    for (let x = Math.max(-50, cube.x1); x <= Math.min(50, cube.x2); x++)
-        for (let y = Math.max(-50, cube.y1); y <= Math.min(50, cube.y2); y++)
-            for (
-                let z = Math.max(-50, cube.z1);
-                z <= Math.min(50, cube.z2);
-                z++
-            ) {
+steps.forEach(({ on, cube: { edges } }: Step) => {
+    let [minx, maxx] = [Math.max(-50, edges[0]), Math.min(50, edges[1])];
+    let [miny, maxy] = [Math.max(-50, edges[2]), Math.min(50, edges[3])];
+    let [minz, maxz] = [Math.max(-50, edges[4]), Math.min(50, edges[5])];
+    for (let x = minx; x <= maxx; x++)
+        for (let y = miny; y <= maxy; y++)
+            for (let z = minz; z <= maxz; z++) {
                 if (on) M[[x, y, z] + ''] = true;
                 else delete M[[x, y, z] + ''];
             }
 });
 console.log('Part 1', Object.keys(M).length);
 
-const getVertices = (c: Cube) => [
-    [c.x1, c.y1, c.z1],
-    [c.x1, c.y1, c.z2],
-    [c.x1, c.y2, c.z1],
-    [c.x1, c.y2, c.z2],
-    [c.x2, c.y1, c.z1],
-    [c.x2, c.y1, c.z2],
-    [c.x2, c.y2, c.z1],
-    [c.x2, c.y2, c.z2]
-];
-
-const between = (n: number, n1: number, n2: number) => n >= n1 && n <= n2;
-
-const inside = (c: Cube, [x, y, z]: number[]) =>
-    between(x, c.x1, c.x2) && between(y, c.y1, c.y2) && between(z, c.z1, c.z2);
-
-const slicex = (c: Cube, x: number) => [
-    { ...c, x2: x },
-    { ...c, x1: x + 1 }
-];
-const slicey = (c: Cube, y: number) => [
-    { ...c, y2: y },
-    { ...c, y1: y + 1 }
-];
-const slicez = (c: Cube, z: number) => [
-    { ...c, z2: z },
-    { ...c, z1: z + 1 }
-];
-
-const union = (a: Cube, b: Cube) => {
-    if (
-        a.x1 > b.x2 ||
-        a.x2 < b.x1 ||
-        a.y1 > b.y2 ||
-        a.y2 < b.y1 ||
-        a.z1 > b.z2 ||
-        a.z2 < b.z1
-    )
-        return [a, b]; //no intersection
+const intersectLine = (a1: number, a2: number, b1: number, b2: number) => {
+    if (b1 > a2 || a1 > b2) return [];
+    const r = [a1, a2, b1, b2].sort((a, b) => a - b);
+    return [r[1], r[2]];
 };
 
+const intersectCube = ({ edges: a }: Cube, { edges: b }: Cube) => {
+    let xs = intersectLine(a[0], a[1], b[0], b[1]);
+    let ys = intersectLine(a[2], a[3], b[2], b[3]);
+    let zs = intersectLine(a[4], a[5], b[4], b[5]);
+    if ([xs, ys, zs].some((a) => a.length === 0)) {
+        return undefined;
+    }
+    return cubeFromArr([...xs, ...ys, ...zs]);
+};
+
+const removeCube = (a: Cube, b: Cube) => {
+    let intersect = intersectCube(a, b);
+    if (intersect === undefined) return;
+    a.negatives = a.negatives || [];
+    a.negatives.forEach((c) => removeCube(c, intersect!));
+    a.negatives.push(intersect);
+};
+
+const cubes: Cube[] = [];
+steps.forEach((s: Step) => {
+    cubes.forEach((c) => removeCube(c, s.cube));
+    if (s.on) cubes.push(s.cube);
+});
+
+const volume = (c: Cube): number =>
+    (c.edges[1] - c.edges[0] + 1) *
+        (c.edges[3] - c.edges[2] + 1) *
+        (c.edges[5] - c.edges[4] + 1) -
+    c.negatives.reduce((a, c) => a + volume(c), 0);
+
 console.log(
-    union(
-        cubeFromArr([0, 10, 0, 10, 0, 10]),
-        cubeFromArr([11, 21, 0, 10, 0, 10])
-    )
+    'Part 2',
+    cubes.reduce((a, c) => a + volume(c), 0)
 );
-
-// const ON = [];
-
-// arr.forEach((s: Step) => {
-//     if (s.on) {
-//         ON.push(s.cube);
-//     } else {
-//     }
-
-// });
