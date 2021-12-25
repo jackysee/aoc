@@ -95,7 +95,14 @@ interface State {
     RoomD: string[];
 }
 
-const deepCopy = (s: State): State => JSON.parse(JSON.stringify(s));
+const deepCopy = (s: State): State => ({
+    waiting: [...s.waiting],
+    energy: s.energy,
+    RoomA: [...s.RoomA],
+    RoomB: [...s.RoomB],
+    RoomC: [...s.RoomC],
+    RoomD: [...s.RoomD]
+});
 
 const canEnterRoom = (pod: string, room: string[]) =>
     room.length === 0 || room.every((p) => p === pod);
