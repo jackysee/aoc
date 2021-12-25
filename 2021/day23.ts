@@ -86,11 +86,6 @@ const dist: { [key: string]: any } = {
 let rate = { A: 1, B: 10, C: 100, D: 1000 };
 type Pod = keyof typeof rate;
 
-const RoomA = ['A', 'D', 'D', 'C'];
-const RoomB = ['D', 'C', 'B', 'D'];
-const RoomC = ['A', 'B', 'A', 'B'];
-const RoomD = ['C', 'A', 'C', 'B'];
-
 interface State {
     waiting: Array<string | null>;
     energy: number;
@@ -100,55 +95,49 @@ interface State {
     RoomD: string[];
 }
 
-let queue: State[] = [
-    {
-        waiting: Array(7).fill(null),
-        energy: 0,
-        RoomA: [...RoomA],
-        RoomB: [...RoomB],
-        RoomC: [...RoomC],
-        RoomD: [...RoomD]
-    }
-];
-
 const deepCopy = (s: State): State => JSON.parse(JSON.stringify(s));
 
 const canEnterRoom = (pod: string, room: string[]) =>
     room.length === 0 || room.every((p) => p === pod);
 
-const completed = (state: State) =>
-    ['A', 'B', 'C', 'D'].every((pod) => {
-        let room = state[`Room${pod}` as Room];
-        return room.every((p) => p === pod) && room.length === 4;
-    });
-
-let min = Infinity;
-const done: State[] = [];
-while (queue.length) {
-    // console.log(queue.length);
-    let state = queue.pop()!;
-    //queue possible next states
-    ['A', 'B', 'C', 'D'].forEach((r) => {
-        const roomKey = `Room${r}` as Room;
-        const room = state[roomKey];
-        if (room.length && room.some((p) => p !== r)) {
-            canWait[roomKey].forEach((ws, w) => {
-                //the waiting area and its path is empty
-                if (ws.every((w) => !state.waiting[w]) && !state.waiting[w]) {
-                    let _state = deepCopy(state);
-                    let pod = _state[roomKey].shift() as Pod;
-                    _state.waiting[w] = pod;
-                    _state.energy +=
-                        (dist[roomKey][`W${w}`] +
-                            (4 - _state[roomKey].length)) *
-                        rate[pod];
-                    queue.push(_state);
-                }
-            });
+function solve(state: State) {
+    let queue: State[] = [state];
+    let roomSize = state.RoomA.length;
+    const completed = (state: State) =>
+        ['A', 'B', 'C', 'D'].every((pod) => {
+            let room = state[`Room${pod}` as Room];
+            return room.every((p) => p === pod) && room.length === roomSize;
+        });
+    let min = Infinity;
+    let t = performance.now();
+    while (queue.length) {
+        // console.log(queue.length);
+        let state = queue.pop()!;
+        if (state.energy > min) {
+            continue;
         }
-    });
-    state.waiting.forEach((pod, w) => {
-        if (pod) {
+        //queue possible next states
+        ['A', 'B', 'C', 'D'].forEach((r) => {
+            const roomKey = `Room${r}` as Room;
+            const room = state[roomKey];
+            if (room.length && room.some((p) => p !== r)) {
+                canWait[roomKey].forEach((ws, w) => {
+                    //the waiting area and its path is empty
+                    if ([...ws, w].every((w) => !state.waiting[w])) {
+                        let _state = deepCopy(state);
+                        let pod = _state[roomKey].shift() as Pod;
+                        _state.waiting[w] = pod;
+                        _state.energy +=
+                            (dist[roomKey][`W${w}`] +
+                                (roomSize - _state[roomKey].length)) *
+                            rate[pod];
+                        queue.push(_state);
+                    }
+                });
+            }
+        });
+        state.waiting.forEach((pod, w) => {
+            if (!pod) return;
             const room = `Room${pod}` as Room;
             const targetRoom = state[room];
             const canEnter =
@@ -157,40 +146,42 @@ while (queue.length) {
                 ) && canEnterRoom(pod, targetRoom);
             if (canEnter) {
                 let _state = deepCopy(state);
-                // console.log('before', state);
-                // console.log(
-                //     'waiting area',
-                //     w,
-                //     'with pod',
-                //     pod,
-                //     'canEnter',
-                //     _state[room]
-                // );
                 _state.waiting[w] = null;
                 _state.energy +=
-                    (dist[`W${w}`][`Room${pod}`] + (4 - _state[room].length)) *
+                    (dist[`W${w}`][`Room${pod}`] +
+                        (roomSize - _state[room].length)) *
                     rate[pod as Pod];
                 _state[room].push(pod);
+                if (_state.energy > min) {
+                    return;
+                }
                 if (completed(_state)) {
                     min = Math.min(min, _state.energy);
-                    // console.log('done', _state.energy);
                 } else {
-                    // console.log('after', _state);
                     queue.push(_state);
                 }
             }
-        }
-    });
-    // break;
+        });
+    }
+    return [min, performance.now() - t];
 }
-console.log(done);
 
-/*
-#############
-#...........#
-###A#D#A#C###
-  #D#C#B#A#
-  #D#B#A#C#
-  #C#D#B#B#
-  #########
-*/
+const part1State = {
+    waiting: Array(7).fill(null),
+    energy: 0,
+    RoomA: ['A', 'C'],
+    RoomB: ['D', 'D'],
+    RoomC: ['A', 'B'],
+    RoomD: ['C', 'B']
+};
+console.log('Part 1', solve(part1State));
+
+const part2State = {
+    waiting: Array(7).fill(null),
+    energy: 0,
+    RoomA: ['A', 'D', 'D', 'C'],
+    RoomB: ['D', 'C', 'B', 'D'],
+    RoomC: ['A', 'B', 'A', 'B'],
+    RoomD: ['C', 'A', 'C', 'B']
+};
+console.log('Part 2', solve(part2State));
