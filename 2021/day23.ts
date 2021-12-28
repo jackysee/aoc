@@ -1,3 +1,5 @@
+import { BinaryHeap } from 'https://deno.land/x/collections@0.11.2/mod.ts';
+
 /*
 #############
 #...........#
@@ -25,48 +27,13 @@ type Room = keyof typeof canWait;
 //from waiting area of index, can go to rooom when array of waiting area is empty
 //e.g. canAccessRoom[0].RoomA = [1] mean at W0 to enter RoomA, W1 needs to be empty
 const canAccessRoom = [
-    {
-        RoomA: [1],
-        RoomB: [1, 2],
-        RoomC: [1, 2, 3],
-        RoomD: [1, 2, 3, 4]
-    },
-    {
-        RoomA: [],
-        RoomB: [2],
-        RoomC: [2, 3],
-        RoomD: [2, 3, 4]
-    },
-    {
-        RoomA: [],
-        RoomB: [],
-        RoomC: [3],
-        RoomD: [3, 4]
-    },
-    {
-        RoomA: [2],
-        RoomB: [],
-        RoomC: [],
-        RoomD: [4]
-    },
-    {
-        RoomA: [2, 3],
-        RoomB: [3],
-        RoomC: [],
-        RoomD: []
-    },
-    {
-        RoomA: [2, 3, 4],
-        RoomB: [3, 4],
-        RoomC: [4],
-        RoomD: []
-    },
-    {
-        RoomA: [5, 4, 3, 2],
-        RoomB: [5, 4, 3],
-        RoomC: [5, 4],
-        RoomD: [5]
-    }
+    { RoomA: [1], RoomB: [1, 2], RoomC: [1, 2, 3], RoomD: [1, 2, 3, 4] },
+    { RoomA: [], RoomB: [2], RoomC: [2, 3], RoomD: [2, 3, 4] },
+    { RoomA: [], RoomB: [], RoomC: [3], RoomD: [3, 4] },
+    { RoomA: [2], RoomB: [], RoomC: [], RoomD: [4] },
+    { RoomA: [2, 3], RoomB: [3], RoomC: [], RoomD: [] },
+    { RoomA: [2, 3, 4], RoomB: [3, 4], RoomC: [4], RoomD: [] },
+    { RoomA: [5, 4, 3, 2], RoomB: [5, 4, 3], RoomC: [5, 4], RoomD: [5] }
 ];
 
 const dist: { [key: string]: any } = {
@@ -107,22 +74,36 @@ const deepCopy = (s: State): State => ({
 const canEnterRoom = (pod: string, room: string[]) =>
     room.length === 0 || room.every((p) => p === pod);
 
+const hash = (s: State) =>
+    [
+        s.waiting.map((s) => s || '.').join(''),
+        s.RoomA.join(''),
+        s.RoomB.join(''),
+        s.RoomC.join(''),
+        s.RoomD.join('')
+    ].join('|');
+
 function solve(state: State) {
-    let queue: State[] = [state];
+    let queue = new BinaryHeap<State>(
+        (a: State, b: State) => a.energy - b.energy
+    );
+    queue.push(state);
+    let visited = new Map<string, number>();
+    visited.set(hash(state), Infinity);
     let roomSize = state.RoomA.length;
     const completed = (state: State) =>
         ['A', 'B', 'C', 'D'].every((pod) => {
             let room = state[`Room${pod}` as Room];
             return room.every((p) => p === pod) && room.length === roomSize;
         });
-    let min = Infinity;
     let t = performance.now();
     while (queue.length) {
-        // console.log(queue.length);
         let state = queue.pop()!;
-        if (state.energy > min) {
-            continue;
+
+        if (completed(state)) {
+            return [state.energy, performance.now() - t];
         }
+
         //queue possible next states
         ['A', 'B', 'C', 'D'].forEach((r) => {
             const roomKey = `Room${r}` as Room;
@@ -138,7 +119,13 @@ function solve(state: State) {
                             (dist[roomKey][`W${w}`] +
                                 (roomSize - _state[roomKey].length)) *
                             rate[pod];
-                        queue.push(_state);
+                        if (
+                            !visited.has(hash(_state)) ||
+                            _state.energy < visited.get(hash(_state))!
+                        ) {
+                            visited.set(hash(_state), _state.energy);
+                            queue.push(_state);
+                        }
                     }
                 });
             }
@@ -148,9 +135,8 @@ function solve(state: State) {
             const room = `Room${pod}` as Room;
             const targetRoom = state[room];
             const canEnter =
-                canAccessRoom[w][room].every(
-                    (w: number) => !state.waiting[w]
-                ) && canEnterRoom(pod, targetRoom);
+                canAccessRoom[w][room].every((w) => !state.waiting[w]) &&
+                canEnterRoom(pod, targetRoom);
             if (canEnter) {
                 let _state = deepCopy(state);
                 _state.waiting[w] = null;
@@ -159,18 +145,17 @@ function solve(state: State) {
                         (roomSize - _state[room].length)) *
                     rate[pod as Pod];
                 _state[room].push(pod);
-                if (_state.energy > min) {
-                    return;
-                }
-                if (completed(_state)) {
-                    min = Math.min(min, _state.energy);
-                } else {
+                if (
+                    !visited.has(hash(_state)) ||
+                    _state.energy < visited.get(hash(_state))!
+                ) {
+                    visited.set(hash(_state), _state.energy);
                     queue.push(_state);
                 }
             }
         });
     }
-    return [min, performance.now() - t];
+    return 'none';
 }
 
 const part1State = {
@@ -181,7 +166,8 @@ const part1State = {
     RoomC: ['A', 'B'],
     RoomD: ['C', 'B']
 };
-console.log('Part 1', solve(part1State));
+const result1 = solve(part1State);
+console.log('Part 1', result1[0], `took ${result1[1]} ms`);
 
 const part2State = {
     waiting: Array(7).fill(null),
@@ -191,4 +177,5 @@ const part2State = {
     RoomC: ['A', 'B', 'A', 'B'],
     RoomD: ['C', 'A', 'C', 'B']
 };
-console.log('Part 2', solve(part2State));
+const result2 = solve(part2State);
+console.log('Part 2', result2[0], `took ${result2[1]} ms`);
