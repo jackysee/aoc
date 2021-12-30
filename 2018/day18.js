@@ -80,24 +80,29 @@ function toStr(M) {
 
 function findRepeat(_M) {
     let M = { ..._M };
-    let seen = new Set([toStr(M)]);
+    let seen = [toStr(M)];
+    // let count = 0;
     let i = 0;
     while (true) {
         M = change(M);
         let state = toStr(M);
-        if (seen.has(state)) break;
-        seen.add(state);
+        let idx = seen.indexOf(state);
+        if (idx !== -1) {
+            console.log({ i, idx });
+            return [i, idx];
+        }
+        // if (seen.includes(state)) break;
+        seen.push(state);
         i++;
     }
-    return i;
 }
 
 let r = findRepeat(M);
 let remain = 1000000000 % r;
 
 // console.log('-----');
-console.log(toStr(M) === toStr(changeBy(M, r)[1]));
+console.log(toStr(M) === toStr(changeBy(M, 530)[1]));
 console.log({ r, remain });
-console.log(changeBy(M, remain)[0]);
+console.log('Part 2', changeBy(M, remain)[0]);
 
 // console.log('Part 2', changeBy(M, 0)[0], changeBy(M, 16)[0]);
