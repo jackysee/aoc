@@ -81,7 +81,7 @@ function toStr(M) {
 function findRepeat(_M) {
     let M = { ..._M };
     let seen = new Set([toStr(M)]);
-    let i = 1;
+    let i = 0;
     while (true) {
         M = change(M);
         let state = toStr(M);
@@ -96,7 +96,7 @@ let r = findRepeat(M);
 let remain = 1000000000 % r;
 
 // console.log('-----');
-// console.log(toStr(changeBy(M, 1)[1]), '\n------\n', toStr(changeBy(M, 16)[1]));
+console.log(toStr(M) === toStr(changeBy(M, r)[1]));
 console.log({ r, remain });
 console.log(changeBy(M, remain)[0]);
 
