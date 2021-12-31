@@ -97,6 +97,7 @@ ip = r3
 35  seti 0 9 3    r3 = 0, jump 1 (MAIN)
 */
 
+//R0 is sum of divisors of number 10551354
 let num = 10551354;
 let sum = 0;
 for (let i = 1; i <= num; i++) if (num % i === 0) sum += i;
