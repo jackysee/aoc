@@ -49,20 +49,17 @@ function run(reg) {
 }
 
 console.log('Part 1', run([0, 0, 0, 0, 0, 0])[0]);
-console.log('Part 2', run([1, 0, 0, 0, 0, 0])[0]);
 
 /*
-
 ip = r3
-
 0   addi 3 16 3  r3 = 16, jump 17
-MAIN
+--- MAIN
 1   seti 1 3 4   r4 = 1
-LOOP1
+--- LOOP1
 2   seti 1 8 5   r5 = 1
-LOOP2
-3   mulr 4 5 1   r1 = r4 * r5 = 1
-4   eqrr 1 2 1   if r4 * r5 === r2 ? r0 += 4
+--- LOOP2
+3   mulr 4 5 1   
+4   eqrr 1 2 1   if r4 * r5 === r2 ? r0 += r4
 5   addr 1 3 3   
 6   addi 3 1 3    
 7   addr 4 0 0    
@@ -70,18 +67,18 @@ LOOP2
 9   gtrr 5 2 1   r5 <= r2 ? jump 3 (LOOP2)
 10  addr 3 1 3  
 11  seti 2 6 3   
-/LOOP2
+--- /LOOP2
 12  addi 4 1 4   r4 = r4 + 1
-13  gtrr 4 2 1   r1 = r4 > r2
+13  gtrr 4 2 1   r4 > r2
 14  addr 1 3 3     true => HALT
-15  seti 1 1 3     false => r3 = 1, jump 2
-/LOOP1
+15  seti 1 1 3     false => jump 2
+--- /LOOP1
 16  mulr 3 3 3    r3 = r3 * r3, HALT
---------
+-------- SETUP
 17  addi 2 2 2    
 18  mulr 2 2 2    
 19  mulr 3 2 2    
-20  muli 2 11 2   r2 = r2 = 2 * 2 * 19 * 11 = 836
+20  muli 2 11 2   r2 = 2 * 2 * 19 * 11 = 836
 21  addi 1 5 1    
 22  mulr 1 3 1    
 23  addi 1 8 1    r1 = 5 * 22 + 8 = 118
@@ -89,13 +86,18 @@ LOOP2
 25  addr 3 0 3    r0 == 0? jump 1 (MAIN)
 26  seti 0 5 3    
 --------
-27  setr 3 9 1
-28  mulr 1 3 1
-29  addr 3 1 1
-30  mulr 3 1 1
-31  muli 1 14 1
-32  mulr 1 3 1
-33  addr 2 1 2
-34  seti 0 9 0
-35  seti 0 9 3
+27  setr 3 9 1    r1 = 27
+28  mulr 1 3 1    r1 = r1 * r3 = 27 * 28 = 756
+29  addr 3 1 1    r1 = r3 + r1 = 29 + 756 = 785
+30  mulr 3 1 1    r1 = r3 * r1 = 30 * 785 = 23350
+31  muli 1 14 1   r1 = r1 * 14 = 326900
+32  mulr 1 3 1    r1 = r1 * r3 = 326900 * 32 = 10550400
+33  addr 2 1 2    r2 = r2 + r1 = 954 + 10550400 = 10551354
+34  seti 0 9 0    r0 = 0
+35  seti 0 9 3    r3 = 0, jump 1 (MAIN)
 */
+
+let num = 10551354;
+let sum = 0;
+for (let i = 1; i <= num; i++) if (num % i === 0) sum += i;
+console.log('Part 2', sum);
