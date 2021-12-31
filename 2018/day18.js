@@ -52,7 +52,7 @@ function change(_M) {
 
 function getCount(M) {
     let count = {};
-    Object.values(M).forEach((v) => {
+    (Array.isArray(M) ? M : Object.values(M)).forEach((v) => {
         count[v] = (count[v] || 0) + 1;
     });
     return count;
@@ -68,7 +68,7 @@ function changeBy(M, min) {
 }
 console.log('Part 1', changeBy(M, 10)[0]);
 
-function toStr(M) {
+function hash(M) {
     let str = '';
     for (let y = 0; y <= my; y++) {
         for (let x = 0; x <= mx; x++) {
@@ -80,29 +80,20 @@ function toStr(M) {
 
 function findRepeat(_M) {
     let M = { ..._M };
-    let seen = [toStr(M)];
-    // let count = 0;
-    let i = 0;
+    let seen = [hash(M)];
     while (true) {
-        M = change(M);
-        let state = toStr(M);
+        let __M = change(M);
+        let state = hash(__M);
         let idx = seen.indexOf(state);
         if (idx !== -1) {
-            console.log({ i, idx });
-            return [i, idx];
+            return [idx, seen.slice(idx)];
         }
-        // if (seen.includes(state)) break;
         seen.push(state);
-        i++;
+        M = __M;
     }
 }
 
-let r = findRepeat(M);
-let remain = 1000000000 % r;
-
-// console.log('-----');
-console.log(toStr(M) === toStr(changeBy(M, 530)[1]));
-console.log({ r, remain });
-console.log('Part 2', changeBy(M, remain)[0]);
-
-// console.log('Part 2', changeBy(M, 0)[0], changeBy(M, 16)[0]);
+let [idx, seen] = findRepeat(M);
+let n = (1000000000 - idx) % seen.length;
+let result = getCount(seen[n].split(''));
+console.log('Part 2', result['|'] * result['#']);
