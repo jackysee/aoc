@@ -17,6 +17,8 @@ function contains(b1, b2) {
 
 console.log('Part 1', bots.filter((n) => contains(o, n)).length);
 
+//Part 2 is re-implementation of 
+// https://www.reddit.com/r/adventofcode/comments/a8s17l/comment/ecfmpy0/
 let max = Math.max(
     ...[0, 1, 2].map((i) => Math.max(...bots.map((b) => b[3] + Math.abs(b[i]))))
 );
