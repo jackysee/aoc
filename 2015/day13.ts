@@ -15,36 +15,26 @@ data()
     });
 
 type Seating = { happiness: number; seats: string[] };
-
-function findSeating(M: HappinessMap) {
-    let len = Object.keys(M).length;
-    let queue = Object.keys(M).map((s) => ({ happiness: 0, seats: [s] }));
+function findSeating(M: HappinessMap): number {
+    let people = Object.keys(M);
+    let queue = [{ happiness: 0, seats: [people[0]] }];
     let result: Seating[] = [];
     while (queue.length) {
         let s = queue.pop()!;
         let last = s.seats.at(-1)!;
-        if (s.seats.length === len) {
-            s.happiness += M[last][s.seats[0]] + M[s.seats[0]][last];
-            result.push(s);
-        }
         Object.entries(M[last]).forEach(([k, v]) => {
             if (s.seats.includes(k)) return;
             let happiness = s.happiness + v + M[k][last];
             let seats = [...s.seats, k];
-            if (s.seats.length === len) {
-                happiness += M[last][s.seats[0]] + M[s.seats[0]][last];
+            if (seats.length === people.length) {
+                happiness += M[k][s.seats[0]] + M[s.seats[0]][k];
                 result.push({ seats, happiness });
             } else {
                 queue.push({ seats, happiness });
             }
         });
     }
-    // console.log(result);
-    let max = -Infinity;
-    result.forEach((r) => {
-        if (r.happiness > max) max = r.happiness;
-    });
-    return max;
+    return Math.max(...result.map((r) => r.happiness));
 }
 
 console.log('Part 1', findSeating(M));
