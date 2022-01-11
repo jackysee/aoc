@@ -41,21 +41,21 @@ const parseTable = (s: string) =>
 
 let [weapons, armors, rings] = shop.split('\n\n').map(parseTable);
 
-function combos(arr: any[], len: (l: number) => boolean): any[][] {
+function _combos(arr: any[]): any[][] {
     if (arr[0] === undefined) return [arr];
-    return combos(arr.slice(1), len)
-        .flatMap((el: any) => [el.concat(arr[0]), el])
-        .filter((a) => len(a.length));
+    return _combos(arr.slice(1)).flatMap((el: any) => [el.concat(arr[0]), el]);
+}
+
+function combos(arr: any[], len: (l: number) => boolean): any[][] {
+    return _combos(arr).filter((a) => len(a.length));
 }
 
 function getAllEquip() {
-    return weapons.flatMap((w) => {
-        return [
-            ...combos(armors, (l) => l <= 1).flatMap((a) => [
-                ...combos(rings, (l) => l <= 2).map((r) => [w, ...a, ...r])
-            ])
-        ];
-    });
+    return combos(weapons, (l) => l == 1).flatMap((w) => [
+        ...combos(armors, (l) => l <= 1).flatMap((a) => [
+            ...combos(rings, (l) => l <= 2).map((r) => [...w, ...a, ...r])
+        ])
+    ]);
 }
 
 const allEquip = (getAllEquip() as Equip[][]).sort((a, b) => {
@@ -63,3 +63,5 @@ const allEquip = (getAllEquip() as Equip[][]).sort((a, b) => {
     let cb = b.reduce((a, c) => a + c.cost, 0);
     return ca - cb;
 });
+
+console.log(allEquip.slice(0, 4));
