@@ -29,6 +29,11 @@ interface Equip {
     damage: number;
     armor: number;
 }
+interface Player {
+    hp: number;
+    damage: number;
+    armor: number;
+}
 const parseTable = (s: string) =>
     s
         .split('\n')
@@ -58,10 +63,31 @@ function getAllEquip() {
     ]);
 }
 
-const allEquip = (getAllEquip() as Equip[][]).sort((a, b) => {
-    let ca = a.reduce((a, c) => a + c.cost, 0);
-    let cb = b.reduce((a, c) => a + c.cost, 0);
-    return ca - cb;
+const allEquip = (getAllEquip() as Equip[][])
+    .map((e) => [e.reduce((a, c) => a + c.cost, 0), e])
+    .sort((a, b) => (a[0] as number) - (b[0] as number));
+
+const play = (player: Player, boss: Player) => {
+    while (true) {
+        boss.hp -= Math.max(1, player.damage - boss.armor);
+        player.hp -= Math.max(1, boss.damage - player.armor);
+        if (boss.hp <= 0) return true;
+        if (player.hp <= 0) return false;
+    }
+};
+
+const createPlayer = (list: Equip[]) => ({
+    hp: 100,
+    damage: list.reduce((a, c) => a + c.damage, 0),
+    armor: list.reduce((a, c) => a + c.armor, 0)
 });
 
-console.log(allEquip.slice(0, 4));
+const ans1 = allEquip.find((i) =>
+    play(createPlayer(i[1] as Equip[]), { ...boss })
+);
+console.log('Part 1', ans1![0]);
+
+const ans2 = allEquip
+    .reverse()
+    .find((i) => !play(createPlayer(i[1] as Equip[]), { ...boss }));
+console.log('Part 2', ans2![0]);
