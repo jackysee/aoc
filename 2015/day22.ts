@@ -5,11 +5,17 @@ interface Player {
     mana: number;
     manaUsed: number;
     activeSpells: Record<string, number>;
+    history: string[];
+}
+interface Boss {
+    hp: number;
+    damage: number;
 }
 const spells = [
     {
         id: 'missles',
-        cast: (player: Player, boss: Player) => {
+        cost: 53,
+        cast: (player: Player, boss: Boss) => {
             player.mana -= 53;
             player.manaUsed += 53;
             boss.hp -= 4;
@@ -17,7 +23,8 @@ const spells = [
     },
     {
         id: 'drain',
-        cast: (player: Player, boss: Player) => {
+        cost: 73,
+        cast: (player: Player, boss: Boss) => {
             player.mana -= 73;
             player.manaUsed += 73;
             player.hp += 2;
@@ -26,7 +33,8 @@ const spells = [
     },
     {
         id: 'shield',
-        cast: (player: Player, boss?: Player) => {
+        cost: 113,
+        cast: (player: Player, boss?: Boss) => {
             if (!player.activeSpells.shield) {
                 player.mana -= 113;
                 player.manaUsed += 113;
@@ -43,7 +51,8 @@ const spells = [
     },
     {
         id: 'poison',
-        cast: (player: Player, boss: Player) => {
+        cost: 173,
+        cast: (player: Player, boss: Boss) => {
             if (!player.activeSpells.poison) {
                 player.mana -= 173;
                 player.manaUsed += 173;
@@ -51,7 +60,7 @@ const spells = [
                 return;
             }
             boss.hp -= 3;
-            player.activeSpells.shield -= 1;
+            player.activeSpells.poison -= 1;
             if (player.activeSpells.poison === 0) {
                 delete player.activeSpells.poison;
             }
@@ -59,10 +68,11 @@ const spells = [
     },
     {
         id: 'recharge',
-        cast: (player: Player, boss?: Player) => {
+        cost: 229,
+        cast: (player: Player, boss?: Boss) => {
             if (!player.activeSpells.recharge) {
-                player.mana -= 299;
-                player.manaUsed += 299;
+                player.mana -= 229;
+                player.manaUsed += 229;
                 player.activeSpells.recharge = 5;
                 return;
             }
@@ -76,3 +86,50 @@ const spells = [
 ];
 
 const boss = { hp: 55, damage: 8, armor: 0 };
+const player = {
+    hp: 50,
+    damage: 0,
+    armor: 0,
+    mana: 500,
+    manaUsed: 0,
+    activeSpells: {},
+    history: [] as string[]
+};
+
+let queue = [{ boss, player }];
+while (queue.length) {
+    let p = queue.pop()!;
+    if (p.boss.hp <= 0) {
+        console.log(p);
+        break;
+    }
+    spells
+        .filter(
+            (s) =>
+                ((p.player as Player).activeSpells[s.id] || 0) <= 1 &&
+                p.player.mana >= s.cost
+        )
+        .forEach((s) => {
+            let player = {
+                ...p.player,
+                activeSpells: { ...p.player.activeSpells },
+                history: [...p.player.history, s.id]
+            };
+            let boss = { ...p.boss };
+
+            //player turn
+            Object.keys(player.activeSpells).forEach((id) => {
+                spells.find((_s) => _s.id == id)!.cast(player, boss);
+            });
+            s.cast(player, boss);
+
+            //boss turn
+            Object.keys(player.activeSpells).forEach((id) => {
+                spells.find((_s) => _s.id == id)!.cast(player, boss);
+            });
+            player.hp = Math.max(1, boss.damage - player.armor);
+
+            queue.push({ player, boss });
+        });
+    queue.sort((a, b) => b.player.manaUsed - a.player.manaUsed);
+}
