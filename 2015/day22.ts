@@ -96,40 +96,80 @@ const player = {
     history: [] as string[]
 };
 
-let queue = [{ boss, player }];
-while (queue.length) {
-    let p = queue.pop()!;
-    if (p.boss.hp <= 0) {
-        console.log(p);
-        break;
-    }
-    spells
-        .filter(
-            (s) =>
-                ((p.player as Player).activeSpells[s.id] || 0) <= 1 &&
-                p.player.mana >= s.cost
-        )
-        .forEach((s) => {
-            let player = {
-                ...p.player,
-                activeSpells: { ...p.player.activeSpells },
-                history: [...p.player.history, s.id]
-            };
-            let boss = { ...p.boss };
+function play(_player: Player, _boss: Boss, spellId: string): [Player, Boss] {
+    let player = {
+        ..._player,
+        activeSpells: { ..._player.activeSpells },
+        history: [..._player.history, spellId]
+    };
+    let boss = { ..._boss };
+    let spell = spells.find((s) => s.id === spellId)!;
 
-            //player turn
-            Object.keys(player.activeSpells).forEach((id) => {
-                spells.find((_s) => _s.id == id)!.cast(player, boss);
-            });
-            s.cast(player, boss);
+    //player turn
+    Object.keys(player.activeSpells).forEach((id) => {
+        spells.find((_s) => _s.id == id)!.cast(player, boss);
+    });
+    spell.cast(player, boss);
 
-            //boss turn
-            Object.keys(player.activeSpells).forEach((id) => {
-                spells.find((_s) => _s.id == id)!.cast(player, boss);
-            });
-            player.hp = Math.max(1, boss.damage - player.armor);
-
-            queue.push({ player, boss });
-        });
-    queue.sort((a, b) => b.player.manaUsed - a.player.manaUsed);
+    //boss turn
+    Object.keys(player.activeSpells).forEach((id) => {
+        spells.find((_s) => _s.id == id)!.cast(player, boss);
+    });
+    player.hp -= Math.max(1, boss.damage - player.armor);
+    return [player, boss];
 }
+
+function findLowestMana(player: Player, boss: Boss) {
+    let minManaUsed = Infinity;
+    let queue = [{ boss, player }];
+    while (queue.length) {
+        let p = queue.pop()!;
+        if (p.boss.hp <= 0) {
+            if (p.player.manaUsed < minManaUsed) {
+                minManaUsed = p.player.manaUsed;
+            }
+            continue;
+        }
+        if (p.player.hp <= 0 || p.player.manaUsed >= minManaUsed) continue;
+        spells
+            .filter(
+                (s) =>
+                    ((p.player as Player).activeSpells[s.id] || 0) === 0 &&
+                    p.player.mana >= s.cost
+            )
+            .forEach((s) => {
+                let [player, boss] = play(p.player, p.boss, s.id);
+                queue.push({ player, boss });
+            });
+        // queue.sort((a, b) => b.player.manaUsed - a.player.manaUsed);
+    }
+    return minManaUsed;
+}
+
+console.log('Part 1', findLowestMana(player, boss));
+
+// let bb: Boss = { hp: 14, damage: 8 };
+// let pp: Player = {
+//     hp: 10,
+//     damage: 0,
+//     armor: 0,
+//     mana: 250,
+//     manaUsed: 0,
+//     activeSpells: {},
+//     history: [] as string[]
+// };
+
+// [pp, bb] = play(pp, bb, 'recharge');
+// console.log(pp, bb);
+
+// [pp, bb] = play(pp, bb, 'shield');
+// console.log(pp, bb);
+
+// [pp, bb] = play(pp, bb, 'drain');
+// console.log(pp, bb);
+
+// [pp, bb] = play(pp, bb, 'poison');
+// console.log(pp, bb);
+
+// [pp, bb] = play(pp, bb, 'missles');
+// console.log(pp, bb);
