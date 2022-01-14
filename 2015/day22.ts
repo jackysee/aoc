@@ -35,7 +35,7 @@ const spells = [
     {
         id: 'shield',
         cost: 113,
-        cast: (player: Player, boss?: Boss) => {
+        cast: (player: Player) => {
             if (player.activeSpells.shield === undefined) {
                 player.mana -= 113;
                 player.manaUsed += 113;
@@ -44,7 +44,7 @@ const spells = [
                 return;
             }
         },
-        effect: (player: Player, boss: Boss) => {
+        effect: (player: Player) => {
             player.activeSpells.shield -= 1;
             if (player.activeSpells.shield === 0) {
                 player.armor -= 7;
@@ -55,7 +55,7 @@ const spells = [
     {
         id: 'poison',
         cost: 173,
-        cast: (player: Player, boss: Boss) => {
+        cast: (player: Player) => {
             if (player.activeSpells.poison === undefined) {
                 player.mana -= 173;
                 player.manaUsed += 173;
@@ -74,7 +74,7 @@ const spells = [
     {
         id: 'recharge',
         cost: 229,
-        cast: (player: Player, boss?: Boss) => {
+        cast: (player: Player) => {
             if (player.activeSpells.recharge === undefined) {
                 player.mana -= 229;
                 player.manaUsed += 229;
@@ -82,7 +82,7 @@ const spells = [
                 return;
             }
         },
-        effect: (player: Player, boss?: Boss) => {
+        effect: (player: Player) => {
             player.mana += 101;
             player.activeSpells.recharge -= 1;
             if (player.activeSpells.recharge === 0) {
