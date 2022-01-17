@@ -17,5 +17,4 @@ const arr2 = arr.flatMap((a, ai, arr) => {
         [a[2], arr[ai + 1][2], arr[ai + 2][2]]
     ];
 });
-console.log(arr2.slice(0, 10));
 console.log('Part 2', arr2.filter(isTrangle).length);
