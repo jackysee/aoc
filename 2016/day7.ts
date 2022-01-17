@@ -13,11 +13,7 @@ let arr: Line[] = data()
         s
     }));
 
-const hasABBA = (s: string) => {
-    let m = s.match(/(.)(.)\2\1/g);
-    return !!m && m.every((s) => !/(.)\1\1\1/.test(s));
-};
-
+const hasABBA = (s: string) => !!/(.)(?!\1)(.)\2\1/.test(s);
 console.log(
     'Part 1',
     arr.filter(
@@ -42,9 +38,7 @@ console.log(
     'Part 2',
     arr.filter(({ insides, outsides }) => {
         let patterns = outsides
-            .flatMap((s) =>
-                matchOverlap(s, /(.)(.)\1/g).filter((s) => !/(.)\1\1/.test(s))
-            )
+            .flatMap((s) => matchOverlap(s, /(.)(?!\1)(.)\1/g))
             .map((s) => s[1] + s[0] + s[1]);
         return patterns.some((p) => insides.some((s) => s.indexOf(p) !== -1));
     }).length
