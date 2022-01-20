@@ -1,7 +1,5 @@
 import data from './day12_input.ts';
 // import data from './day12_sample.ts';
-
-// const reg: Record<string, number> = { a: 0, b: 0, c: 0, d: 0 };
 const arr = data().split('\n');
 
 function run(reg: Record<string, number>) {
