@@ -1,7 +1,6 @@
 import data from './day15_input.ts';
 // import data from './day15_sample.ts';
-
-let arr: number[][] = data()
+const arr: number[][] = data()
     .split('\n')
     .map((l) => {
         let m = l.match(/\d+/g)!;
@@ -9,9 +8,7 @@ let arr: number[][] = data()
     });
 
 const tick = (arr: number[][], t: number) =>
-    arr.map((a) => {
-        return [a[0], (a[1] + t) % a[0]];
-    });
+    arr.map((a) => [a[0], (a[1] + t) % a[0]]);
 
 const play = (arr: number[][], t: number) => {
     let discs = arr.map((a) => [...a]);
