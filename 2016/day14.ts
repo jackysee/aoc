@@ -23,11 +23,12 @@ async function run(hashFunc: (s: string) => Promise<string>) {
     }
 }
 
-const hash1 = async (s: string) => await md5(s);
-console.log('Part 1', await run(hash1));
+const createHash =
+    (t: number = 1) =>
+    async (s: string) => {
+        for (let i = 0; i < t; i++) s = await md5(s);
+        return s;
+    };
 
-const hash2 = async (s: string) => {
-    for (let i = 0; i < 2017; i++) s = await md5(s);
-    return s;
-};
-console.log('Part 2', await run(hash2));
+console.log('Part 1', await run(createHash()));
+console.log('Part 2', await run(createHash(2017)));
