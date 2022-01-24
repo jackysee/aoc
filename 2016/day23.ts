@@ -51,8 +51,8 @@ console.log('Part 1', run({ a: 7, b: 0, c: 0, d: 0 }).a);
  2 cpy a d      d = a               d = 12
  3 cpy 0 a      a = 0               a = 0
  4 cpy b c      c = b               c = 11
- 5 inc a        a += 1              a = 1,  2, 3, 4, 5, 6, 7, 8, 9, 10
- 6 dec c        c -= 1              c = 10, 9, 8, 7, 6, 5, 4, 3, 2, 1
+ 5 inc a        a += 1              a = 1 .. 11
+ 6 dec c        c -= 1              c = 10 .. 0
  7 jnz c -2     c !== 0 , j 5
  8 dec d        d -= 1              d = 12
  9 jnz d -5     d !== 0, j  4
