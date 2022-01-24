@@ -3,8 +3,7 @@ import { BinaryHeap } from 'https://deno.land/x/collections@0.11.2/mod.ts';
 import data from './day22_input.ts';
 // import data from './day22_sample.ts';
 interface Node {
-    x: number;
-    y: number;
+    pos: string;
     size: number;
     used: number;
     avail: number;
@@ -16,7 +15,7 @@ let arr: Node[] = data()
     .map((l) => {
         let [x, y] = l.match(/(?<=[xy])\d+/g)!.map(Number);
         let [size, used, avail] = l.match(/\d+(?=T)/g)!.map(Number);
-        return { x, y, size, used, avail };
+        return { pos: [x, y] + '', size, used, avail };
     });
 
 console.log(
@@ -28,9 +27,7 @@ console.log(
     }).length
 );
 
-let M: Record<string, Node> = Object.fromEntries(
-    arr.map((a) => [`${a.x},${a.y}`, a])
-);
+let M: Record<string, Node> = Object.fromEntries(arr.map((a) => [a.pos, a]));
 
 interface Item {
     pos: string;
@@ -38,7 +35,7 @@ interface Item {
     map: Record<string, Node>;
 }
 
-let mx = Math.max(...arr.map((a) => a.x));
+let mx = Math.max(...arr.map((a) => +a.pos.split(',')[0]));
 let minSize = M[`${mx},0`].used;
 
 function getNeigbours({ pos, map }: Item, visited: Set<string>) {
@@ -100,8 +97,7 @@ function dij(
     return D[to];
 }
 
-let _ = arr.find((a) => a.used === 0)!;
-let current = `${_.x},${_.y}`;
+let current = arr.find((a) => a.used === 0)!.pos;
 let dist = 0;
 let G = mx;
 while (true) {
