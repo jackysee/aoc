@@ -30,6 +30,6 @@ console.log(
     pass().reduce((a, c) => a + c, 0)
 );
 
-let i = 0;
-while (pass(i).length) i++;
+let i = -1;
+while (pass(++i).length);
 console.log('Part 2', i);
