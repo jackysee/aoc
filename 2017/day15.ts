@@ -10,11 +10,9 @@ const genB = createGen(48271);
 
 function countMatch([a, b]: number[], times: number, [da, db]: number[]) {
     let [i, total] = [0, 0];
-    let mask = (1 << 16) - 1;
-    while (i < times) {
+    while (i++ < times) {
         [a, b] = [genA(a, da), genB(b, db)];
-        if ((a & mask) == (b & mask)) total++;
-        i++;
+        if ((a & 0xffff) == (b & 0xffff)) total++;
     }
     return total;
 }
