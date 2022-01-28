@@ -22,16 +22,12 @@ const turnLeft = (dir: string) => ({ N: 'W', E: 'N', S: 'E', W: 'S' }[dir]);
 const turnRight = (dir: string) => ({ N: 'E', E: 'S', S: 'W', W: 'N' }[dir]);
 
 let current = '1,0';
+// let current = '8,0';
 let dir = 'S';
 let result: string[] = [];
+let count = 0;
 while (true) {
-    // console.log(
-    //     current,
-    //     dir,
-    //     M[current],
-    //     [dir, turnLeft(dir), turnRight(dir)].map((d) => M[walk(d!, current)])
-    // );
-    let next: string = '';
+    let next = '';
     if (/[\|\-A-Z]/.test(M[current])) {
         next = walk(dir, current);
     }
@@ -51,6 +47,8 @@ while (true) {
     if (current === next) break;
     current = next;
     if (/[A-Z]/.test(M[current])) result.push(M[current]);
+    count++;
 }
 
 console.log('Part 1', result.join(''));
+console.log('Part 2', count - 1);
