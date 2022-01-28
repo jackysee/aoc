@@ -1,5 +1,7 @@
 import data from './day19_input.ts';
+let current = '1,0';
 // import data from './day19_sample.ts';
+// let current = '8,0';
 
 let M: Record<string, string> = {};
 data()
@@ -21,13 +23,11 @@ const walk = (dir: string, pos: string) => {
 const turnLeft = (dir: string) => ({ N: 'W', E: 'N', S: 'E', W: 'S' }[dir]);
 const turnRight = (dir: string) => ({ N: 'E', E: 'S', S: 'W', W: 'N' }[dir]);
 
-let current = '1,0';
-// let current = '8,0';
 let dir = 'S';
 let result: string[] = [];
-let count = 0;
+let count = 1;
 while (true) {
-    let next = '';
+    let next = undefined;
     if (/[\|\-A-Z]/.test(M[current])) {
         next = walk(dir, current);
     }
@@ -44,6 +44,7 @@ while (true) {
             }
         }
     }
+    if (!next || M[next] === undefined) break;
     if (current === next) break;
     current = next;
     if (/[A-Z]/.test(M[current])) result.push(M[current]);
@@ -51,4 +52,4 @@ while (true) {
 }
 
 console.log('Part 1', result.join(''));
-console.log('Part 2', count - 1);
+console.log('Part 2', count);
