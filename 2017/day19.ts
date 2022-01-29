@@ -1,7 +1,7 @@
 import data from './day19_input.ts';
-let current = '1,0';
+let pos = '1,0';
 // import data from './day19_sample.ts';
-// let current = '8,0';
+// let pos = '8,0';
 
 let M: Record<string, string> = {};
 data()
@@ -25,31 +25,22 @@ const turnRight = (dir: string) => ({ N: 'E', E: 'S', S: 'W', W: 'N' }[dir]);
 
 let dir = 'S';
 let result: string[] = [];
-let count = 1;
 while (true) {
+    result.push(M[pos]);
     let next = undefined;
-    if (/[\|\-A-Z]/.test(M[current])) {
-        next = walk(dir, current);
+    if (/[\|\-A-Z]/.test(M[pos])) {
+        next = walk(dir, pos);
     }
-    if (M[current] === '+') {
-        let p = walk(turnLeft(dir)!, current);
-        if (/[\|\-A-Z]/.test(M[p])) {
-            dir = turnLeft(dir)!;
-            next = p;
-        } else {
-            let p = walk(turnRight(dir)!, current);
-            if (/[\|\-A-Z]/.test(M[p])) {
-                dir = turnRight(dir)!;
-                next = p;
-            }
-        }
+    if (M[pos] === '+') {
+        let [d, p] = [turnLeft(dir)!, turnRight(dir)!]
+            .map((d) => [d, walk(d, pos)])
+            .find(([d, p]) => /[\|\-A-Z]/.test(M[p]))!;
+        dir = d;
+        next = p;
     }
-    if (!next || M[next] === undefined) break;
-    if (current === next) break;
-    current = next;
-    if (/[A-Z]/.test(M[current])) result.push(M[current]);
-    count++;
+    if (!next || !M[next]) break;
+    pos = next;
 }
 
-console.log('Part 1', result.join(''));
-console.log('Part 2', count);
+console.log('Part 1', result.filter((c) => /[A-Z]/.test(c)).join(''));
+console.log('Part 2', result.length);
