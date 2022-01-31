@@ -28,16 +28,46 @@ console.log('Part 1', run());
 /*
  *
  *
-
-b = 67
-c = b = 67
-b = b * 100 = 6700
-b = b - 100000
-
-
-
-
-
-
+  b = 106700
+  c = b + 17000
+  do { 
+      f = 1
+      d = 2
+      do { 
+          e = 2
+          do { 
+              g = d 
+              g *= e
+              g -= b
+              if(g == 0) {
+                f = 0
+              }
+              e += 1
+              g = e
+              g -= b
+          } while(g !== 0)
+          d += 1
+          g = d
+          g -= b
+      } while(g !== 0)
+      if(f == 0)
+        h += 1
+      g = b
+      g -= c
+      if(g == 0) return 
+      b += 17
+   } while(true)
 
 */
+
+const isPrime = (n: number) => {
+    for (let i = 2, s = Math.sqrt(n); i <= s; i++)
+        if (n % i === 0) return false;
+    return n !== 1;
+};
+
+let h = 0;
+for (let b = 106700; b <= 106700 + 17000; b += 17) {
+    if (!isPrime(b)) h++;
+}
+console.log('Part 2', h);
