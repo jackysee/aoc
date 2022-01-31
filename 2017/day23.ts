@@ -24,3 +24,20 @@ function run(M: Record<string, number> = {}) {
 }
 
 console.log('Part 1', run());
+
+/*
+ *
+ *
+
+b = 67
+c = b = 67
+b = b * 100 = 6700
+b = b - 100000
+
+
+
+
+
+
+
+*/
