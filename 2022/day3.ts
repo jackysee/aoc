@@ -3,7 +3,7 @@ import data from './day3_input.ts';
 
 let arr: string[] = data().split('\n');
 const L = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-const val = (c: string | undefined) => return (c === undefined) 0 : L.indexOf(c) + 1;
+const val = (c: string | undefined) => (c === undefined ? 0 : L.indexOf(c) + 1);
 const contains = (str: string, c: string) => str.indexOf(c) !== -1;
 const find = (arr: string[]) => {
     return arr[0]
