@@ -2,7 +2,8 @@ import data from './day5_input.ts';
 // import data from './day5_sample.ts';
 
 const [stackStr, insStr] = data().split('\n\n');
-const stacks: Record<string, string[]> = {};
+const stacks1: Record<string, string[]> = {};
+const stacks2: Record<string, string[]> = {};
 stackStr
     .split('\n')
     .slice(0, -1)
@@ -11,44 +12,39 @@ stackStr
         for (let i = 0; i <= l.length; i += 4) {
             const m = l.slice(i, i + 4).match(/\[(\w)\]/);
             if (m) {
-                stacks[s] = stacks[s] || [];
-                stacks[s] = [m[1], ...stacks[s]];
+                stacks1[s] = [m[1], ...(stacks1[s] || [])];
+                stacks2[s] = [m[1], ...(stacks2[s] || [])];
             }
             s++;
         }
     });
 
-const ins = insStr.split('\n').map((l) => l.match(/\d+/g)!.map(Number));
-
-const copy = (stacks: Record<string, string[]>) =>
-    Object.fromEntries(Object.entries(stacks).map(([k, v]) => [k, [...v]]));
-
-const mover1 = (_stacks: Record<string, string[]>) => {
-    const stacks = copy(_stacks);
-    ins.forEach(([n, from, to]) => {
-        for (let i = 0; i < n; i++) {
-            stacks[to].push(stacks[from].pop()!);
-        }
-    });
-    return stacks;
+const moveCrates = (
+    stacks: Record<string, string[]>,
+    [n, from, to]: number[]
+) => {
+    const arr = stacks[from].slice(-n);
+    stacks[from] = stacks[from].slice(0, -n);
+    stacks[to] = [...stacks[to], ...arr];
 };
 
-const topCrates = (stacks: Record<string, string[]>) => {
+insStr
+    .split('\n')
+    .map((l) => l.match(/\d+/g)!.map(Number))
+    .forEach(([n, from, to]) => {
+        //mover 1
+        for (let i = 0; i < n; i++) {
+            moveCrates(stacks1, [1, from, to]);
+        }
+        //mover 2
+        moveCrates(stacks2, [n, from, to]);
+    });
+
+const top = (stacks: Record<string, string[]>) => {
     return Object.values(stacks)
         .map((v) => v.at(-1))
         .join('');
 };
 
-console.log(topCrates(mover1(stacks)));
-
-const mover2 = (_stacks: Record<string, string[]>) => {
-    const stacks = copy(_stacks);
-    ins.forEach(([n, from, to]) => {
-        const arr = stacks[from].slice(-n);
-        stacks[from] = stacks[from].slice(0, -n);
-        stacks[to] = [...stacks[to], ...arr];
-    });
-    return stacks;
-};
-
-console.log(topCrates(mover2(stacks)));
+console.log(top(stacks1));
+console.log(top(stacks2));
