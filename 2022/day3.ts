@@ -1,14 +1,12 @@
 import data from './day3_input.ts';
 // import data from './day3_sample.ts';
 
-let arr: string[] = data().split('\n');
+const arr: string[] = data().split('\n');
 const L = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 const val = (c: string | undefined) => (c === undefined ? 0 : L.indexOf(c) + 1);
 const contains = (str: string, c: string) => str.indexOf(c) !== -1;
-const find = (arr: string[]) => {
-    return arr[0]
-        .split('')
-        .find((c) => arr.slice(1).every((l) => contains(l, c)));
+const find = ([head, ...rest]: string[]) => {
+    return head.split('').find((c) => rest.every((l) => contains(l, c)));
 };
 const partA = arr
     .map((l) => {

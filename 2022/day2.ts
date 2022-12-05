@@ -5,7 +5,7 @@ const arr: string[] = data().split('\n');
 
 //X === rock, Y === paper, Z === scissors
 //A === rock, B === paper, C === scissors
-const scores1 = {
+const scores1: Record<string, number> = {
     'A X': 1 + 3,
     'A Y': 2 + 6,
     'A Z': 3 + 0,
@@ -24,7 +24,7 @@ console.log(
 
 //X === lose, Y === draw,  Z === win
 //A === rock, B === paper, C === scissors
-const scores2 = {
+const scores2: Record<string, number> = {
     'A X': 3 + 0,
     'A Y': 1 + 3,
     'A Z': 2 + 6,

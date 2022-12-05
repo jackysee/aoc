@@ -1,5 +1,5 @@
 import data from './day4_input.ts';
-let arr: number[][] = data()
+const arr: number[][] = data()
     .split('\n')
     .map((l) => l.split(/[,\-]/).map(Number));
 
