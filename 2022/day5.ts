@@ -19,32 +19,23 @@ stackStr
         }
     });
 
-const moveCrates = (
-    stacks: Record<string, string[]>,
-    [n, from, to]: number[]
-) => {
-    const arr = stacks[from].slice(-n);
+const move = (stacks: Record<string, string[]>, [n, from, to]: number[]) => {
+    stacks[to] = [...stacks[to], ...stacks[from].slice(-n)];
     stacks[from] = stacks[from].slice(0, -n);
-    stacks[to] = [...stacks[to], ...arr];
 };
 
 insStr
     .split('\n')
     .map((l) => l.match(/\d+/g)!.map(Number))
     .forEach(([n, from, to]) => {
-        //mover 1
-        for (let i = 0; i < n; i++) {
-            moveCrates(stacks1, [1, from, to]);
-        }
-        //mover 2
-        moveCrates(stacks2, [n, from, to]);
+        for (let i = 0; i < n; i++) move(stacks1, [1, from, to]);
+        move(stacks2, [n, from, to]);
     });
 
-const top = (stacks: Record<string, string[]>) => {
-    return Object.values(stacks)
+const top = (stacks: Record<string, string[]>) =>
+    Object.values(stacks)
         .map((v) => v.at(-1))
         .join('');
-};
 
 console.log(top(stacks1));
 console.log(top(stacks2));
