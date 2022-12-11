@@ -2,17 +2,16 @@
 import data from './day11_sample.ts';
 
 const M: Record<number, any> = {};
-
-const makeOp = (s) => {
-    let [b, c] = s.split(' ').slice(-2);
+const makeOp = (s: string) => {
+    const [b, c] = s.split(' ').slice(-2);
     if (b === '+') {
-        return (n) => n + Number(c);
+        return (n: number) => n + Number(c);
     }
     if (b === '*') {
-        if (c === 'old') return (n) => n * n;
-        return (n) => n * Number(c);
+        if (c === 'old') return (n: number) => n * n;
+        return (n: number) => n * Number(c);
     }
-    return (n) => n;
+    return (n: number) => n;
 };
 
 data()
@@ -36,9 +35,9 @@ data()
 const ROUND = 10000;
 for (let r = 0; r < ROUND; r++) {
     for (let i = 0; i < Object.values(M).length; i++) {
-        let m = M[i];
-        m.items.forEach((n) => {
-            let _n = m.op(n);
+        const m = M[i];
+        m.items.forEach((n: number) => {
+            const _n = m.op(n);
             // _n = Math.floor(_n / 3);
             // if (r % 1000 == 0)
             //     console.log({ n, _n, i, div: m.test, inspected: m.inspected });
@@ -46,7 +45,7 @@ for (let r = 0; r < ROUND; r++) {
             if (_n % m.test === 0) {
                 M[m.yes].items.push(m.test);
             } else {
-                M[m.no].items.push(_n % m.test);
+                M[m.no].items.push(_n);
             }
             m.inspected++;
         });
