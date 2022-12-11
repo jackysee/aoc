@@ -52,7 +52,7 @@ for (let r = 0; r < ROUND; r++) {
         m.items = [];
     }
 }
-
+//sample ans 2713310158
 console.log(
     Object.values(M)
         .map((m) => m.inspected)
