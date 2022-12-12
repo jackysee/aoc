@@ -20,13 +20,10 @@ data()
     .split('\n\n')
     .forEach((l) => {
         const arr = l.split('\n');
-        M.push({
-            items: nums(arr[1]),
-            op: makeOp(arr[2]),
-            divisor: nums(arr[3])[0],
-            yes: nums(arr[4])[0],
-            no: nums(arr[5])[0]
-        });
+        const items = nums(arr[1]);
+        const op = makeOp(arr[2]);
+        const [divisor, yes, no] = nums(arr.slice(3).join('\n'));
+        M.push({ items, op, divisor, yes, no });
     });
 
 function play(round: number, cb: (n: number, i: number) => number) {
@@ -43,10 +40,8 @@ function play(round: number, cb: (n: number, i: number) => number) {
             items[i] = [];
         });
     }
-    return inspected
-        .sort((a, b) => b - a)
-        .slice(0, 2)
-        .reduce((a, c) => a * c, 1);
+    inspected.sort((a, b) => b - a);
+    return inspected[0] * inspected[1];
 }
 
 console.log(play(20, (n) => Math.floor(n / 3)));
