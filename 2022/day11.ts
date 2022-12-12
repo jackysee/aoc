@@ -4,7 +4,7 @@ import data from './day11_input.ts';
 type monkey = {
     items: number[];
     op: (n: number) => number;
-    test: number;
+    divisor: number;
     yes: number;
     no: number;
 };
@@ -23,7 +23,7 @@ data()
         M.push({
             items: nums(arr[1]),
             op: makeOp(arr[2]),
-            test: nums(arr[3])[0],
+            divisor: nums(arr[3])[0],
             yes: nums(arr[4])[0],
             no: nums(arr[5])[0]
         });
@@ -36,7 +36,7 @@ function play(round: number, cb: (n: number, i: number) => number) {
         M.forEach((m, i) => {
             items[i].forEach((ns: number[]) => {
                 const _n = ns.map((n, i) => cb(m.op(n), i));
-                const to = _n[i] % m.test === 0 ? m.yes : m.no;
+                const to = _n[i] % m.divisor === 0 ? m.yes : m.no;
                 items[to].push(_n);
                 inspected[i] += 1;
             });
@@ -50,4 +50,4 @@ function play(round: number, cb: (n: number, i: number) => number) {
 }
 
 console.log(play(20, (n) => Math.floor(n / 3)));
-console.log(play(10000, (n, i) => n % M[i].test));
+console.log(play(10000, (n, i) => n % M[i].divisor));
