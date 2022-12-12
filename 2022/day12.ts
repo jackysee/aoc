@@ -1,55 +1,49 @@
 import data from './day12_input.ts';
 // import data from './day12_sample.ts';
 
-type point = [number, number];
 const map: Record<string, number> = {};
-let start: point | undefined = undefined;
-let end: point | undefined = undefined;
-const as: point[] = [];
+let start: string | undefined;
+let end: string | undefined;
+const as: string[] = [];
 data()
     .split('\n')
     .forEach((l, r) => {
         l.split('').forEach((n, c) => {
+            const key = [r, c].join(',');
             if (n === 'S') {
-                map[[r, c] + ''] = 'a'.charCodeAt(0);
-                start = [r, c];
+                map[key] = 'a'.charCodeAt(0);
+                start = key;
                 as.push(start);
             } else if (n === 'E') {
-                map[[r, c] + ''] = 'z'.charCodeAt(0);
-                end = [r, c];
+                map[key] = 'z'.charCodeAt(0);
+                end = key;
             } else {
-                if (n === 'a') as.push([r, c]);
-                map[[r, c] + ''] = n.charCodeAt(0);
+                if (n === 'a') as.push([r, c].join(','));
+                map[key] = n.charCodeAt(0);
             }
         });
     });
 
-const bfs = (starts: point[], dest: point, map: Record<string, number>) => {
-    const visited = new Set(starts.map((pt) => '' + pt));
+const bfs = (starts: string[], dest: string, map: Record<string, number>) => {
+    const visited = new Set(starts);
     const queue = starts.map((pt) => ({ pt, steps: 0 }));
     while (queue.length) {
         const p = queue.shift()!;
-        if ('' + p.pt === '' + dest) {
+        if (p.pt === dest) {
             return p.steps;
         }
-        const [r, c] = p.pt as number[];
-        [
-            [r - 1, c],
-            [r + 1, c],
-            [r, c - 1],
-            [r, c + 1]
-        ]
+        const [r, c] = p.pt.split(',').map(Number);
+        [[r - 1, c] + '', [r + 1, c] + '', [r, c - 1] + '', [r, c + 1] + '']
             .filter((pt) => {
-                const h = map['' + pt];
+                const h = map[pt];
                 if (h === undefined) return false;
-                if (visited.has('' + pt)) return false;
-                if (h - map[p.pt + ''] > 1) return false;
+                if (visited.has(pt)) return false;
+                if (h - map[p.pt] > 1) return false;
                 return true;
             })
             .forEach((pt) => {
-                const q = { pt: pt as point, steps: p.steps + 1 };
-                visited.add('' + pt);
-                queue.push(q);
+                visited.add(pt);
+                queue.push({ pt, steps: p.steps + 1 });
             });
     }
     return Infinity;
