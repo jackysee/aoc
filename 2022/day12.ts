@@ -24,23 +24,16 @@ data()
         });
     });
 
-const bfs = (
-    start: point,
-    dest: point,
-    map: Record<string, number>,
-    min = Infinity
-) => {
-    const visited = new Set();
-    let queue = [{ pt: start, steps: 0, height: map['' + start] }];
+const bfs = (starts: point[], dest: point, map: Record<string, number>) => {
+    const visited = new Set(starts.map((pt) => '' + pt));
+    const queue = starts.map((pt) => ({ pt, steps: 0 }));
     while (queue.length) {
         const p = queue.shift()!;
-        if (p.steps > min) continue;
         if ('' + p.pt === '' + dest) {
-            min = Math.min(p.steps, min);
-            continue;
+            return p.steps;
         }
         const [r, c] = p.pt as number[];
-        const _queue = [
+        [
             [r - 1, c],
             [r + 1, c],
             [r, c - 1],
@@ -50,24 +43,17 @@ const bfs = (
                 const h = map['' + pt];
                 if (h === undefined) return false;
                 if (visited.has('' + pt)) return false;
-                if (h - p.height > 1) return false;
+                if (h - map[p.pt + ''] > 1) return false;
                 return true;
             })
-            .map((pt) => ({
-                pt: pt as point,
-                steps: p.steps + 1,
-                height: map[pt + '']
-            }));
-        _queue.forEach((p) => visited.add(p.pt + ''));
-        queue = [...queue, ..._queue];
+            .forEach((pt) => {
+                const q = { pt: pt as point, steps: p.steps + 1 };
+                visited.add('' + pt);
+                queue.push(q);
+            });
     }
-    return min;
+    return Infinity;
 };
 
-console.log(bfs(start!, end!, map));
-
-let min = Infinity;
-as.forEach((a) => {
-    min = Math.min(bfs(a, end!, map, min), min);
-});
-console.log(min);
+console.log(bfs([start!], end!, map));
+console.log(bfs(as, end!, map));
