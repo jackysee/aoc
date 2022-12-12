@@ -26,7 +26,7 @@ data()
         M.push({ items, op, divisor, yes, no });
     });
 
-function play(round: number, cb: (n: number, i: number) => number) {
+const calc = (round: number, cb: (n: number, i: number) => number) => {
     const inspected = Array(M.length).fill(0);
     const items = M.map((m) => m.items.map((n) => Array(M.length).fill(n)));
     for (let r = 0; r < round; r++) {
@@ -42,7 +42,7 @@ function play(round: number, cb: (n: number, i: number) => number) {
     }
     inspected.sort((a, b) => b - a);
     return inspected[0] * inspected[1];
-}
+};
 
-console.log(play(20, (n) => Math.floor(n / 3)));
-console.log(play(10000, (n, i) => n % M[i].divisor));
+console.log(calc(20, (n) => Math.floor(n / 3)));
+console.log(calc(10000, (n, i) => n % M[i].divisor));
