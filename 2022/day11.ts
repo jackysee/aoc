@@ -45,4 +45,13 @@ const calc = (round: number, cb: (n: number, i: number) => number) => {
 };
 
 console.log(calc(20, (n) => Math.floor(n / 3)));
+
+//Method 1 : operate on all moduli
 console.log(calc(10000, (n, i) => n % M[i].divisor));
+
+//Method 2:  use LCM of all divisors.
+//As all divisors are prime, just multiply them all together
+//this way you also don't need to keep track of all moduli
+//but I just reuse the code here anyway
+const base = M.reduce((a, m) => m.divisor * a, 1);
+console.log(calc(10000, (n) => n % base));
