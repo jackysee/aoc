@@ -18,7 +18,7 @@ data()
                 map[key] = 'z'.charCodeAt(0);
                 end = key;
             } else {
-                if (n === 'a') as.push([r, c].join(','));
+                if (n === 'a') as.push(key);
                 map[key] = n.charCodeAt(0);
             }
         });
@@ -29,14 +29,12 @@ const bfs = (starts: string[], dest: string, map: Record<string, number>) => {
     const queue = starts.map((pt) => ({ pt, steps: 0 }));
     while (queue.length) {
         const p = queue.shift()!;
-        if (p.pt === dest) {
-            return p.steps;
-        }
+        if (p.pt === dest) return p.steps;
         const [r, c] = p.pt.split(',').map(Number);
         [[r - 1, c] + '', [r + 1, c] + '', [r, c - 1] + '', [r, c + 1] + '']
             .filter((pt) => {
                 const h = map[pt];
-                if (h === undefined) return false;
+                if (!h) return false;
                 if (visited.has(pt)) return false;
                 if (h - map[p.pt] > 1) return false;
                 return true;
