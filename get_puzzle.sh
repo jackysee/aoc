@@ -28,6 +28,8 @@ const sum = (a: number, c: number) => a + c;
 const asc = (a: number, b: number) => a - b;
 const desc = (a: number, b: number) => b - a;
 // prettier-ignore
+const range = (a: number, b: number) => [...Array(b - a - 1)].map((_, i) => a + i);
+// prettier-ignore
 const DIRS = [[0,1],[0,-1],[1,0],[-1,0]];
 
 let arr: number[] = data().split('\n').map(Number);
