@@ -26,9 +26,10 @@ data()
 const floor = maxY + 2;
 const source = '500,0';
 let count = 0;
-let sand = source;
+const sands = [source];
 let p1 = false;
 while (true) {
+    const sand = sands.at(-1)!;
     const [x, y] = ints(sand);
     if (y > maxY && !p1) {
         p1 = true;
@@ -43,9 +44,9 @@ while (true) {
         M[sand] = 'o';
         count++;
         if (sand === source) break;
-        sand = source;
+        sands.pop();
     } else {
-        sand = _sand;
+        sands.push(_sand);
     }
 }
 console.log(count);
