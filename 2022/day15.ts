@@ -54,12 +54,15 @@ const countNoBeacon = (y: number, x1 = -Infinity, x2 = Infinity) => {
     let [left, right] = getBoundX(y);
     left = Math.max(left, x1);
     right = Math.min(right, x2);
-    for (let x = left; x <= right; x++) {
+    let x = left;
+    while (x < right) {
         const result = detect([x, y]);
         if (result.inRange) {
-            count += Math.min(result.skipToX, right) - x;
-            x = result.skipToX;
+            const _right = Math.min(result.skipToX, right);
+            count += _right - x;
+            x = _right;
         } else {
+            x++;
             notInRange.push([x, y]);
         }
     }
