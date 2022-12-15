@@ -54,15 +54,17 @@ const countNoBeacon = (y: number, x1 = -Infinity, x2 = Infinity) => {
     let count = 0;
     // console.log(getBoundX(y));
     let [left, right] = getBoundX(y);
-    console.log(left, right, x1, x2);
+    // console.log(left, right, x1, x2);
     left = Math.max(left, x1);
     right = Math.min(right, x2);
-    console.log({ left, right });
+    // console.log({ left, right });
     for (let x = left; x <= right; x++) {
         let result = detect([x, y]);
         if (result.noBeacon) {
             // console.log([x, y], 'skipx', result, result.skipToX - x + 1);
-            count += Math.min(result.skipToX, right) - x + 1;
+            count +=
+                result.skipToX > right ? right - x : result.skipToX - x + 1;
+            //Math.min(result.skipToX, right) - x + 1;
             x = result.skipToX;
         }
     }
@@ -72,22 +74,22 @@ const countNoBeacon = (y: number, x1 = -Infinity, x2 = Infinity) => {
             .filter((b) => b[1] === y && b[0] >= left && b[1] <= right)
             .map((b) => '' + b)
     );
-    console.log('resuult', { count, beacons });
+    // console.log('resuult', { count, beacons });
     // console.log(count - beacons.size);
-    return count - beacons.size;
+    return { diff: count - beacons.size, count };
 };
-console.log(countNoBeacon(2000000));
+console.log(countNoBeacon(2000000).diff);
 console.log(countNoBeacon(2000000, 0, 4000000));
 // console.log(countNoBeacon(2000000, -5000000, 5000000));
 
-// let SPACE = 4_000_000;
-// for (let y = 0; y <= SPACE; y++) {
-//     let noBeaconCounts = countNoBeacon(y, 0, SPACE);
-//     if (y % 10_000 === 0) console.log(y);
-//     if (noBeaconCounts < SPACE) {
-//         console.log(y, noBeaconCounts, noBeaconCounts - SPACE);
-//     }
-// }
+let SPACE = 4_000_000;
+for (let y = 0; y <= SPACE; y++) {
+    let noBeaconCounts = countNoBeacon(y, 0, SPACE).count;
+    if (y % 10_000 === 0) console.log(y);
+    if (noBeaconCounts < SPACE) {
+        console.log(y, noBeaconCounts, noBeaconCounts - SPACE);
+    }
+}
 console.log('done');
 
 // let SPACE = 20;
