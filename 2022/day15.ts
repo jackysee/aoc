@@ -5,14 +5,12 @@ const ints = (s: string) => (s.match(/-?\d+/g) || []).map(Number);
 const manh = ([x1, y1]: number[], [x2, y2]: number[]) =>
     Math.abs(x1 - x2) + Math.abs(y1 - y2);
 
-const B: Record<string, boolean> = {};
 const entries = data()
     .split('\n')
     .map((l) => {
         const [sx, sy, bx, by] = ints(l);
         const sensor = [sx, sy];
         const beacon = [bx, by];
-        B[beacon + ''] = true;
         const dist = manh(sensor, beacon);
         return { sensor, beacon, dist };
     });
