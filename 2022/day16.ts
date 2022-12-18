@@ -10,62 +10,44 @@ const range = (a: number, b: number) => [...Array(b - a - 1)].map((_, i) => a + 
 // prettier-ignore
 const DIRS = [[0,1],[0,-1],[1,0],[-1,0]];
 
-const M: Record<string, string[]> = {};
-const R: Record<string, number> = {};
+type Valve = { rate: number; to: string[] };
+const M: Record<string, Valve> = {};
 data()
     .split('\n')
     .forEach((line) => {
         const [from, ...to] = line.match(/[A-Z][A-Z]/g)!;
-        M[from] = to;
-        R[from] = ints(line)[0];
+        M[from] = { to, rate: ints(line)[0] };
     });
 
-console.log(M, R);
+console.log(M);
 console.log('--------------------');
 
-const open = (state) => {
-    if (R[state.v] > 0 && !state.opened.has(state.v)) {
-        state.took += 1;
-        state.released = (30 - state.took) * R[state.v];
-        state.opened.add(state.v);
-    }
-};
-const move = (state, v) => {
-    return {
-        ...state,
-        v,
-        took: state.took + 1,
-        trail: [...state.trail, v]
-    };
-};
-
-const dfs = (state) => {
+type ValveState = { opened: boolean; openedAt: number };
+const nearestValves = (
+    M: Record<string, Valve>,
+    opened: Record<string, ValveState>,
+    start: string
+) => {
+    const queue = [{ valve: start, time: 0, path: [start] }];
     const seen = new Set();
-    const S = [];
-    S.push(state);
-    while (S.length) {
-        console.log(S);
-        const s = S.pop();
-        if (s.took >= 30) {
-            console.log(s);
+    const result = [];
+    while (queue.length) {
+        const q = queue.shift()!;
+        if (!opened[q.valve] && M[q.valve].rate > 0) {
+            result.push(q);
             continue;
         }
-        open(s);
-        if (!seen.has(s.v)) {
-            seen.add(s.v);
-            M[s.v].forEach((v) => {
-                S.push(move(state, v));
+        M[q.valve].to.forEach((valve) => {
+            if (seen.has(valve)) return;
+            queue.push({
+                valve,
+                time: q.time + 1,
+                path: [...q.path, valve]
             });
-        }
+            seen.add(valve);
+        });
     }
+    return result;
 };
-
-console.log(
-    dfs({
-        v: 'AA',
-        released: 0,
-        took: 0,
-        trail: ['AA'],
-        opened: new Set()
-    })
-);
+console.log(nearestValves(M, new Set(), 'AA'));
+// console.log(nearestValves(M, new Set(['BB', 'CC', 'DD', 'EE']), 'AA'));
