@@ -1,15 +1,7 @@
-// import data from './day16_input.ts';
-import data from './day16_sample.ts';
+import data from './day16_input.ts';
+// import data from './day16_sample.ts';
 
 const ints = (s: string) => (s.match(/-?\d+/g) || []).map(Number);
-const sum = (a: number, c: number) => a + c;
-const asc = (a: number, b: number) => a - b;
-const desc = (a: number, b: number) => b - a;
-// prettier-ignore
-const range = (a: number, b: number) => [...Array(b - a - 1)].map((_, i) => a + i);
-// prettier-ignore
-const DIRS = [[0,1],[0,-1],[1,0],[-1,0]];
-
 type Valve = { rate: number; to: string[] };
 const M: Record<string, Valve> = {};
 data()
@@ -19,35 +11,48 @@ data()
         M[from] = { to, rate: ints(line)[0] };
     });
 
-console.log(M);
-console.log('--------------------');
-
-type ValveState = { opened: boolean; openedAt: number };
-const nearestValves = (
-    M: Record<string, Valve>,
-    opened: Record<string, ValveState>,
-    start: string
-) => {
-    const queue = [{ valve: start, time: 0, path: [start] }];
-    const seen = new Set();
-    const result = [];
+const D: Record<string, Record<string, number>> = {};
+const nonEmpty: string[] = [];
+for (const valve in M) {
+    D[valve] = { [valve]: 0 };
+    if (M[valve].rate > 0) nonEmpty.push(valve);
+    const seen = new Set([valve]);
+    const queue = [{ dist: 0, valve }];
     while (queue.length) {
         const q = queue.shift()!;
-        if (!opened[q.valve] && M[q.valve].rate > 0) {
-            result.push(q);
-            continue;
-        }
-        M[q.valve].to.forEach((valve) => {
-            if (seen.has(valve)) return;
-            queue.push({
-                valve,
-                time: q.time + 1,
-                path: [...q.path, valve]
-            });
-            seen.add(valve);
+        M[q.valve].to.forEach((v) => {
+            if (seen.has(v)) return;
+            seen.add(v);
+            D[valve][v] = q.dist + 1;
+            queue.push({ dist: q.dist + 1, valve: v });
         });
     }
-    return result;
+    delete D[valve][valve];
+}
+
+const cache: Record<string, number> = {};
+const dfs = (time: number, valve: string, opened: number) => {
+    const key = [time, valve, opened].join('|');
+    if (cache[key]) return cache[key];
+    let max = 0;
+    for (const v in D[valve]) {
+        if (M[v].rate === 0) continue;
+        const bit = 1 << nonEmpty.indexOf(v);
+        if (opened & bit) continue;
+        const t = time - D[valve][v] - 1;
+        if (t <= 0) continue;
+        max = Math.max(max, dfs(t, v, opened | bit) + M[v].rate * t);
+    }
+    cache[key] = max;
+    return max;
 };
-console.log(nearestValves(M, new Set(), 'AA'));
-// console.log(nearestValves(M, new Set(['BB', 'CC', 'DD', 'EE']), 'AA'));
+console.log(dfs(30, 'AA', 0));
+
+const t = Date.now();
+let max = 0;
+const b = (1 << nonEmpty.length) - 1;
+for (let i = 0; i < b + 1; i++) {
+    max = Math.max(max, dfs(26, 'AA', i) + dfs(26, 'AA', b ^ i));
+}
+console.log('Part 2 took', Date.now() - t, 'ms');
+console.log(max);
