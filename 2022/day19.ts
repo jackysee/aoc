@@ -47,13 +47,12 @@ const getGeode = (time: number, id: number) => {
 
             const wait =
                 Math.max(
-                    ...costs.map((v, i) =>
-                        q.res[i] >= v
-                            ? 0
-                            : Math.floor(
-                                  (v - q.res[i] + q.bots[i] - 1) / q.bots[i]
-                              )
-                    )
+                    ...costs.map((v, i) => {
+                        if (q.res[i] >= v) return 0;
+                        return Math.floor(
+                            (v - q.res[i] + q.bots[i] - 1) / q.bots[i]
+                        );
+                    })
                 ) + 1;
 
             if (q.time - wait < 0) return;
