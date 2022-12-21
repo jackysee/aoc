@@ -2,13 +2,6 @@
 import data from './day19_sample.ts';
 
 const ints = (s: string) => (s.match(/-?\d+/g) || []).map(Number);
-const sum = (a: number, c: number) => a + c;
-const asc = (a: number, b: number) => a - b;
-const desc = (a: number, b: number) => b - a;
-// prettier-ignore
-const range = (a: number, b: number) => Array.from({length: b - a}, (_, n) => n + a);
-// prettier-ignore
-const DIRS = [[0,1],[0,-1],[1,0],[-1,0]];
 
 const B: Record<number, Record<string, number[]>> = {};
 data()
