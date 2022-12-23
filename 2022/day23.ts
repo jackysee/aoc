@@ -3,32 +3,31 @@ import data from './day23_input.ts';
 // import data from './day23_sample2.ts';
 
 const ints = (l: string) => l.split(',').map(Number);
-type Map = Record<string, string>;
-const M: Map = {};
+const M: Set<string> = new Set();
 data()
     .split('\n')
     .forEach((l, y) => {
         l.split('').forEach((c, x) => {
-            if (c === '#') M[`${x},${y}`] = '#';
+            if (c === '#') M.add(`${x},${y}`);
         });
     });
 
-const getAdjs = (key: string, M: Map) => {
+const getAdjs = (key: string, M: Set<string>) => {
     const [x, y] = ints(key);
     return {
-        NE: M[`${x + 1},${y - 1}`],
-        N: M[`${x},${y - 1}`],
-        NW: M[`${x - 1},${y - 1}`],
-        E: M[`${x + 1},${y}`],
-        W: M[`${x - 1},${y}`],
-        SE: M[`${x + 1},${y + 1}`],
-        S: M[`${x},${y + 1}`],
-        SW: M[`${x - 1},${y + 1}`]
-    } as Map;
+        NE: M.has(`${x + 1},${y - 1}`),
+        N: M.has(`${x},${y - 1}`),
+        NW: M.has(`${x - 1},${y - 1}`),
+        E: M.has(`${x + 1},${y}`),
+        W: M.has(`${x - 1},${y}`),
+        SE: M.has(`${x + 1},${y + 1}`),
+        S: M.has(`${x},${y + 1}`),
+        SW: M.has(`${x - 1},${y + 1}`)
+    } as Record<string, boolean>;
 };
 
-const getBound = (M: Map) => {
-    const arr = Object.keys(M).map(ints);
+const getBound = (M: Set<string>) => {
+    const arr = [...M].map(ints);
     let x1 = Infinity;
     let x2 = -Infinity;
     let y1 = Infinity;
@@ -42,14 +41,14 @@ const getBound = (M: Map) => {
     return [x2, x1, y2, y1];
 };
 
-// const render = (M: Map) => {
+// const render = (M: Set<string>) => {
 //     const [x2, x1, y2, y1] = getBound(M);
 //     const arr = [];
 //     for (let y = y1 - 1; y <= y2 + 1; y++) {
 //         let line = '';
 
 //         for (let x = x1 - 1; x <= x2 + 1; x++) {
-//             line += M['' + [x, y]] || '.';
+//             line += M.has( '' + [x, y] )? '#' : '.';
 //         }
 //         arr.push(line);
 //     }
@@ -57,7 +56,7 @@ const getBound = (M: Map) => {
 // };
 
 const MOVES = ['N', 'S', 'W', 'E'];
-const move = (r: number, M: Map) => {
+const move = (r: number, M: Set<string>) => {
     const mi = r % 4;
     const moves = [MOVES.slice(mi), MOVES.slice(0, mi)].flat();
     const P: Record<string, string[]> = {};
@@ -67,7 +66,7 @@ const move = (r: number, M: Map) => {
         P[key].push(p);
     };
 
-    Object.keys(M).forEach((p) => {
+    [...M].forEach((p) => {
         const adjs = getAdjs(p, M);
         const [x, y] = ints(p);
         if (Object.values(adjs).every((v) => !v)) {
@@ -97,32 +96,29 @@ const move = (r: number, M: Map) => {
         propose([x, y], p);
     });
     let moved = false;
-    const _M: Map = {};
+    const _M: Set<string> = new Set();
     Object.entries(P).forEach(([k, v]) => {
         if (v.length === 1) {
-            _M[k] = '#';
+            _M.add(k);
             if (v[0] !== k) moved = true;
         }
         if (v.length > 1) {
-            v.forEach((p) => (_M[p] = '#'));
+            v.forEach((p) => _M.add(p));
         }
     });
-    return [_M, moved] as [Map, boolean];
+    return [_M, moved] as [Set<string>, boolean];
 };
 
-const area = (M: Map) => {
+const area = (M: Set<string>) => {
     const [x2, x1, y2, y1] = getBound(M);
-    return (x2 - x1 + 1) * (y2 - y1 + 1) - Object.keys(M).length;
+    return (x2 - x1 + 1) * (y2 - y1 + 1) - M.size;
 };
 
-const ROUND = 10;
-let A = { ...M };
-for (let r = 0; r < ROUND; r++) {
-    [A] = move(r, A);
-}
+let A = new Set([...M]);
+for (let r = 0; r < 10; r++) [A] = move(r, A);
 console.log(area(A));
 
-let B = { ...M };
+let B = new Set([...M]);
 let r = 0;
 while (true) {
     const result = move(r, B);
