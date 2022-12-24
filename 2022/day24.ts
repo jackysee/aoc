@@ -30,6 +30,7 @@ const move = (b: Storm) => {
 const eq = ([x1, y1]: pt, [x2, y2]: pt) => x1 === x2 && y1 === y2;
 
 const getTime = (dests: pt[], B: Storm[]) => {
+    let t = Date.now();
     const start = dests.shift()!;
     let dest = dests.shift()!;
     let queue: pt[] = [[...start] as pt];
@@ -39,7 +40,9 @@ const getTime = (dests: pt[], B: Storm[]) => {
     while (queue.length) {
         const q = queue.find((pos) => eq(pos, dest));
         if (q) {
-            console.log('dest reached:', q, time);
+            const _t = Date.now();
+            console.log('dest reached:', q, time, `(took ${_t - t}ms)`);
+            t = _t;
             result.push(time);
             if (!dests.length) return result;
             queue = [q];
