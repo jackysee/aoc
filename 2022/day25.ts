@@ -7,7 +7,7 @@ const toDec = (s: string) => {
         let m = Number(c);
         if (c === '-') m = -1;
         if (c === '=') m = -2;
-        return a + Math.pow(5, i) * m;
+        return a + 5 ** i * m;
     }, 0);
 };
 
@@ -16,7 +16,7 @@ const toSnafu = (n: number) => {
     while (n != 0) {
         const r = n % 5;
         let carry = 0;
-        if ([0, 1, 2].includes(r)) s = r + s;
+        if (r < 3) s = r + s;
         if (r === 3) [s, carry] = ['=' + s, 2];
         if (r === 4) [s, carry] = ['-' + s, 1];
         n = Math.floor((n + carry) / 5);
