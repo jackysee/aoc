@@ -40,7 +40,7 @@ const toSnafu = (n: number) => {
 //     ['1=11-2', 2022],
 //     ['1121-1110-1=0', 314159265],
 //     ['1-0---0', 12345]
-// ];
+// ] as [string, number][];
 // console.log(
 //     testData.every(([a, b]) => b === toDec(a)),
 //     testData.every(([a, b]) => a === toSnafu(b))
