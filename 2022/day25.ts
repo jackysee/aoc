@@ -12,17 +12,14 @@ const toDec = (s: string) => {
 };
 
 const toSnafu = (n: number) => {
-    let current = n;
     let s = '';
-    while (current != 0) {
-        const r = current % 5;
-        let add = 0;
-        if (r === 0) s = '0' + s;
-        if (r === 1) s = '1' + s;
-        if (r === 2) s = '2' + s;
-        if (r === 3) [s, add] = ['=' + s, 2];
-        if (r === 4) [s, add] = ['-' + s, 1];
-        current = Math.floor((current + add) / 5);
+    while (n != 0) {
+        const r = n % 5;
+        let carry = 0;
+        if ([0, 1, 2].includes(r)) s = r + s;
+        if (r === 3) [s, carry] = ['=' + s, 2];
+        if (r === 4) [s, carry] = ['-' + s, 1];
+        n = Math.floor((n + carry) / 5);
     }
     return s;
 };
