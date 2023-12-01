@@ -4,9 +4,10 @@ import data from './day1_input.ts';
 const lines = data().split('\n');
 const sum = (a: number, c: number) => a + c;
 const digitStr = 'one|two|three|four|five|six|seven|eight|nine';
-const digitMap = Object.fromEntries(
-    Object.entries(digitStr.split('|')).map(([i, v]) => [v, +i + 1 + ''])
-);
+const digitMap = digitStr.split('|').reduce((a, c, i) => {
+    a[c] = i + 1 + '';
+    return a;
+}, {} as Record<string, string>);
 const toNumStr = (s: string) => digitMap[s] || s;
 const findValue =
     (re: string) =>
