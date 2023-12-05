@@ -74,6 +74,7 @@ console.log('B', ranges.flat().sort((a, b) => a - b)[0]);
 
 //Brute force by reverse searching
 console.log('Brute force by reverse searching...');
+ranges = [];
 const findSeed = [...M]
     .reverse()
     .map((ranges) =>
@@ -92,7 +93,7 @@ const t = performance.now();
 let loc = 0;
 while (true) {
     const seed = findSeed(loc);
-    if (ranges.some(([from, to]) => seed >= from && seed <= to)) {
+    if (seedRanges.some(([from, to]) => seed >= from && seed <= to)) {
         console.log('B', loc);
         console.log(`took ${performance.now() - t} ms`);
         break;
