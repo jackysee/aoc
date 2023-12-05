@@ -37,47 +37,43 @@ const findLoc = M.map((ranges) =>
         })
         .reduce(compose1)
 ).reduce(compose2);
-
 console.log('A', Math.min(...seeds.map(findLoc)));
 
-let ranges = seeds
+const seedRanges = seeds
     .map((n, i) => {
         if (i % 2 == 0) return [];
         return [seeds[i - 1], seeds[i - 1] + n - 1];
     })
     .filter((a) => a.length);
 
-// for (const ms of M.slice(0, 1)) {
-//     ranges = ranges
-//         .map(([from, to]) => {
-//             const result: number[][] = [];
-//             let i = from;
-//             ms.filter((m) => from <= m.s2 && to >= m.s1).forEach((m) => {
-//                 const _to = Math.min(m.s2, to);
-//                 if (m.s1 <= i) {
-//                     result.push([m.d1 + (from - m.s1), m.d1 + (_to - m.s1)]);
-//                     i = _to + 1;
-//                 } else {
-//                     result.push([i, m.s1 - 1]);
-//                     result.push([m.d1, m.d1 + (_to - m.s1)]);
-//                     i = _to + 1;
-//                 }
-//             });
-//             if (i <= to) {
-//                 result.push([i, to]);
-//             }
-//             console.log({
-//                 from,
-//                 to,
-//                 result,
-//                 matched: ms.filter((m) => from <= m.s2 && to >= m.s1)
-//             });
-//             return result;
-//         })
-//         .flat();
-// }
-// console.log(ranges.sort((a, b) => a[0] - b[0]));
+let ranges = [...seedRanges];
+for (const ms of M) {
+    ranges = ranges
+        .map(([from, to]) => {
+            const result: number[][] = [];
+            let i = from;
+            ms.filter((m) => from <= m.s2 && to >= m.s1).forEach((m) => {
+                const _to = Math.min(m.s2, to);
+                if (m.s1 <= i) {
+                    result.push([m.d1 + (i - m.s1), m.d1 + (_to - m.s1)]);
+                    i = _to + 1;
+                } else {
+                    result.push([i, m.s1 - 1]);
+                    result.push([m.d1, m.d1 + (_to - m.s1)]);
+                    i = _to + 1;
+                }
+            });
+            if (i <= to) {
+                result.push([i, to]);
+            }
+            return result;
+        })
+        .flat();
+}
+console.log('B', ranges.flat().sort((a, b) => a - b)[0]);
 
+//Brute force by reverse searching
+console.log('Brute force by reverse searching...');
 const findSeed = [...M]
     .reverse()
     .map((ranges) =>
