@@ -15,13 +15,7 @@ const getWinCount = (dist: number, time: number) => {
     return count;
 };
 
-console.log(
-    'A',
-    dists.map((d, i) => getWinCount(d, times[i])).reduce((a, c) => a * c, 1)
-);
-console.log('B', getWinCount(+dists.join(''), +times.join('')));
-
-const getCountQuadratic = (d: number, t: number) => {
+const getWinCountQuadratic = (d: number, t: number) => {
     // d = x*t - x*x
     // -x*x + x*t - d = 0  => a = -1, b = t, c = -d
     const sqrt = Math.sqrt(t * t - 4 * d);
@@ -29,4 +23,12 @@ const getCountQuadratic = (d: number, t: number) => {
     const d2 = Math.floor((t - sqrt) / 2);
     return d1 - d2 - 1;
 };
-console.log('B', getCountQuadratic(+dists.join(''), +times.join('')));
+
+console.log(
+    'A',
+    dists
+        .map((d, i) => getWinCountQuadratic(d, times[i]))
+        .reduce((a, c) => a * c, 1)
+);
+console.log('B', getWinCountQuadratic(+dists.join(''), +times.join('')));
+console.log('B', getWinCount(+dists.join(''), +times.join('')));
