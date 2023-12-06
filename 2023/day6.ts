@@ -29,4 +29,4 @@ const getCountQuadratic = (d: number, t: number) => {
     const d2 = Math.floor((t - sqrt) / 2);
     return d1 - d2 - 1;
 };
-console.log(getCountQuadratic(+dists.join(''), +times.join('')));
+console.log('B', getCountQuadratic(+dists.join(''), +times.join('')));
