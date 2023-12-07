@@ -25,10 +25,7 @@ const typeRank: Record<string, number> = {
 
 const getLetterFreq = (s: string) => {
     const freq: Record<string, number> = {};
-    s.split('').forEach((c) => {
-        if (freq[c]) freq[c]++;
-        else freq[c] = 1;
-    });
+    s.split('').forEach((c) => (freq[c] = (freq[c] ?? 0) + 1));
     return freq;
 };
 
@@ -59,11 +56,12 @@ const sortStrength = (a: string, b: string) => {
     return r === 0 ? sortLabel(a, b) : r;
 };
 
-const getWinning = (a: number, c: hand, i: number) => a + c.bid * (i + 1);
+const getWinning = (sortFunc: (a: hand, b: hand) => number) =>
+    hands.sort(sortFunc).reduce((a, c, i) => a + c.bid * (i + 1), 0);
 
 console.log(
     'A',
-    hands.sort((a, b) => sortStrength(a.cards, b.cards)).reduce(getWinning, 0)
+    getWinning((a: hand, b: hand) => sortStrength(a.cards, b.cards))
 );
 
 const fillJoker = (s: string) => {
@@ -76,10 +74,8 @@ const fillJoker = (s: string) => {
 cardRank.J = 0;
 console.log(
     'B',
-    hands
-        .sort((a, b) => {
-            const r = sortType(fillJoker(a.cards), fillJoker(b.cards));
-            return r === 0 ? sortLabel(a.cards, b.cards) : r;
-        })
-        .reduce(getWinning, 0)
+    getWinning((a: hand, b: hand) => {
+        const r = sortType(fillJoker(a.cards), fillJoker(b.cards));
+        return r === 0 ? sortLabel(a.cards, b.cards) : r;
+    })
 );
