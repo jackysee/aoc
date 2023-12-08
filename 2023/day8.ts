@@ -11,13 +11,8 @@ lines.slice(2).forEach((l) => {
 
 const findStep = (node: string, isDest: (a: string) => boolean) => {
     let count = 0;
-    let i = 0;
-    while (true) {
-        node = M[node][steps[i]];
-        count++;
-        if (isDest(node)) break;
-        i++;
-        if (i === steps.length) i = 0;
+    while (!isDest(node)) {
+        node = M[node][steps[count++ % steps.length]];
     }
     return count;
 };
