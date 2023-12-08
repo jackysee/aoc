@@ -27,14 +27,10 @@ console.log(
     findStep('AAA', (n) => n === 'ZZZ')
 );
 
-function lcm(arr: number[]) {
-    const gcd = (x: number, y: number): number => (!y ? x : gcd(y, x % y));
-    const _lcm = (x: number, y: number) => (x * y) / gcd(x, y);
-    return arr.reduce((a, b) => _lcm(a, b));
-}
-
+const gcd = (x: number, y: number): number => (!y ? x : gcd(y, x % y));
+const lcm = (x: number, y: number) => (x * y) / gcd(x, y);
 const nodeSteps = Object.keys(M)
     .filter((n) => /A$/.test(n))
     .map((n) => findStep(n, (n) => /Z$/.test(n)));
 
-console.log('B', lcm(nodeSteps));
+console.log('B', nodeSteps.reduce(lcm));
