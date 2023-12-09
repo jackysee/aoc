@@ -19,9 +19,9 @@ const getNext = (ns: number[]) => {
 };
 console.log(
     'A',
-    input.map(getNext).reduce((a, c) => a + c, 0)
+    input.map(getNext).reduce((a, c) => a + c)
 );
 console.log(
     'B',
-    input.map((ns) => getNext(ns.toReversed())).reduce((a, c) => a + c, 0)
+    input.map((ns) => getNext(ns.toReversed())).reduce((a, c) => a + c)
 );
