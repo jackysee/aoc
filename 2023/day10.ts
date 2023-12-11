@@ -19,13 +19,14 @@ data()
 .....
 */
 
-const DIR: Record<string, number[]> = {
+type Dir = 'up' | 'down' | 'left' | 'right';
+const DIR: Record<Dir, number[]> = {
     up: [0, -1],
     down: [0, 1],
     left: [-1, 0],
     right: [1, 0]
 };
-const walkable: Record<string, string> = {
+const walkable: Record<Dir, string> = {
     up: 'F|7',
     down: 'L|J',
     left: 'F-L',
@@ -33,9 +34,9 @@ const walkable: Record<string, string> = {
 };
 const getPipe = ([x, y]: number[]) => {
     const [up, down, left, right] = Object.keys(DIR).map((dir) => {
-        const [dx, dy] = DIR[dir];
+        const [dx, dy] = DIR[dir as Dir];
         const n = M[[x + dx, y + dy] + ''];
-        return walkable[dir].includes(n);
+        return walkable[dir as Dir].includes(n);
     });
     if (up && down) return '|';
     if (left && right) return '-';
