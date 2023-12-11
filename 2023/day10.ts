@@ -18,15 +18,25 @@ data()
 .L-J.
 .....
 */
+
+const DIR: Record<string, number[]> = {
+    up: [0, -1],
+    down: [0, 1],
+    left: [-1, 0],
+    right: [1, 0]
+};
+const walkable: Record<string, string> = {
+    up: 'F|7',
+    down: 'L|J',
+    left: 'F-L',
+    right: 'J-7'
+};
 const getPipe = ([x, y]: number[]) => {
-    let up: string | undefined = M[[x, y - 1] + ''];
-    let down: string | undefined = M[[x, y + 1] + ''];
-    let left: string | undefined = M[[x - 1, y] + ''];
-    let right: string | undefined = M[[x + 1, y] + ''];
-    if (up && 'L-J'.includes(up)) up = undefined;
-    if (down && 'F-7'.includes(down)) down = undefined;
-    if (left && '7|J'.includes(left)) left = undefined;
-    if (right && 'F|L'.includes(right)) right = undefined;
+    const [up, down, left, right] = Object.keys(DIR).map((dir) => {
+        const [dx, dy] = DIR[dir];
+        const n = M[[x + dx, y + dy] + ''];
+        return walkable[dir].includes(n);
+    });
     if (up && down) return '|';
     if (left && right) return '-';
     if (left && down) return '7';
@@ -39,36 +49,16 @@ const S_pipe = getPipe(S)!;
 const getPaths = ([x, y]: number[]) => {
     let c = M[[x, y] + ''];
     if (c === 'S') c = S_pipe;
-    if (c === '-')
-        return [
-            [x - 1, y],
-            [x + 1, y]
-        ];
-    if (c === '|')
-        return [
-            [x, y - 1],
-            [x, y + 1]
-        ];
-    if (c === 'F')
-        return [
-            [x + 1, y],
-            [x, y + 1]
-        ];
-    if (c === 'J')
-        return [
-            [x, y - 1],
-            [x - 1, y]
-        ];
-    if (c === '7')
-        return [
-            [x - 1, y],
-            [x, y + 1]
-        ];
-    if (c === 'L')
-        return [
-            [x + 1, y],
-            [x, y - 1]
-        ];
+    const [up, down, left, right] = Object.values(DIR).map(([dx, dy]) => [
+        x + dx,
+        y + dy
+    ]);
+    if (c === '-') return [left, right];
+    if (c === '|') return [up, down];
+    if (c === 'F') return [right, down];
+    if (c === 'J') return [up, left];
+    if (c === '7') return [left, down];
+    if (c === 'L') return [up, right];
     return [];
 };
 
