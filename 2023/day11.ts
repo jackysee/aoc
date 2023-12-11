@@ -21,13 +21,11 @@ const getPos = ([r, c]: number[], factor: number) => [
 const ans = (factor: number) => {
     let d = 0;
     const _stars = stars.map((s) => getPos(s, factor));
-    for (let i = 0; i < _stars.length; i++) {
-        for (let j = i + 1; j < _stars.length; j++) {
-            d +=
-                Math.abs(_stars[i][0] - _stars[j][0]) +
-                Math.abs(_stars[i][1] - _stars[j][1]);
-        }
-    }
+    _stars.forEach(([r1, c1], i) => {
+        _stars.slice(i).forEach(([r2, c2]) => {
+            d += Math.abs(r1 - r2) + Math.abs(c1 - c2);
+        });
+    });
     return d;
 };
 
