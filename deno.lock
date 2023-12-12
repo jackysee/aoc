@@ -1,5 +1,8 @@
 {
-  "version": "2",
+  "version": "3",
+  "redirects": {
+    "https://deno.land/x/combinatorics/mod.ts": "https://deno.land/x/combinatorics@1.1.2/mod.ts"
+  },
   "remote": {
     "https://deno.land/std@0.125.0/_deno_unstable.ts": "1cb49fd91da8dba86043d461a5d74a8c0c45406b102ef46e17231b1e8cd2e941",
     "https://deno.land/std@0.125.0/_util/assert.ts": "6396c1bd0361c4939e7f32f9b03efffcd04b640a1b206ed67058553d6cb59cc4",
@@ -95,6 +98,13 @@
     "https://deno.land/x/branch@0.1.6/branch.ts": "73afddd373e16d12990c3419ecf2bb8a0a5cc55214ebf734638ff493c10889fb",
     "https://deno.land/x/branch@0.1.6/deps.ts": "545b894291831a03b72e43a8407c67739f7c4ae41c98b90b79bbb86d08362d20",
     "https://deno.land/x/branch@0.1.6/mod.ts": "08d49becec5bb0df08a582b87076d07a89af1733f6d17938bd8dba95744f7f84",
+    "https://deno.land/x/combinatorics@1.1.2/cartesian_product.ts": "fe32b62f23352f07f0f6e5d01478255111434856a944be08d0b1f2029bcf9ed5",
+    "https://deno.land/x/combinatorics@1.1.2/combinations.ts": "49b79a8323f19315a32f5026fa948012c07f9168cdc7e9b176f5e8677c0e2fa8",
+    "https://deno.land/x/combinatorics@1.1.2/combinations_with_replacement.ts": "d14062f2cd407c2669af69c2df9c5f991e0bc3586c68948238ce2328cf49b707",
+    "https://deno.land/x/combinatorics@1.1.2/mod.ts": "f33c6ce1342a7ea5ce35fd80be9e4b413c672c63cee0c25549c1aba6baec899d",
+    "https://deno.land/x/combinatorics@1.1.2/permutations.ts": "b02b79a979cff9641e6986910475d77abf57b51079590c5f8bbd226ccc09a9a4",
+    "https://deno.land/x/combinatorics@1.1.2/permutations_with_replacement.ts": "4a90c4d86818ff877208d1eb19df4c6203d485904457a2ee85eb5269221836ec",
+    "https://deno.land/x/combinatorics@1.1.2/power_set.ts": "ea9b3d81cc87e1e37c81cfe71f2df8480d66352ec6d72dec47a14dea35bf6405",
     "https://deno.land/x/denon@2.5.0/denon.ts": "6972278bbb30589fd8c4a22788dfc7e76589559422dbf035240312a4005f1119",
     "https://deno.land/x/denon@2.5.0/deps.ts": "c0e967b569fc8569d97c1e3c803131a52684520049db8d1d2271843b33bb5c8f",
     "https://deno.land/x/denon@2.5.0/info.ts": "14131eb43d562d63cdaf012e125f3e6cfc9939fd184697cc37afc01f9748850b",
