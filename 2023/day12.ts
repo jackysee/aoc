@@ -8,9 +8,8 @@ const _countWays = (row: string, ns: number[]): number => {
     row = row.replace(/^\.+|\.+$/, '');
     if (row === '') return ns.length ? 0 : 1;
     if (!ns.length) return row.includes('#') ? 0 : 1;
-    if (cache.has(row + ' ' + ns)) {
-        return cache.get(row + ' ' + ns)!;
-    }
+    const key = [row, ns].join(' ');
+    if (cache.has(key)) return cache.get(key)!;
 
     let result = 0;
     const damaged = row.match(/^#+(?=\.|$)/);
@@ -25,7 +24,7 @@ const _countWays = (row: string, ns: number[]): number => {
             result += _countWays(row.replace('?', '#'), ns);
         }
     }
-    cache.set(row + ' ' + ns, result);
+    cache.set(key, result);
     return result;
 };
 
