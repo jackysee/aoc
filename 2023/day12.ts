@@ -15,7 +15,7 @@ const _countWays = (row: string, ns: number[]): number => {
     const damaged = row.match(/^#+(?=\.|$)/);
     if (damaged) {
         if (damaged[0].length === ns[0]) {
-            result += _countWays(row.replace(/^#+/, ''), ns.slice(1));
+            result += _countWays(row.slice(ns[0]), ns.slice(1));
         }
     } else if (row.includes('?')) {
         const total = ns.reduce(sum);
@@ -41,5 +41,15 @@ const unfold = (s: string) => {
     ].join(' ');
 };
 
-console.log('A', lines.map(countWays).reduce(sum));
-console.log('B', lines.map(unfold).map(countWays).reduce(sum));
+let t = performance.now();
+console.log(
+    'A',
+    lines.map(countWays).reduce(sum),
+    `took ${performance.now() - t}ms`
+);
+t = performance.now();
+console.log(
+    'B',
+    lines.map(unfold).map(countWays).reduce(sum),
+    `took ${performance.now() - t}ms`
+);
