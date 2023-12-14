@@ -55,6 +55,7 @@ const count = () => {
     return count;
 };
 
+const t = performance.now();
 const hash = () => M.map((r) => r.join('')).join('|');
 const patterns = [hash()];
 const counts = [count()];
@@ -76,4 +77,8 @@ for (let i = 0; i < N; i++) {
     patterns.push(h);
     counts.push(count());
 }
-console.log('B', counts.slice(idx)[(N - idx) % len]);
+console.log(
+    'B',
+    counts.slice(idx)[(N - idx) % len],
+    `took ${performance.now() - t}ms`
+);
