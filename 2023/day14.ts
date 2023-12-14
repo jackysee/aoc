@@ -20,7 +20,6 @@ const move = (_r: number, _c: number, dir = 'north') => {
     }
     M[_r][_c] = '.';
     M[r][c] = 'O';
-    return [r, c];
 };
 
 function* range(start: number, end: number) {
