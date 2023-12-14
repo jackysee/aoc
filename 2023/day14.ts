@@ -60,8 +60,6 @@ const hash = () => M.map((r) => r.join('')).join('|');
 const patterns = [hash()];
 const counts = [count()];
 const N = 1000000000;
-let len = -1;
-let idx = -1;
 for (let i = 0; i < N; i++) {
     tilt('north');
     if (i === 0) console.log('A', count());
@@ -69,16 +67,16 @@ for (let i = 0; i < N; i++) {
     tilt('south');
     tilt('east');
     const h = hash();
-    idx = patterns.indexOf(h);
+    const idx = patterns.indexOf(h);
     if (idx !== -1) {
-        len = i - idx + 1;
+        const len = i - idx + 1;
+        console.log(
+            'B',
+            counts.slice(idx)[(N - idx) % len],
+            `took ${performance.now() - t}ms`
+        );
         break;
     }
     patterns.push(h);
     counts.push(count());
 }
-console.log(
-    'B',
-    counts.slice(idx)[(N - idx) % len],
-    `took ${performance.now() - t}ms`
-);
