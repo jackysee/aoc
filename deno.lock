@@ -1,0 +1,27 @@
+{
+  "version": "3",
+  "redirects": {
+    "https://deno.land/std/hash/md5.ts": "https://deno.land/std@0.120.0/hash/md5.ts",
+    "https://deno.land/x/combinatorics/mod.ts": "https://deno.land/x/combinatorics@1.0.1/mod.ts"
+  },
+  "remote": {
+    "https://deno.land/std@0.120.0/encoding/hex.ts": "5bc7df19af498c315cdaba69e2fce1b2aef5fc57344e8c21c08991aa8505a260",
+    "https://deno.land/std@0.120.0/hash/md5.ts": "957791b9052b40cfa211eeb755a76ad6ad12177387ba84b47c4bc8be4edd60c8",
+    "https://deno.land/x/collections@0.11.2/binary_heap.ts": "9b7548bfbbf256136d9f783d57956d1c006a1208e98f232542470a7f4cd0253d",
+    "https://deno.land/x/collections@0.11.2/common.ts": "34e8367e3696c3f872ae417d7c421fa908a5a2125a1c4cb259f7dee9561a7096",
+    "https://deno.land/x/collections@0.11.2/comparators.ts": "08563340dbb0051f032bacdcf854bcabd13d607d2e8cb1889826417419df89d0",
+    "https://deno.land/x/collections@0.11.2/mod.ts": "20d17a8211b5e9514c7a9c47d8a7c68a1d74c51fc0962f3dabef22ee66c4e8f3",
+    "https://deno.land/x/collections@0.11.2/trees/bs_node.ts": "854d39f6d60cdcb47e1183f0fa67091e6bad59dd2b13252a8b38b1b37269fa67",
+    "https://deno.land/x/collections@0.11.2/trees/bs_tree.ts": "694605e10a9f56caf8468c5eea06d60a8d81521dee75d4524a5f790b1ee713b5",
+    "https://deno.land/x/collections@0.11.2/trees/rb_node.ts": "e5eecc211933140e0535fc371a4990bd5ac889b00136c96a4a610dbbf78d9ecb",
+    "https://deno.land/x/collections@0.11.2/trees/rb_tree.ts": "e1e5f4e26bc255ebf41d72b498a2af903af69f0391276a4a0eac6d46fc43f942",
+    "https://deno.land/x/collections@0.11.2/vector.ts": "23cb91087cc89ce9a1e10954336484b537a44bd786e21babc310ae85cb7ad52d",
+    "https://deno.land/x/combinatorics@1.0.1/cartesian_product.ts": "3419368756e8f8de59d0130ac6a6a0e4b12f2b2b089b7a5560f3b0f262d482e9",
+    "https://deno.land/x/combinatorics@1.0.1/combinations.ts": "df8f887783c4f7596acf411ecaedc1f363c43aa295a5d4ec3e48fd15f6d3e6ef",
+    "https://deno.land/x/combinatorics@1.0.1/combinations_with_replacement.ts": "b42d1f545180f2939da19bfa3bdcffd14998b6d19481bc61efcfed0a123f6615",
+    "https://deno.land/x/combinatorics@1.0.1/mod.ts": "f33c6ce1342a7ea5ce35fd80be9e4b413c672c63cee0c25549c1aba6baec899d",
+    "https://deno.land/x/combinatorics@1.0.1/permutations.ts": "d4b33a21db8e5a671e3c97e15e6bb096749b9391787cf4c673824ca7d206a8ca",
+    "https://deno.land/x/combinatorics@1.0.1/permutations_with_replacement.ts": "5a14593ac5efff8fd9aa2d38cf2c9dc68a5c2cfc6ca3bfdea72c423e4534a1e3",
+    "https://deno.land/x/combinatorics@1.0.1/power_set.ts": "57c249858549332173c17272b82954366a7db79272f90303f7213044521b5cb2"
+  }
+}
