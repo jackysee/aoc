@@ -55,22 +55,9 @@ const count = () => {
     return count;
 };
 
-const patterns = [];
-const counts = [];
-const hash = () => {
-    const result: string[] = [];
-    M.forEach((row, r) => {
-        row.forEach((n, c) => {
-            if (n === 'O') {
-                result.push([r, c].join(','));
-            }
-        });
-    });
-    return result.join('|');
-};
-
-patterns.push(hash());
-counts.push(count());
+const hash = () => M.map((r) => r.join('')).join('|');
+const patterns = [hash()];
+const counts = [count()];
 const N = 1000000000;
 let len = -1;
 let idx = -1;
