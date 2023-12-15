@@ -5,11 +5,14 @@ const steps = data().split(',');
 const hash = (s: string) =>
     [...s].reduce((val, c) => ((val + c.charCodeAt(0)) * 17) % 256, 0);
 
-let A = 0;
+console.log(
+    'A',
+    steps.reduce((a, c) => a + hash(c), 0)
+);
+
 const box: string[][] = [...Array(256)].map(() => []);
 const F: Record<string, number> = {};
 steps.forEach((s) => {
-    A += hash(s);
     const [label, focalLen] = s.split(/=|-/);
     const n = hash(label);
     const arr = box[n];
@@ -20,8 +23,6 @@ steps.forEach((s) => {
         box[n] = arr.filter((l) => l !== label);
     }
 });
-
-console.log('A', A);
 
 let B = 0;
 box.forEach((b, bi) => {
