@@ -48,6 +48,7 @@ const count = (start: Light) => {
 
 console.log('A', count({ r: 0, c: 0, d: 'R' }));
 
+const t = performance.now();
 let max = -Infinity;
 for (let r = 0; r < M.length; r++) {
     max = Math.max(
@@ -63,4 +64,4 @@ for (let c = 0; c < M[0].length; c++) {
         max
     );
 }
-console.log('B', max);
+console.log('B', max, `took ${performance.now() - t}ms`);
