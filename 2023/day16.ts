@@ -23,30 +23,22 @@ const interact = (l: Light) => {
     if (['/L', '\\R'].includes(p)) return [{ r, c, d: 'D' }];
     if (['/D', '\\U'].includes(p)) return [{ r, c, d: 'L' }];
     if (['/U', '\\D'].includes(p)) return [{ r, c, d: 'R' }];
-    if (['|L', '|R'].includes(p))
-        return [
-            { r, c, d: 'U' },
-            { r, c, d: 'D' }
-        ];
-    if (['-U', '-D'].includes(p))
-        return [
-            { r, c, d: 'L' },
-            { r, c, d: 'R' }
-        ];
+    if (['|L', '|R'].includes(p)) return ['U', 'D'].map((d) => ({ r, c, d }));
+    if (['-U', '-D'].includes(p)) return ['L', 'R'].map((d) => ({ r, c, d }));
     return [];
 };
 
-const hash = (l: Light) => `${l.r},${l.c},${l.d}`;
+const key = (l: Light) => `${l.r},${l.c},${l.d}`;
 const count = (start: Light) => {
     const seen = new Set();
     const queue: Light[] = [...interact(start)];
-    seen.add(hash(start));
+    seen.add(key(start));
     while (queue.length) {
         const pt = queue.pop()!;
         const next = walk(pt);
-        if (M[next.r]?.[next.c] && !seen.has(hash(next))) {
+        if (M[next.r]?.[next.c] && !seen.has(key(next))) {
             queue.push(...interact(next));
-            seen.add(hash(next));
+            seen.add(key(next));
         }
     }
     return new Set(
