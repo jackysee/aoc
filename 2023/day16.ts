@@ -57,20 +57,40 @@ const interact = (p: Light) => {
     return [];
 };
 
-const seen = new Set();
-const start: Light = { r: 0, c: 0, d: 'R' };
 const hash = (l: Light) => `${l.r},${l.c},${l.d}`;
-const queue: Light[] = [...interact({ r: 0, c: 0, d: 'R' })];
-seen.add(hash(start));
-while (queue.length) {
-    const pt = queue.pop()!;
-    const next = walk(pt);
-    if (M[next.r]?.[next.c] && !seen.has(hash(next))) {
-        // console.log(pt, next, '=>', M[next.r]?.[next.c], interact(next));
-        queue.push(...interact(next));
-        seen.add(hash(next));
+const count = (start: Light) => {
+    const seen = new Set();
+    const queue: Light[] = [...interact(start)];
+    seen.add(hash(start));
+    while (queue.length) {
+        const pt = queue.pop()!;
+        const next = walk(pt);
+        if (M[next.r]?.[next.c] && !seen.has(hash(next))) {
+            // console.log(pt, next, '=>', M[next.r]?.[next.c], interact(next));
+            queue.push(...interact(next));
+            seen.add(hash(next));
+        }
     }
+    return new Set(
+        [...seen].map((n) => (n as string).split(',').slice(0, 2).join(','))
+    ).size;
+};
+
+console.log('A', count({ r: 0, c: 0, d: 'R' }));
+
+let max = -Infinity;
+for (let r = 0; r < M.length; r++) {
+    max = Math.max(
+        count({ r, c: 0, d: 'R' }),
+        count({ r, c: M[0].length - 1, d: 'L' }),
+        max
+    );
 }
-console.log(
-    new Set([...seen].map((n) => n.split(',').slice(0, 2).join(','))).size
-);
+for (let c = 0; c < M[0].length; c++) {
+    max = Math.max(
+        count({ r: 0, c, d: 'D' }),
+        count({ r: M.length - 1, c, d: 'U' }),
+        max
+    );
+}
+console.log('B', max);
