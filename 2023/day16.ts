@@ -1,9 +1,11 @@
-// deno --allow-read=. --watch day16.ts
+// deno --allow-read --watch day16.ts
 // const data = Deno.readTextFileSync('./day16.ex');
-const data = Deno.readTextFileSync('./day16.in').trim();
+const __dirname = new URL('.', import.meta.url).pathname;
+const data = Deno.readTextFileSync(__dirname + './day16.in').trim();
 const M = data.split('\n').map((l) => [...l]);
 
-type Light = { r: number; c: number; d: string };
+type Dir = 'U' | 'D' | 'L' | 'R';
+type Light = { r: number; c: number; d: Dir };
 
 const walk = (p: Light) => {
     let { r, c, d } = p;
@@ -15,17 +17,17 @@ const walk = (p: Light) => {
 };
 const interact = (l: Light) => {
     const { r, c, d } = l;
-    const target = M[r]?.[c];
-    const p = target + d;
-    if (target === '.' || ['|D', '|U', '-R', '-L'].includes(p))
-        return [{ r, c, d }];
-    if (['/R', '\\L'].includes(p)) return [{ r, c, d: 'U' }];
-    if (['/L', '\\R'].includes(p)) return [{ r, c, d: 'D' }];
-    if (['/D', '\\U'].includes(p)) return [{ r, c, d: 'L' }];
-    if (['/U', '\\D'].includes(p)) return [{ r, c, d: 'R' }];
-    if (['|L', '|R'].includes(p)) return ['U', 'D'].map((d) => ({ r, c, d }));
-    if (['-U', '-D'].includes(p)) return ['L', 'R'].map((d) => ({ r, c, d }));
-    return [];
+    const tile = M[r]?.[c];
+    const p = tile + d;
+    let dirs: Dir[] = [];
+    if (tile === '.' || ['|D', '|U', '-R', '-L'].includes(p)) dirs = [d];
+    if (['/R', '\\L'].includes(p)) dirs = ['U'];
+    if (['/L', '\\R'].includes(p)) dirs = ['D'];
+    if (['/D', '\\U'].includes(p)) dirs = ['L'];
+    if (['/U', '\\D'].includes(p)) dirs = ['R'];
+    if (['|L', '|R'].includes(p)) dirs = ['U', 'D'];
+    if (['-U', '-D'].includes(p)) dirs = ['L', 'R'];
+    return dirs.map((d) => ({ r, c, d }));
 };
 
 const key = (l: Light) => `${l.r},${l.c},${l.d}`;
