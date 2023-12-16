@@ -1,7 +1,7 @@
 // deno --allow-read=. --watch day16.ts
 // const data = Deno.readTextFileSync('./day16.ex');
-const data = Deno.readTextFileSync('./day16.in');
-const M = data.split('\n').map((l) => l.split(''));
+const data = Deno.readTextFileSync('./day16.in').trim();
+const M = data.split('\n').map((l) => [...l]);
 
 type Light = { r: number; c: number; d: string };
 
@@ -13,47 +13,26 @@ const walk = (p: Light) => {
     if (d === 'D') r++;
     return { r, c, d };
 };
-
-const interact = (p: Light) => {
-    const { r, c, d } = p;
+const interact = (l: Light) => {
+    const { r, c, d } = l;
     const target = M[r]?.[c];
-    if (target === '.') return [{ r, c, d }];
-    if (target === '/' && d === 'R') return [{ r, c, d: 'U' }];
-    if (target === '\\' && d === 'R') return [{ r, c, d: 'D' }];
-    if (target === '-' && d === 'R') return [{ r, c, d }];
-    if (target === '|' && d === 'R')
+    const p = target + d;
+    if (target === '.' || ['|D', '|U', '-R', '-L'].includes(p))
+        return [{ r, c, d }];
+    if (['/R', '\\L'].includes(p)) return [{ r, c, d: 'U' }];
+    if (['/L', '\\R'].includes(p)) return [{ r, c, d: 'D' }];
+    if (['/D', '\\U'].includes(p)) return [{ r, c, d: 'L' }];
+    if (['/U', '\\D'].includes(p)) return [{ r, c, d: 'R' }];
+    if (['|L', '|R'].includes(p))
         return [
             { r, c, d: 'U' },
             { r, c, d: 'D' }
         ];
-
-    if (target === '/' && d === 'U') return [{ r, c, d: 'R' }];
-    if (target === '\\' && d === 'U') return [{ r, c, d: 'L' }];
-    if (target === '|' && d === 'U') return [{ r, c, d }];
-    if (target === '-' && d === 'U')
+    if (['-U', '-D'].includes(p))
         return [
             { r, c, d: 'L' },
             { r, c, d: 'R' }
         ];
-
-    if (target === '/' && d === 'L') return [{ r, c, d: 'D' }];
-    if (target === '\\' && d === 'L') return [{ r, c, d: 'U' }];
-    if (target === '-' && d === 'L') return [{ r, c, d }];
-    if (target === '|' && d === 'L')
-        return [
-            { r, c, d: 'U' },
-            { r, c, d: 'D' }
-        ];
-
-    if (target === '/' && d === 'D') return [{ r, c, d: 'L' }];
-    if (target === '\\' && d === 'D') return [{ r, c, d: 'R' }];
-    if (target === '|' && d === 'D') return [{ r, c, d }];
-    if (target === '-' && d === 'D')
-        return [
-            { r, c, d: 'L' },
-            { r, c, d: 'R' }
-        ];
-
     return [];
 };
 
@@ -66,7 +45,6 @@ const count = (start: Light) => {
         const pt = queue.pop()!;
         const next = walk(pt);
         if (M[next.r]?.[next.c] && !seen.has(hash(next))) {
-            // console.log(pt, next, '=>', M[next.r]?.[next.c], interact(next));
             queue.push(...interact(next));
             seen.add(hash(next));
         }
