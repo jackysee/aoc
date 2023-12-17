@@ -1,5 +1,4 @@
-import { BinaryHeap } from 'https://deno.land/x/collections@0.12.1/mod.ts';
-// import BinaryHeap from '../util/binaryHeap.ts';
+import { BinaryHeap } from '../util/binaryHeap.ts';
 import data from './day17_input.ts';
 // import data from './day17_sample.ts';
 const M = data()
