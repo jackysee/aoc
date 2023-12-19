@@ -12,25 +12,21 @@ type Condition = {
 const [workflows, _parts] = data().split('\n\n');
 const W: Record<string, Condition[]> = {};
 workflows.split('\n').map((l) => {
-    const [_, name, _conditions] = l.match(/(\w+)\{(.*)\}/)!;
-    const conditions = _conditions.split(',').map((s) => {
+    const [_, name, conditions] = l.match(/(\w+)\{(.*)\}/)!;
+    W[name] = conditions.split(',').map((s) => {
         if (s.includes(':')) {
-            const [_c, dest] = s.split(':');
-            const [_, c, op, val] = _c.match(/([xmas])([<>])(\d+)/)!;
+            const [_, c, op, val, dest] = s.match(/([xmas])([<>])(\d+):(\w+)/)!;
             return { c, op, val: +val, dest };
         } else {
             return { dest: s };
         }
     });
-    W[name] = conditions;
 });
 
 const parts = _parts.split('\n').map((s) => {
-    return [...s.matchAll(/\w+=\d+/g)].reduce((a, c) => {
-        const [k, v] = c[0].split('=');
-        a[k] = +v;
-        return a;
-    }, {} as Part);
+    return Object.fromEntries(
+        [...s.matchAll(/(\w+)=(\d+)/g)].map((c) => [c[1], +c[2]])
+    );
 });
 
 const testPartByWorkFlow = (part: Part, name: string) => {
