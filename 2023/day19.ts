@@ -88,11 +88,11 @@ const getCombinations = (conds: Condition[]) => {
         const { c, op, val, not } = conds[i];
         if (!c) continue;
         if (!not) {
-            if (op === '>') p[c][0] = Math.max(val! + 1, p[c][0]);
-            if (op === '<') p[c][1] = Math.min(val! - 1, p[c][1]);
+            if (op === '>') p[c][0] = val! + 1;
+            if (op === '<') p[c][1] = val! - 1;
         } else {
-            if (op === '>') p[c][1] = Math.min(val!, p[c][1]);
-            if (op === '<') p[c][0] = Math.max(val!, p[c][0]);
+            if (op === '>') p[c][1] = val!;
+            if (op === '<') p[c][0] = val!;
         }
     }
     return Object.values(p).reduce((a, c) => a * (c[1] - c[0] + 1), 1);
