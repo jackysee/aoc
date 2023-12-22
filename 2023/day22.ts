@@ -57,13 +57,10 @@ C.forEach((c, i) => {
 
 console.log(
     'A',
-    C.filter((_c, i) => {
-        return UP[i].every((s) => DOWN[s].length >= 2);
-    }).length
+    C.filter((_c, i) => UP[i].every((s) => DOWN[s].length >= 2)).length
 );
 
-let count = 0;
-C.forEach((_c, i) => {
+const countFall = (i: number) => {
     const queue = UP[i].filter((j) => DOWN[j].length === 1);
     const fall = new Set(queue);
     while (queue.length) {
@@ -76,6 +73,10 @@ C.forEach((_c, i) => {
             }
         });
     }
-    count += fall.size;
-});
-console.log('B', count);
+    return fall.size;
+};
+
+console.log(
+    'B',
+    C.reduce((a, _c, i) => a + countFall(i), 0)
+);
