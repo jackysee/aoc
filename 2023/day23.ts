@@ -1,37 +1,49 @@
-// import data from './day23_input.ts';
-import data from './day23_sample.ts';
+import data from './day23_input.ts';
+// import data from './day23_sample.ts';
+// import { BinaryHeap } from '../util/binaryHeap.ts';
 const M = data()
     .split('\n')
     .map((l) => [...l]);
-// console.log(M);
 
-const queue = [[0, 1, 0]];
-const seen = new Set<string>();
-const dest = [M.length - 1, M[0].length - 2];
-while (queue.length) {
-    const [r, c, s] = queue.pop()!;
-    if (r === dest[0] && c === dest[1]) {
-        console.log(s);
-        continue;
-    }
+const adjs = (r, c) => {
+    const result = [];
     let dir = [
         [0, 1],
-        [1, 0],
         [0, -1],
+        [1, 0],
         [-1, 0]
     ];
     const tile = M[r][c];
-    if (tile === '>') dir = [[0, 1]];
     if (tile === '<') dir = [[0, -1]];
+    if (tile === '>') dir = [[0, 1]];
     if (tile === '^') dir = [[-1, 0]];
     if (tile === 'v') dir = [[1, 0]];
     for (const [dr, dc] of dir) {
         const [nr, nc] = [r + dr, c + dc];
-        if (!M[nr]?.[nc]) continue;
-        if (M[nr]?.[nc] === '#') continue;
-        if (seen.has([nr, nc, s + 1].join(','))) continue;
-        seen.add([nr, nc, s + 1].join(','));
-        queue.push([nr, nc, s + 1]);
+        const tile = M[nr]?.[nc];
+        if ('.<>^v'.includes(tile)) result.push([nr, nc]);
     }
-}
-console.log('done');
+    return result;
+};
+
+const dest = [M.length - 1, M[0].length - 2];
+let result = 0;
+const dfs = (current: number[], path: number[][], seen: Set<string>) => {
+    if (current[0] === dest[0] && current[1] === dest[1]) {
+        result = Math.max(result, path.length);
+    }
+    const [r, c] = current;
+    for (const n of adjs(r, c)) {
+        const key = `${r},${c}`;
+        if (!seen.has(key)) {
+            path.push(n);
+            seen.add(key);
+            dfs(n, path, seen);
+            seen.delete(key);
+            path.pop();
+        }
+    }
+};
+
+dfs([0, 1], [], new Set());
+console.log('done', result);
