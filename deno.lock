@@ -1,5 +1,28 @@
 {
   "version": "3",
+  "packages": {
+    "specifiers": {
+      "npm:z3-solver": "npm:z3-solver@4.12.4"
+    },
+    "npm": {
+      "async-mutex@0.3.2": {
+        "integrity": "sha512-HuTK7E7MT7jZEh1P9GtRW9+aTWiDWWi9InbZ5hjxrnRa39KS4BW04+xLBhYNS2aXhHUIKZSw3gj4Pn1pj+qGAA==",
+        "dependencies": {
+          "tslib": "tslib@2.6.2"
+        }
+      },
+      "tslib@2.6.2": {
+        "integrity": "sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q==",
+        "dependencies": {}
+      },
+      "z3-solver@4.12.4": {
+        "integrity": "sha512-B9ymul40bvtGSW0OQYfcYan1EhGm0JV/HgbO24JikIhuEOUv2+mdcOVd4V3q89UOx2mA0MOv+6d5msVF+/yJ6g==",
+        "dependencies": {
+          "async-mutex": "async-mutex@0.3.2"
+        }
+      }
+    }
+  },
   "redirects": {
     "https://deno.land/std/hash/md5.ts": "https://deno.land/std@0.120.0/hash/md5.ts",
     "https://deno.land/x/combinatorics/mod.ts": "https://deno.land/x/combinatorics@1.0.1/mod.ts"

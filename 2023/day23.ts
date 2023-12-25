@@ -27,6 +27,7 @@ const neighbors = (r: number, c: number, climb = false) => {
     return result;
 };
 
+const start = [0, 1];
 const dest = [M.length - 1, M[0].length - 2];
 const toKey = (r: number, c: number) => [r, c].join(',');
 const dfs = (
@@ -50,7 +51,7 @@ const dfs = (
 };
 
 let max = 0;
-dfs([0, 1], new Set(), 0, neighbors);
+dfs(start, new Set(), 0, neighbors);
 console.log('A', max);
 
 const V = new Set<string>();
@@ -61,7 +62,7 @@ M.forEach((l, r) => {
         }
     });
 });
-V.add('0,1');
+V.add(start.join(','));
 V.add(dest.join(','));
 
 const P: Record<string, number[][]> = {};
@@ -73,10 +74,10 @@ for (const s of V) {
     let dist = 0;
     const key = toKey(r, c);
     while (queue.length) {
-        const _q: number[][] = [];
+        const _queue: number[][] = [];
         dist += 1;
-        for (const v of queue) {
-            for (const a of neighbors(v[0], v[1], true)) {
+        for (const [r, c] of queue) {
+            for (const a of neighbors(r, c, true)) {
                 const ak = a + '';
                 if (!seen.has(ak)) {
                     seen.add(ak);
@@ -84,18 +85,18 @@ for (const s of V) {
                         P[key] = P[key] || [];
                         P[key].push([...a, dist]);
                     } else {
-                        _q.push(a);
+                        _queue.push(a);
                     }
                 }
             }
         }
-        queue = _q;
+        queue = _queue;
     }
 }
 
 max = 0;
 const adj2 = (r: number, c: number) => P[toKey(r, c)] || [];
 console.time('B');
-dfs([0, 1], new Set(), 0, adj2);
+dfs(start, new Set(), 0, adj2);
 console.log('B', max);
 console.timeEnd('B');
