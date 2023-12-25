@@ -1,7 +1,7 @@
 // deno --allow-read --watch day16.ts
 // const data = Deno.readTextFileSync('./day16.ex');
-const __dirname = new URL('.', import.meta.url).pathname;
-const data = Deno.readTextFileSync(__dirname + './day16_input.txt').trim();
+import fs from "node:fs";
+const data = fs.readFileSync('./day16_input.txt', 'utf-8');
 const M = data.split('\n').map((l) => [...l]);
 
 type Dir = 'U' | 'D' | 'L' | 'R';
