@@ -7,21 +7,21 @@ fi
 
 data=$(curl -s -b cookiefile https://adventofcode.com/$1/day/$2/input)
 
-tee $1/day$2_input.ts <<EOF
+tee $1/day$2_input.js <<EOF
 export default () => \`${data}\`;
 EOF
 
-tee $1/day$2_sample.ts <<EOF
+tee $1/day$2_sample.js <<EOF
 export default () => \`
 
 \`.trim();
 EOF
 
-echo "Data file written to $1/day$2_input.ts"
+echo "Data file written to $1/day$2_input.js"
 
-tee $1/day$2.ts << EOF
-import data from './day${2}_input.ts';
-// import data from './day${2}_sample.ts';
+tee $1/day$2.js << EOF
+import data from './day${2}_input.js';
+// import data from './day${2}_sample.js';
 const lines = data().split('\n');
 
 
