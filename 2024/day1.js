@@ -8,13 +8,20 @@ data().trim().split('\n')
         A.push(a);
         B.push(b);
     });
+
 A.sort();
 B.sort();
 let sum = 0;
-for(let i=0; i<=A.length-1; i++) {
-    console.log(A[i], B[i])
-    sum += Math.abs(A[i] - B[i]);
-}
-console.log('A:'  + sum)
+let score = 0;
+A.forEach((a,i) => {
+    sum += Math.abs(a - B[i]);
+    const times = B.filter(b => b === a).length;
+    score += a * times;
+});
+
+console.log('A:'  + sum);
+console.log('B:'  + score);
+
+
 
 
