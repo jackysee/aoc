@@ -7,11 +7,10 @@ const range = (m, n) => Object.keys([...Array(n - m + 1)]).map((_, i) => i + m);
 const diagonal = (r, c, dr, dc) => {
     let s = lines[r][c];
     while (true) {
-        const char = lines[r + dr]?.[c + dc];
+        [r, c] = [r + dr, c + dc];
+        const char = lines[r]?.[c];
         if (!char) break;
         s += char;
-        r = r + dr;
-        c = c + dc;
     }
     return s;
 };
@@ -46,14 +45,10 @@ range(0, W - 1).forEach((r) => {
         const center = lines?.[r]?.[c];
         if (center !== 'A') return;
         const side1 =
-            (lines[r - 1]?.[c - 1] || '') +
-            center +
-            (lines[r + 1]?.[c + 1] || '');
+            (lines[r - 1]?.[c - 1] || '') + (lines[r + 1]?.[c + 1] || '');
         const side2 =
-            (lines[r - 1]?.[c + 1] || '') +
-            center +
-            (lines[r + 1]?.[c - 1] || '');
-        if ([side1, side2].every((s) => s.match(/^(MAS|SAM)$/))) x += 1;
+            (lines[r - 1]?.[c + 1] || '') + (lines[r + 1]?.[c - 1] || '');
+        if ([side1, side2].every((s) => s.match(/^(MS|SM)$/))) x += 1;
     });
 });
 console.log('B', x);
