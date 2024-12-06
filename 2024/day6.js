@@ -45,22 +45,26 @@ const patrol = (M, d, r, c) => {
     }
 };
 
-const originalPath = new Set(
-    [...patrol(M, dir, sr, sc).path].map((s) => s.slice(2))
-);
-console.log('A', new Set(originalPath).size);
-
-const list = [...originalPath].map((s) => s.split(',').map(Number));
+const originalPath = patrol(M, dir, sr, sc).path;
+const points = new Set([...originalPath].map((s) => s.slice(2)));
+console.log('A', points.size);
 
 let count = 0;
-list.forEach(([r, c]) => {
+const tested = new Set();
+let current = [ dir, sr, sc ]; 
+originalPath.forEach((p) => {
+    let [d, r, c] = p.split(',');
+    [r, c] = [+r, +c];
+    if(tested.has([r,c]+'')) return;
+    tested.add([r,c]+'');
     const m = M[r]?.[c];
     if (m === '.' || m === '^') {
         M[r].splice(c, 1, '#');
-        const path = patrol(M, dir, sr, sc);
+        const path = patrol(M, ...current);
         if (path.loop) count++;
         M[r].splice(c, 1, m);
     }
+    current = [d, r, c]; //optimize do not re-walk
 });
 
 console.log('B', count);
