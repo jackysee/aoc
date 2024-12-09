@@ -23,17 +23,43 @@ function combos(arr, n) {
     return result;
 }
 
+//test operator the straight forward way, more resource heavy
+const testOp1 = (entry, op) => {
+    const value = entry.nums.reduce((a, c, i) => {
+        if (i === 0) return a + c;
+        if (op[i - 1] === '|') return Number([a, c].join(''));
+        if (op[i - 1] === '+') return a + c;
+        if (op[i - 1] === '*') return a * c;
+    }, 0);
+    return value === entry.value;
+};
+
+//test operator in reverse and early exit
+const testOp2 = (entry, op) => {
+    let value = entry.value;
+    for (let i = entry.nums.length; i >= 0; i--) {
+        const n = entry.nums[i];
+        if (op[i - 1] === '|') {
+            const m = (value + '').match(new RegExp(n + '$'));
+            if (!m) return false;
+            value = Number(m.input.slice(0, m.index));
+        }
+        if (op[i - 1] === '+' || i === 0) {
+            value -= n;
+            if (value < 0) return false;
+        }
+        if (op[i - 1] === '*') {
+            if (value % n !== 0) return false;
+            value = value / n;
+        }
+    }
+    return value === 0;
+};
+
 const isValid = (ops) => (entry) => {
     const operators = combos(ops, entry.nums.length - 1);
-    return operators.some((op) => {
-        const value = entry.nums.reduce((a, c, i) => {
-            if (i === 0) return a + c;
-            if (op[i - 1] === '|') return Number([a, c].join(''));
-            if (op[i - 1] === '+') return a + c;
-            if (op[i - 1] === '*') return a * c;
-        }, 0);
-        return value === entry.value;
-    });
+    // return operators.some((op) => testOp1(entry, op));
+    return operators.some((op) => testOp2(entry, op));
 };
 
 console.time('A');
