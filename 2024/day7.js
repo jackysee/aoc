@@ -36,11 +36,16 @@ const isValid = (ops) => (entry) => {
     });
 };
 
+console.time('A');
 console.log(
     'A',
     list.filter(isValid(['+', '*'])).reduce((a, c) => a + c.value, 0)
 );
+console.timeEnd('A');
+
+console.time('B');
 console.log(
     'B',
     list.filter(isValid(['+', '*', '|'])).reduce((a, c) => a + c.value, 0)
 );
+console.timeEnd('B');
