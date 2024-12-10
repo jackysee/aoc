@@ -19,7 +19,7 @@ const getTrails = (head) => {
         const path = queue.pop();
         const [m, r, c] = path.at(-1);
         if (m === 9) {
-            trails.push(path);
+            trails.push([m, r, c] + '');
             continue;
         }
         [
@@ -40,8 +40,6 @@ const getTrails = (head) => {
 const trails = heads.map(getTrails);
 console.log(
     'A',
-    trails.reduce((a, t) => {
-        return a + new Set(t.map((p) => p.at(-1) + '')).size;
-    }, 0)
+    trails.reduce((a, t) => a + new Set(t).size, 0)
 );
 console.log('B', trails.flat().length);
