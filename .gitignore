@@ -1,0 +1,4 @@
+node_modules
+cookiefile
+.git_old
+**/day*_input.*

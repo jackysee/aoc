@@ -1,0 +1,2 @@
+language = "nodejs"
+run = "node 2020/day23.js"
