@@ -16,7 +16,8 @@ const getTrails = (head) => {
     const queue = [[head]];
     const trails = [];
     while (queue.length) {
-        const path = queue.pop();
+        const path = queue.shift();
+        // const path = queue.pop();
         const [m, r, c] = path.at(-1);
         if (m === 9) {
             trails.push([m, r, c] + '');
