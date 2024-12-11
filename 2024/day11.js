@@ -1,28 +1,27 @@
 import data from './day11_input.js';
-const M = Object.fromEntries(
+let M = Object.fromEntries(
     data()
         .split(/\s+/)
         .map((n) => [+n, 1])
 );
 
-const blink = (s) => {
-    if (+s === 0) return [1];
-    if (s.length % 2 === 0) {
-        const len = s.length;
-        return [+s.slice(0, len / 2), +s.slice(len / 2)];
-    }
-    return [+s * 2024];
+const blink = (M) => {
+    const N = {};
+    Object.entries(M).forEach(([s, c]) => {
+        const arr = [];
+        if (+s === 0) arr.push(1);
+        else if (s.length % 2 === 0)
+            arr.push(+s.slice(0, s.length / 2), +s.slice(s.length / 2));
+        else arr.push(+s * 2024);
+        arr.forEach((nn) => (N[nn] = (N[nn] ?? 0) + c));
+    });
+    return N;
 };
 
 const count = (M) => Object.values(M).reduce((a, c) => a + c, 0);
 
 for (let i = 0; i < 75; i++) {
-    Object.entries(M)
-        .filter(([_, c]) => c > 0)
-        .forEach(([n, c]) => {
-            M[n] = M[n] - c;
-            blink(n).forEach((nn) => (M[nn] = (M[nn] ?? 0) + c));
-        });
+    M = blink(M);
     if (i === 24) console.log('A', count(M));
 }
 console.log('B', count(M));
