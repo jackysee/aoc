@@ -2,18 +2,15 @@
 import data from './day13_input.js';
 
 function parse(s) {
-    let arr = s
-        .split('\n')
-        .slice(1, -1)
-        .map((l) => l.split(''));
-    let carts = [];
-    let map = {};
-    let w = arr[0].length;
-    let h = arr.length;
+    const arr = s.split('\n').map((l) => l.split(''));
+    const carts = [];
+    const map = {};
+    const w = arr[0].length;
+    const h = arr.length;
     let cartId = 1;
     for (let y = 0; y < arr.length; y++) {
         for (let x = 0; x < w; x++) {
-            let c = arr[y][x];
+            const c = arr[y][x];
             if (c !== ' ') {
                 map[[x, y]] = c;
             }
@@ -55,7 +52,7 @@ function move(cart, map) {
     let [x, y] = cart.pos;
     let action = cart.action;
     let face = cart.face;
-    let tile = map[[x, y]];
+    const tile = map[[x, y]];
     //turn : left, straight, right
     if (tile === '+') {
         if (action === 0) face = TURN_LEFT[cart.face];
@@ -73,19 +70,19 @@ function move(cart, map) {
 }
 
 function tick(carts, map, logFirst) {
-    let ys = [...new Set(carts.map((c) => c.pos[1]))].sort((a, b) => a - b);
-    let moved = new Set();
+    // const ys = [...new Set(carts.map((c) => c.pos[1]))].sort((a, b) => a - b);
+    // const moved = new Set();
     carts = carts.sort((a, b) => {
-        let [x1, y1] = a.pos;
-        let [x2, y2] = b.pos;
+        const [x1, y1] = a.pos;
+        const [x2, y2] = b.pos;
         return y1 === y2 ? x1 - x2 : y1 - y2;
     });
-    for (var i = 0, len = carts.length; i < len; i++) {
+    for (let i = 0, len = carts.length; i < len; i++) {
         if (carts[i].removed) {
             continue;
         }
-        let _c = move(carts[i], map);
-        let idx = carts.findIndex(
+        const _c = move(carts[i], map);
+        const idx = carts.findIndex(
             (c) => c.pos + '' === _c.pos + '' && !c.removed
         );
         if (idx !== -1) {
@@ -114,11 +111,11 @@ function printMap(carts, map, w, h) {
 }
 
 function run(str) {
-    let { carts, map, w, h } = parse(str);
+    let { carts, map /*, w, h*/ } = parse(str);
     let logFirst = true;
     while (true) {
         // printMap(carts, map, w, h);
-        let _carts = tick(carts, map, logFirst);
+        const _carts = tick(carts, map, logFirst);
         carts = _carts.filter((c) => !c.removed);
         if (carts.length !== _carts.length) {
             logFirst = false;

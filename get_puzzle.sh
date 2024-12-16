@@ -14,8 +14,10 @@ if [[ $js_year =~ $1 ]]; then
 fi
 
 if [ ! -f $1/day$2_input.$ext ]; then
+    data="${data//\\/\\\\}"
+    data="${data//$/\\$}"
     tee $1/day$2_input.$ext <<EOF
-export default () => \`${data//$/\\$}\`;
+export default () => \`$data\`;
 EOF
     echo "Data file written to $1/day$2_input.$ext"
 fi
