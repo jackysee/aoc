@@ -1,5 +1,7 @@
 //AOC2018 D13
 import data from './day13_input.js';
+// import { sample as data } from './day13_sample.js';
+// import { sample2 as data } from './day13_sample.js';
 
 function parse(s) {
     const arr = s.split('\n').map((l) => l.split(''));
@@ -129,26 +131,3 @@ function run(str) {
 
 // run(sample2());
 run(data()); //8,3  72,121
-
-function sample() {
-    return `
-/->-\\        
-|   |  /----\\
-| /-+--+-\\  |
-| | |  | v  |
-\\-+-/  \\-+--/
-  \\------/   
-`;
-}
-
-function sample2() {
-    return `
-/>-<\\  
-|   |  
-| /<+-\\
-| | | v
-\\>+</ |
-  |   ^
-  \\<->/
-`;
-}

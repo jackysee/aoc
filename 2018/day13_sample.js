@@ -1,3 +1,22 @@
-export default () => `
+export function sample() {
+    return `
+/->-\\        
+|   |  /----\\
+| /-+--+-\\  |
+| | |  | v  |
+\\-+-/  \\-+--/
+  \\------/   
+`;
+}
 
-`.trim();
+export function sample2() {
+    return `
+/>-<\\  
+|   |  
+| /<+-\\
+| | | v
+\\>+</ |
+  |   ^
+  \\<->/
+`;
+}
