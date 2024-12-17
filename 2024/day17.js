@@ -50,11 +50,9 @@ while (Q.length) {
     const from = parseInt(q.result + '000', 2);
     const to = parseInt(q.result + '111', 2);
     const expect = program.slice((q.len + 1) * -1).join(',');
-    const as = [];
     for (let a = from; a <= to; a++) {
         const r = run(a, B, C, program);
         if (r === expect) {
-            as.push(a);
             Q.push({ result: a.toString(2), len: q.len + 1 });
         }
     }
