@@ -14,7 +14,7 @@ const run = (A, B, C, program) => {
         if (operand === 4) combo = A;
         if (operand === 5) combo = B;
         if (operand === 6) combo = C;
-        if (code === 0) A = Math.floor(A / Math.pow(2, combo));
+        if (code === 0) A = Math.floor(A / 2 ** combo);
         if (code === 1) B = (B ^ operand) >>> 0; //js xor unsigned
         if (code === 2) B = combo % 8;
         if (code === 3 && A !== 0) {
@@ -23,8 +23,8 @@ const run = (A, B, C, program) => {
         }
         if (code === 4) B = (B ^ C) >>> 0;
         if (code === 5) out.push(combo % 8);
-        if (code === 6) B = Math.floor(A / Math.pow(2, combo));
-        if (code === 7) C = Math.floor(A / Math.pow(2, combo));
+        if (code === 6) B = Math.floor(A / 2 ** combo);
+        if (code === 7) C = Math.floor(A / 2 ** combo);
         ptr += 2;
     }
     return out.join(',');
