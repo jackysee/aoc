@@ -3,8 +3,6 @@ import data from './day17_input.js';
 const [A, B, C, ...program] = data().match(/\d+/gm).map(Number);
 // console.log({ A, B, C, program });
 
-const mod = (n, m) => ((n % m) + m) % m;
-
 const run = (A, B, C, program) => {
     let ptr = 0;
     const out = [];
@@ -18,13 +16,13 @@ const run = (A, B, C, program) => {
         if (operand === 6) combo = C;
         if (code === 0) A = Math.floor(A / Math.pow(2, combo));
         if (code === 1) B = (B ^ operand) >>> 0; //js xor unsigned
-        if (code === 2) B = mod(combo, 8);
+        if (code === 2) B = combo % 8;
         if (code === 3 && A !== 0) {
             ptr = operand;
             continue;
         }
         if (code === 4) B = (B ^ C) >>> 0;
-        if (code === 5) out.push(mod(combo, 8));
+        if (code === 5) out.push(combo % 8);
         if (code === 6) B = Math.floor(A / Math.pow(2, combo));
         if (code === 7) C = Math.floor(A / Math.pow(2, combo));
         ptr += 2;
