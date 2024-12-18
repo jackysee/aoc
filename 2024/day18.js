@@ -10,11 +10,11 @@ const H = 70;
 
 const B = data()
     .split('\n')
-    .map((l) => l.split(',').map(Number).reverse());
+    .map((l) => l.split(',').map(Number));
 
 const run = (idx) => {
     const BS = B.slice(0, idx + 1);
-    const corrupted = (r, c) => BS.some(([_r, _c]) => _r === r && c === _c);
+    const corrupted = (r, c) => BS.some(([bc, br]) => br === r && c === bc);
     const Q = [[0, 0, []]];
     const seen = { [[0, 0]]: true };
     while (Q.length) {
@@ -39,7 +39,7 @@ let path = run(idx);
 console.log('A', path.length);
 
 while (true) {
-    const di = B.slice(idx).findIndex(([r, c]) =>
+    const di = B.slice(idx).findIndex(([c, r]) =>
         path.some((p) => r === p[0] && c === p[1])
     );
     if (di === -1) {
@@ -49,7 +49,7 @@ while (true) {
     idx += di;
     path = run(idx);
     if (!path) {
-        console.log('B', B[idx].reverse() + '');
+        console.log('B', B[idx] + '');
         break;
     }
 }
