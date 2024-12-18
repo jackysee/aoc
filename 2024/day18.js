@@ -10,7 +10,6 @@ const B = data()
 
 const run = (idx) => {
     const BS = B.slice(0, idx + 1);
-    const corrupted = (r, c) => BS.some(([bc, br]) => br === r && c === bc);
     const Q = [[0, 0, []]];
     const seen = { [[0, 0]]: true };
     while (Q.length) {
@@ -24,7 +23,7 @@ const run = (idx) => {
         ].forEach(([nr, nc]) => {
             if (seen[[nr, nc]]) return;
             if (nr < 0 || nr > H || nc < 0 || nc > W) return;
-            if (corrupted(nr, nc)) return;
+            if (BS.some(([bc, br]) => br === r && c === bc)) return;
             Q.push([nr, nc, [...path, [nr, nc]]]);
             seen[[nr, nc]] = true;
         });
@@ -59,11 +58,8 @@ let right = B.length - 1;
 while (left != right) {
     const idx = Math.floor((left + right) / 2);
     const path = run(idx);
-    if (path) {
-        left = idx + 1;
-    } else {
-        right = idx - 1;
-    }
+    if (path) left = idx + 1;
+    else right = idx - 1;
 }
 console.log('B(binary search)', B[idx] + '');
 console.timeEnd('BinarySearch');
