@@ -38,6 +38,7 @@ const run = (idx) => {
 let path = run(idx);
 console.log('A', path.length);
 
+console.time('B');
 while (true) {
     const di = B.slice(idx).findIndex(([c, r]) =>
         path.some((p) => r === p[0] && c === p[1])
@@ -50,6 +51,7 @@ while (true) {
     path = run(idx);
     if (!path) {
         console.log('B', B[idx] + '');
+        console.timeEnd('B');
         break;
     }
 }
