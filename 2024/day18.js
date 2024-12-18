@@ -1,12 +1,8 @@
 import data from './day18_input.js';
-let idx = 1023;
-const W = 70;
-const H = 70;
+const [bidx, W, H] = [1023, 70, 70];
 
 // import data from './day18_sample.js';
-// let idx = 11;
-// const W = 6;
-// const H = 6;
+// const [bidx, W, H ]= [11, 6, 6];
 
 const B = data()
     .split('\n')
@@ -35,10 +31,11 @@ const run = (idx) => {
     }
 };
 
+let idx = bidx;
 let path = run(idx);
 console.log('A', path.length);
 
-console.time('B');
+console.time('Linear');
 while (true) {
     const di = B.slice(idx).findIndex(([c, r]) =>
         path.some((p) => r === p[0] && c === p[1])
@@ -50,8 +47,23 @@ while (true) {
     idx += di;
     path = run(idx);
     if (!path) {
-        console.log('B', B[idx] + '');
-        console.timeEnd('B');
+        console.log('B(linear)', B[idx] + '');
+        console.timeEnd('Linear');
         break;
     }
 }
+
+console.time('BinarySearch');
+let left = bidx;
+let right = B.length - 1;
+while (left != right) {
+    const idx = Math.floor((left + right) / 2);
+    const path = run(idx);
+    if (path) {
+        left = idx + 1;
+    } else {
+        right = idx - 1;
+    }
+}
+console.log('B(binary search)', B[idx] + '');
+console.timeEnd('BinarySearch');
