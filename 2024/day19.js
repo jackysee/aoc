@@ -25,12 +25,3 @@ const possible = (design) => {
 const ds = designs.map(possible);
 console.log('A', ds.filter((d) => d > 0).length);
 console.log('B', ds.reduce(sum, 0));
-
-// const ways = (design) => {
-//     if (design === '') return true;
-//     const ts = towels.filter((t) => design.startsWith(t));
-//     if (!ts.length) return false;
-//     return ts.some((t) => possible(design.slice(t.length)));
-// };
-
-// console.log('A-test', designs.filter(ways).length);
