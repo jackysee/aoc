@@ -42,27 +42,27 @@ const trackIndex = Object.fromEntries(
     Object.entries(track).map(([k, v]) => [v + '', +k])
 );
 
-const findCheats = (r, c, d) => {
+const findCheatSaved = (r, c, d) => {
     const i = trackIndex[[r, c]];
-    const points = [];
+    const result = [];
     for (let nr = r - d; nr <= r + d; nr++) {
         for (let nc = c - d; nc <= c + d; nc++) {
             const dd = Math.abs(nr - r) + Math.abs(nc - c);
             const ni = trackIndex[[nr, nc]];
             const saved = ni - i - dd;
             if (dd <= d && M[nr]?.[nc] === '.' && saved > 0) {
-                points.push([nr, nc, saved]);
+                result.push(saved);
             }
         }
     }
-    return points;
+    return result;
 };
 
 const countCheats = (t) => {
     const saved = {};
-    track.forEach(([r, c], i) => {
-        const cheats = findCheats(r, c, t);
-        cheats.forEach(([er, ec, ds]) => {
+    track.forEach(([r, c]) => {
+        const cheats = findCheatSaved(r, c, t);
+        cheats.forEach((ds) => {
             saved[ds] = saved[ds] ?? 0;
             saved[ds]++;
         });
@@ -76,4 +76,6 @@ const countCheats = (t) => {
 };
 
 console.log('A', countCheats(2));
+console.time('B');
 console.log('B', countCheats(20));
+console.timeEnd('B');
