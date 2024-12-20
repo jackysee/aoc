@@ -6,7 +6,6 @@ const M = data()
 
 let start;
 let end;
-let cheats = [];
 M.forEach((l, r) =>
     l.forEach((t, c) => {
         if (t === 'S') {
