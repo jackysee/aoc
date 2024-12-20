@@ -21,27 +21,20 @@ M.forEach((l, r) =>
 );
 
 const findTrack = () => {
-    const Q = [];
-    Q.push([...start, 0, [start]]);
-    const seen = { start: true };
-    while (Q.length) {
-        const [r, c, len, path] = Q.pop();
-        if (r === end[0] && c === end[1]) {
-            return path;
-        }
-        [
+    const result = [start];
+    const seen = { [start]: true };
+    while (result.at(-1) + '' !== end + '') {
+        const [r, c] = result.at(-1);
+        const np = [
             [r + 1, c],
             [r - 1, c],
             [r, c + 1],
             [r, c - 1]
-        ].forEach(([nr, nc]) => {
-            const t = M[nr]?.[nc];
-            if (seen[[nr, nc]]) return;
-            if (t !== '.') return;
-            Q.push([nr, nc, len + 1, [...path, [nr, nc]]]);
-            seen[[nr, nc]] = true;
-        });
+        ].find(([nr, nc]) => M[nr]?.[nc] === '.' && !seen[[nr, nc]]);
+        result.push(np);
+        seen[np] = true;
     }
+    return result;
 };
 
 const track = findTrack();
