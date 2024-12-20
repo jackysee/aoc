@@ -29,9 +29,8 @@ M.forEach((l, r) =>
     })
 );
 
-import { BinaryHeap } from '../util/binaryHeap.ts';
 const findTrack = () => {
-    const Q = new BinaryHeap((a, b) => a[2] - b[2]);
+    const Q = [];
     Q.push([...start, 0, [start]]);
     const seen = { start: true };
     while (Q.length) {
@@ -42,11 +41,9 @@ const findTrack = () => {
         getAdj(r, c).forEach(([nr, nc]) => {
             const t = M[nr]?.[nc];
             if (seen[[nr, nc]]) return;
-            if (!t) return;
-            if (t !== '#') {
-                Q.push([nr, nc, len + 1, [...path, [nr, nc]]]);
-                seen[[nr, nc]] = true;
-            }
+            if (t !== '.') return;
+            Q.push([nr, nc, len + 1, [...path, [nr, nc]]]);
+            seen[[nr, nc]] = true;
         });
     }
 };
@@ -57,15 +54,15 @@ const pathIndex = Object.fromEntries(
 );
 
 const findCheats = (r, c, d) => {
-    const idx = pathIndex[[r, c]];
+    const i = pathIndex[[r, c]];
     const points = [];
-    for (let rr = r - d; rr <= r + d; rr++) {
-        for (let cc = c - d; cc <= c + d; cc++) {
-            const dd = Math.abs(rr - r) + Math.abs(cc - c);
-            const iidx = pathIndex[[rr, cc]];
-            const saved = iidx - idx - dd;
-            if (dd <= d && M[rr]?.[cc] === '.' && saved > 0) {
-                points.push([rr, cc, saved]);
+    for (let nr = r - d; nr <= r + d; nr++) {
+        for (let nc = c - d; nc <= c + d; nc++) {
+            const dd = Math.abs(nr - r) + Math.abs(nc - c);
+            const ni = pathIndex[[nr, nc]];
+            const saved = ni - i - dd;
+            if (dd <= d && M[nr]?.[nc] === '.' && saved > 0) {
+                points.push([nr, nc, saved]);
             }
         }
     }
