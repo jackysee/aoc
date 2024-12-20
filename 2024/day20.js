@@ -56,8 +56,6 @@ const pathIndex = Object.fromEntries(
     Object.entries(path).map(([k, v]) => [v + '', +k])
 );
 
-const saved = {};
-
 const findCheats = (r, c, d) => {
     const idx = pathIndex[[r, c]];
     const points = [];
@@ -65,8 +63,9 @@ const findCheats = (r, c, d) => {
         for (let cc = c - d; cc <= c + d; cc++) {
             const dd = Math.abs(rr - r) + Math.abs(cc - c);
             const iidx = pathIndex[[rr, cc]];
-            if (dd <= d && M[rr]?.[cc] === '.' && iidx > idx) {
-                points.push([rr, cc, dd]);
+            const saved = iidx - idx - dd;
+            if (dd <= d && M[rr]?.[cc] === '.' && saved > 0) {
+                points.push([rr, cc, saved]);
             }
         }
     }
@@ -74,18 +73,14 @@ const findCheats = (r, c, d) => {
 };
 
 const countCheats = (t) => {
+    const saved = {};
     path.forEach(([r, c], i) => {
         const cheats = findCheats(r, c, t);
-        cheats.forEach(([er, ec, cost]) => {
-            const idx = pathIndex[[er, ec]];
-            const ds = idx - i - cost;
-            if (ds <= 0) return;
+        cheats.forEach(([er, ec, ds]) => {
             saved[ds] = saved[ds] ?? 0;
             saved[ds]++;
         });
     });
-    // console.log({ saved });
-
     let sum = 0;
     Object.entries(saved).map(([saved, count]) => {
         if (+saved >= 100) sum += count;
