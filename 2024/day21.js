@@ -1,3 +1,4 @@
+import { BinaryHeap } from '../util/binaryHeap.ts';
 // import data from './day21_input.js';
 import data from './day21_sample.js';
 const codes = data().split('\n');
@@ -41,10 +42,11 @@ const findPadPath = (s, e, NS, PAD) => {
     const [sr, sc] = posMap[s];
     const [er, ec] = posMap[e];
     const result = [];
-    const Q = [[sr, sc, []]];
+    const Q = new BinaryHeap((a, b) => a[2] - b[2]);
+    Q.push([sr, sc, 0, []]);
     const seen = {};
     while (Q.length) {
-        const [r, c, path] = Q.shift();
+        const [r, c, cd, path] = Q.pop();
         if (r === er && c === ec) {
             result.push(path);
         }
@@ -53,11 +55,12 @@ const findPadPath = (s, e, NS, PAD) => {
             [r + 1, c, 'v'],
             [r, c - 1, '<'],
             [r, c + 1, '>']
-        ].forEach(([nr, nc, dir]) => {
+        ].forEach(([nr, nc, ndir]) => {
             const n = PAD[nr]?.[nc];
             if (!n || n === ' ') return;
             if (seen[[nr, nc]]) return;
-            Q.push([nr, nc, [...path, dir]]);
+            const ncd = path.at(-1) !== ndir ? cd + 1 : cd;
+            Q.push([nr, nc, ncd, [...path, ndir]]);
             seen[[nr, nc]] = true;
         });
     }
@@ -82,6 +85,7 @@ DIRS.forEach((s) => {
     });
 });
 
+console.log(NUMSPATH);
 console.log(DIRSPATH);
 
 const findSeq = (code, paths) => {
@@ -102,29 +106,36 @@ const findSeq = (code, paths) => {
 
 const finalSeq = (code) => {
     let s = findSeq(code, NUMSPATH);
-    console.log('1', s);
+    // console.log('1', s);
     s = findSeq(s, DIRSPATH);
-    console.log('2', s, s.length, 'v<<A>>^A<A>AvA<^AA>A<vAAA>^A'.length);
+    // console.log('2', s, s.length, 'v<<A>>^A<A>AvA<^AA>A<vAAA>^A'.length);
     s = findSeq(s, DIRSPATH);
-    console.log(
-        '3',
-        s.length,
-        '<vA<AA>>^AvAA<^A>A<v<A>>^AvA^A<vA>^A<v<A>^A>AAvA^A<v<A>A>^AAAvA<^A>A'
-            .length
-    );
-    console.log('g', s);
-    console.log(
-        's',
-        '<vA<AA>>^AvAA<^A>A<v<A>>^AvA^A<vA>^A<v<A>^A>AAvA^A<v<A>A>^AAAvA<^A>A'
-    );
+    // console.log(
+    //     '3',
+    //     s.length,
+    //     '<vA<AA>>^AvAA<^A>A<v<A>>^AvA^A<vA>^A<v<A>^A>AAvA^A<v<A>A>^AAAvA<^A>A'
+    //         .length
+    // );
+    // console.log('g', s);
+    // console.log(
+    //     's',
+    //     '<vA<AA>>^AvAA<^A>A<v<A>>^AvA^A<vA>^A<v<A>^A>AAvA^A<v<A>A>^AAAvA<^A>A'
+    // );
     return s;
 };
 
-console.log(
-    finalSeq('029A').length,
-    '<vA<AA>>^AvAA<^A>A<v<A>>^AvA^A<vA>^A<v<A>^A>AAvA^A<v<A>A>^AAAvA<^A>A'
-        .length
-);
+let sum = 0;
+for (const c of codes) {
+    console.log('-', finalSeq(c).length, +c.substring(0, 3));
+    sum += finalSeq(c).length * +c.substring(0, 3);
+}
+console.log(sum);
+
+// console.log(
+//     finalSeq('029A').length,
+//     '<vA<AA>>^AvAA<^A>A<v<A>>^AvA^A<vA>^A<v<A>^A>AAvA^A<v<A>A>^AAAvA<^A>A'
+//         .length
+// );
 
 /*
 
@@ -132,6 +143,8 @@ console.log(
 <V>
 
 v<<A>^>A<A>A<AAv>A^Av<AAA^>A
+
+<vA <A A >>^A vA A<^A>A<v<A>>^AvA^A<vA>^A<v<A>^A>AAvA^A<v<A>A>^AAAvA<^A>A
 
 v: v<A
 <: <A
@@ -141,7 +154,6 @@ A: >^>A
 ^: ^<A
 >: v>A
 
+console.log('d', findSeq('v<<A>^>A^', DIRSPATH));
 
 */
-
-console.log('d', findSeq('v<<A>^>A^', DIRSPATH));
