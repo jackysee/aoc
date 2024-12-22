@@ -98,7 +98,6 @@ const finalSeq = (code, robots = 2) => {
     let s = findSeq(code, NUMSPATH);
     for (let i = 0; i < robots; i++) {
         s = findSeq(s, DIRSPATH);
-        s = findSeq(s, DIRSPATH);
     }
     return s;
 };
