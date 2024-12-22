@@ -50,25 +50,20 @@ const findPadPath = (s, e, NS, PAD) => {
     const [sr, sc] = posMap[s];
     const [er, ec] = posMap[e];
     const [dr, dc] = [er - sr, ec - sc];
-    const rowMoves = Array(Math.abs(dc))
+    const row = Array(Math.abs(dc))
         .fill(ec < sc ? '<' : '>')
         .join('');
-    const colMoves = Array(Math.abs(dr))
+    const col = Array(Math.abs(dr))
         .fill(er < sr ? '^' : 'v')
         .join('');
-    let result = '';
-    if (sr === wr && ec === wc) {
-        result += colMoves + rowMoves;
-    } else if (sc === wc && er === wr) {
-        result += rowMoves + colMoves;
-    } else if (dc < 0) {
-        //left
-        result += rowMoves + colMoves;
-    } else if (dc >= 0) {
-        //right
-        result += colMoves + rowMoves;
+    //when go left , prefer left -> up/down
+    //when go right , prefer down/up -> right
+    const result = dc < 0 ? [row, col] : [col, row];
+    if ((sr === wr && ec === wc) || (sc === wc && er === wr)) {
+        //if it will hit a wall, flip the move
+        result.reverse();
     }
-    return result + 'A';
+    return result.join('') + 'A';
 };
 
 const NUMSPATH = {};
