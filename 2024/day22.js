@@ -18,8 +18,7 @@ ns.forEach((num) => {
     const seen = {};
     for (let i = 0; i < 2000; i++) {
         num = generate(num);
-        const p = num % 10;
-        prices.push(p);
+        prices.push(num % 10);
         if (i >= 4) {
             const trend = [
                 prices[i - 3] - prices[i - 4],
@@ -28,7 +27,7 @@ ns.forEach((num) => {
                 prices[i] - prices[i - 1]
             ].join(',');
             if (!seen[trend]) {
-                M[trend] = (M[trend] ?? 0) + p;
+                M[trend] = (M[trend] ?? 0) + prices[i];
                 seen[trend] = true;
             }
         }
