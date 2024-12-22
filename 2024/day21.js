@@ -1,26 +1,6 @@
 import data from './day21_input.js';
 // import data from './day21_sample.js';
 const codes = data().split('\n');
-// const M = data().split('\n').map(l => [...l]);
-// console.log(codes);
-
-/*
-789
-456
-123
- 0A
-
- ^A
-<V>
-
-<^A vs ^<A
-
-it is either "move vertically then horizontally", or 
-"move horizontally then vertically". 
-If one of the options is blocked by an empty space, the choice is obvious; 
-otherwise turns out, 
-we should always prefer going left, then down, then up, then right
-*/
 
 const NUMPAD = ['789', '456', '123', '#0A'];
 const DIRPAD = ['#^A', '<v>'];
@@ -33,10 +13,7 @@ const findPosMap = (NS, PAD) => {
             let nr, nc;
             PAD.forEach((row, r) => {
                 row.split('').forEach((m, c) => {
-                    if (m === n) {
-                        nr = r;
-                        nc = c;
-                    }
+                    if (m === n) [nr, nc] = [r, c];
                 });
             });
             return [n, [nr, nc]];
@@ -82,40 +59,48 @@ DIRS.forEach((s) => {
     });
 });
 
-const findSeq = (code, paths, memo = {}) => {
-    console.log(memo);
-    if (memo[code] !== undefined) return memo[code];
-    let last = 'A';
-    const result = code
-        .split('')
-        .flatMap((c) => {
-            const p = paths[last][c];
-            last = c;
-            return [...p];
+const findSeq = (code, paths) => {
+    return ['A', ...code]
+        .map((c, i, arr) => {
+            if (i === 0) return '';
+            const p = paths[arr[i - 1]][c];
+            return p;
         })
         .join('');
-    memo[code] = result;
-    return result;
 };
 
-const finalSeq = (code, robots = 2) => {
-    let s = findSeq(code, NUMSPATH);
-    const memo = {};
-    for (let i = 0; i < robots; i++) {
-        s = findSeq(s, DIRSPATH, memo);
-    }
-    return s;
+const chunks = (code) => {
+    const M = {};
+    code.split('A')
+        .slice(0, -1)
+        .forEach((c) => {
+            M[c + 'A'] = (M[c + 'A'] ?? 0) + 1;
+        });
+    return M;
 };
-// console.log(finalSeq('029A'));
+
+const findSeqLen = (code, robots = 2) => {
+    let m = chunks(findSeq(code, NUMSPATH));
+    for (let i = 0; i < robots; i++) {
+        const nm = {};
+        Object.entries(m).forEach(([code, t]) => {
+            const s = findSeq(code, DIRSPATH);
+            Object.entries(chunks(s)).forEach(([c, ct]) => {
+                nm[c] = nm[c] ?? 0;
+                nm[c] += t * ct;
+            });
+            m = nm;
+        });
+    }
+    return Object.entries(m).reduce((a, [k, v]) => a + k.length * v, 0);
+};
 
 const complexity = (robots) => {
-    let sum = 0;
-    for (const c of codes) {
-        // console.log(c, '-', finalSeq(c).length, +c.substring(0, 3));
-        // console.log(c, finalSeq(c).length, Number(c.substring(0, 3)));
-        sum += finalSeq(c, robots).length * Number(c.substring(0, 3));
-    }
-    return sum;
+    return codes.reduce(
+        (a, c) => a + findSeqLen(c, robots) * Number(c.substring(0, 3)),
+        0
+    );
 };
+
 console.log('A', complexity(2));
-// console.log('B', complexity(25));
+console.log('B', complexity(25));
