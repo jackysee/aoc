@@ -82,9 +82,11 @@ DIRS.forEach((s) => {
     });
 });
 
-const findSeq = (code, paths) => {
+const findSeq = (code, paths, memo = {}) => {
+    console.log(memo);
+    if (memo[code] !== undefined) return memo[code];
     let last = 'A';
-    return code
+    const result = code
         .split('')
         .flatMap((c) => {
             const p = paths[last][c];
@@ -92,12 +94,15 @@ const findSeq = (code, paths) => {
             return [...p];
         })
         .join('');
+    memo[code] = result;
+    return result;
 };
 
 const finalSeq = (code, robots = 2) => {
     let s = findSeq(code, NUMSPATH);
+    const memo = {};
     for (let i = 0; i < robots; i++) {
-        s = findSeq(s, DIRSPATH);
+        s = findSeq(s, DIRSPATH, memo);
     }
     return s;
 };
