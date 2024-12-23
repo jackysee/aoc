@@ -13,11 +13,9 @@ data()
 
 const setOfThree = new Set(
     Object.keys(M).flatMap((a) => {
-        const as = M[a];
-        return as.flatMap((b) => {
-            const cs = M[b].filter((c) => as.includes(c));
-            if (!cs.length) return [];
-            return cs
+        return M[a].flatMap((b) => {
+            return M[b]
+                .filter((c) => M[a].includes(c))
                 .filter((c) => [a, b, c].some((n) => n.startsWith('t')))
                 .map((c) => [a, b, c].sort() + '');
         });
