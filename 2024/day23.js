@@ -25,11 +25,11 @@ console.log('A', setOfThree.size);
 
 //Bron-Kerbosch algorithm
 let maxlen = 0;
-const cliques = [];
+let clique;
 const findCliques = (P, R = new Set(), X = new Set()) => {
-    if (P.size === 0 && X.size === 0) {
-        if (R.size > maxlen) maxlen = R.size;
-        cliques.push([...R].sort());
+    if (P.size === 0 && X.size === 0 && R.size > maxlen) {
+        maxlen = R.size;
+        clique = [...R].sort().join(',');
     }
     [...P].forEach((n) => {
         const V = new Set([n]);
@@ -40,4 +40,4 @@ const findCliques = (P, R = new Set(), X = new Set()) => {
     });
 };
 findCliques(new Set(Object.keys(M)));
-console.log('B', cliques.filter((a) => a.length === maxlen)[0].join(','));
+console.log('B', clique);
