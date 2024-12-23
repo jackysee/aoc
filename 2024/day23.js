@@ -3,7 +3,7 @@ import data from './day23_input.js';
 const M = {};
 data()
     .split('\n')
-    .map((l) => {
+    .forEach((l) => {
         const [c1, c2] = l.split('-');
         M[c1] = M[c1] ?? [];
         M[c1].push(c2);
