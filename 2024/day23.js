@@ -17,12 +17,13 @@ const setOfThree = new Set(
         return as.flatMap((b) => {
             const cs = M[b].filter((c) => as.includes(c));
             if (!cs.length) return [];
-            return cs.map((c) => [a, b, c].sort() + '');
+            return cs
+                .filter((c) => [a, b, c].some((n) => n.startsWith('t')))
+                .map((c) => [a, b, c].sort() + '');
         });
     })
 );
-
-console.log('A', [...setOfThree].filter((s) => /t[^,]/.test(s)).length);
+console.log('A', setOfThree.size);
 
 //Bron-Kerbosch algorithm
 let maxlen = 0;
