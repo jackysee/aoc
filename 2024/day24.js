@@ -44,25 +44,30 @@ const run = () => {
 const result = run();
 console.log('A', result);
 
+/*
+adopt from: https://github.com/CodingAP/advent-of-code/tree/main/puzzles/2024/day24
+works for input with no carry flag swapped
+- z connected to XOR
+- AND --> OR (except i = 0)
+- XOR --> XOR or AND
+- XOR connected to x, y or z
+*/
 const list = [];
 for (let i = 0; i < zs.length; i++) {
     const id = ('' + i).padStart(2, '0');
-    const isXYIn = (c) =>
-        (c.w1 === `x${id}` && c.w2 === `y${id}`) ||
-        (c.w1 === `y${id}` && c.w2 === `x${id}`);
-    const xor1 = conns.find((c) => isXYIn(c) && c.op === 'XOR');
-    const and1 = conns.find((c) => isXYIn(c) && c.op === 'AND');
+    const isXYIn = (c) => [c.w1, c.w2].sort() + '' === `x${id},y${id}`;
+    const xor = conns.find((c) => isXYIn(c) && c.op === 'XOR');
+    const and = conns.find((c) => isXYIn(c) && c.op === 'AND');
     const z = conns.find((c) => c.out === `z${id}`);
-
-    if (xor1 === undefined || and1 === undefined || z === undefined) continue;
+    if (!xor || !and || !z) continue;
 
     if (z.op !== 'XOR') list.push(z.out);
 
-    const or = conns.find((c) => c.w1 === and1.out || c.w2 === and1.out);
-    if (or && or.op !== 'OR' && i > 0) list.push(and1.out);
+    const afterAnd = conns.find((c) => [c.w1, c.w2].includes(and.out));
+    if (afterAnd && afterAnd.op !== 'OR' && i > 0) list.push(and.out);
 
-    const after = conns.find((c) => c.w1 === xor1.out || c.w2 === xor1.out);
-    if (after?.op === 'OR') list.push(xor1.out);
+    const afterXor = conns.find((c) => [c.w1, c.w2].includes(xor.out));
+    if (afterXor?.op === 'OR') list.push(xor.out);
 }
 list.push(
     ...conns
