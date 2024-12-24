@@ -41,8 +41,7 @@ const run = () => {
     return parseInt(zs.map((z) => W[z]).join(''), 2);
 };
 
-const result = run();
-console.log('A', result);
+console.log('A', run());
 
 /*
 adopt from: https://github.com/CodingAP/advent-of-code/tree/main/puzzles/2024/day24
