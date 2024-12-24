@@ -48,8 +48,8 @@ console.log('A', result);
 adopt from: https://github.com/CodingAP/advent-of-code/tree/main/puzzles/2024/day24
 works for input with no carry flag swapped
 - z connected to XOR
-- AND --> OR (except i = 0)
-- XOR --> XOR or AND
+- (x,y)AND --> OR (except i = 0)
+- (x,y)XOR --> XOR or AND
 - XOR connected to x, y or z
 */
 const list = [];
@@ -73,9 +73,7 @@ list.push(
     ...conns
         .filter(
             (c) =>
-                !/^[xy]/.test(c.w1) &&
-                !/^[xy]/.test(c.w2) &&
-                !/^z/.test(c.out) &&
+                [c.w1, c.w2, c.out].every((s) => !/^[xyz]/.test(s)) &&
                 c.op === 'XOR'
         )
         .map((c) => c.out)
