@@ -51,7 +51,14 @@ works for input with no carry flag swapped
 - (x,y)XOR --> XOR or AND
 - XOR connected to x, y or z
 */
-const list = [];
+const list = conns
+    .filter((c) => {
+        return (
+            [c.w1, c.w2, c.out].every((s) => !/^[xyz]/.test(s)) &&
+            c.op === 'XOR'
+        );
+    })
+    .map((c) => c.out);
 for (let i = 0; i < zs.length; i++) {
     const id = ('' + i).padStart(2, '0');
     const isXYIn = (c) => [c.w1, c.w2].sort() + '' === `x${id},y${id}`;
@@ -68,13 +75,4 @@ for (let i = 0; i < zs.length; i++) {
     const afterXor = conns.find((c) => [c.w1, c.w2].includes(xor.out));
     if (afterXor?.op === 'OR') list.push(xor.out);
 }
-list.push(
-    ...conns
-        .filter(
-            (c) =>
-                [c.w1, c.w2, c.out].every((s) => !/^[xyz]/.test(s)) &&
-                c.op === 'XOR'
-        )
-        .map((c) => c.out)
-);
 console.log('B', list.sort().join(','));
