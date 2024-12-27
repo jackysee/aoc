@@ -86,7 +86,7 @@ const findSeqLen = (code, robots = 2) => {
         Object.entries(m).forEach(([code, t]) => {
             const s = findSeq(code, DIRSPATH);
             Object.entries(chunks(s)).forEach(([c, ct]) => {
-                nm[c] = nm[c] ?? 0;
+                nm[c] ??= 0;
                 nm[c] += t * ct;
             });
             m = nm;

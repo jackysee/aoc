@@ -5,9 +5,9 @@ data()
     .split('\n')
     .forEach((l) => {
         const [c1, c2] = l.split('-');
-        M[c1] = M[c1] ?? [];
+        M[c1] ??= [];
         M[c1].push(c2);
-        M[c2] = M[c2] ?? [];
+        M[c2] ??= [];
         M[c2].push(c1);
     });
 

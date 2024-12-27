@@ -5,7 +5,7 @@ const arr = data().split('\n\n');
 const rules = {};
 arr[0].split('\n').map((l) => {
     const [m, n] = l.split('|').map(Number);
-    rules[m] = rules[m] ?? [];
+    rules[m] ??= [];
     rules[m].push(n);
 });
 const updates = arr[1].split('\n').map((l) => l.split(',').map(Number));
