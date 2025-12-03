@@ -7,7 +7,7 @@ fi
 
 data=$(curl -s -b cookiefile https://adventofcode.com/$1/day/$2/input)
 
-js_year="2018 2019 2020 2024"
+js_year="2018 2019 2020 2024 2025"
 ext='ts'
 if [[ $js_year =~ $1 ]]; then 
     ext='js'

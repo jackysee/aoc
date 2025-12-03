@@ -30,5 +30,9 @@ const isSafe2 = (l) => {
     return false;
 };
 
+// somehtobadf dslfkj
+Lorem sint
+
+
 console.log('A', lines.filter(isSafe).length);
 console.log('B', lines.filter(isSafe2).length);
