@@ -3,20 +3,15 @@ import data from './day6_input.js';
 const lines = data().split('\n');
 const datas = lines.map((l) => l.trim().split(/\s+/));
 
-const calc = (arr, op) => {
-    return arr.reduce(
-        (a, c) => (op === '*' ? +c * a : +c + a),
-        op === '*' ? 1 : 0
-    );
-};
-
 const result = datas.at(-1).map((op, i) => {
-    return calc(
-        datas.slice(0, -1).map((l) => l[i]),
-        op
+    return eval(
+        datas
+            .slice(0, -1)
+            .map((l) => l[i])
+            .join(op)
     );
 });
-console.log(result.reduce((a, c) => a + c, 0));
+console.log(eval(result.join('+')));
 
 let idx = lines[0].length - 1;
 let arr = [];
@@ -30,10 +25,9 @@ while (idx >= 0) {
         .trim();
     if (s) {
         const op = lines.at(-1)?.[idx]?.trim();
-        if (!op) {
-            arr.push(+s);
-        } else {
-            result2 += calc([...arr, +s], op);
+        arr.push(+s);
+        if (op) {
+            result2 += eval(arr.join(op));
             arr = [];
         }
     }
