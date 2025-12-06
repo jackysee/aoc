@@ -15,7 +15,7 @@ console.log(eval(result.join('+')));
 
 let idx = lines[0].length - 1;
 let arr = [];
-let result2 = 0;
+const result2 = [];
 while (idx >= 0) {
     const s = lines
         .slice(0, -1)
@@ -27,10 +27,10 @@ while (idx >= 0) {
         const op = lines.at(-1)?.[idx]?.trim();
         arr.push(+s);
         if (op) {
-            result2 += eval(arr.join(op));
+            result2.push(eval(arr.join(op)));
             arr = [];
         }
     }
     idx--;
 }
-console.log(result2);
+console.log(eval(result2.join('+')));
