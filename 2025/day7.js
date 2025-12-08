@@ -8,17 +8,17 @@ M.forEach((row, r) => {
         beams = { [row.indexOf('S')]: 1 };
         return;
     }
-    const newBeams = {};
-    Object.entries(beams).forEach(([idx, world]) => {
+    const entries = Object.entries(beams);
+    beams = {};
+    entries.forEach(([idx, world]) => {
         idx = +idx;
-        if (row[idx] === '.') newBeams[idx] = (newBeams[idx] ?? 0) + world;
+        if (row[idx] === '.') beams[idx] = (beams[idx] ?? 0) + world;
         if (row[idx] === '^') {
             split++;
-            newBeams[idx - 1] = (newBeams[idx - 1] ?? 0) + world;
-            newBeams[idx + 1] = (newBeams[idx + 1] ?? 0) + world;
+            beams[idx - 1] = (beams[idx - 1] ?? 0) + world;
+            beams[idx + 1] = (beams[idx + 1] ?? 0) + world;
         }
     });
-    beams = newBeams;
 });
 
 console.log(split);
