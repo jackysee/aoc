@@ -20,14 +20,13 @@ for (let j = 0; j < pairs.length; j++) {
     const sa = arr.find((s) => s.has(a));
     const sb = arr.find((s) => s.has(b));
     i++;
-    if (!!sa && !!sb && sa === sb) continue;
-    else if (!sa && !sb) arr.push(new Set([a, b]));
-    else if (sa && !sb) sa.add(b);
-    else if (!sa && sb) sb.add(a);
-    else if (!!sa && !!sb) {
+    if (!!sa && !!sb) {
+        if (sa === sb) continue;
         arr = arr.filter((s) => s !== sa && s !== sb);
         arr.push(new Set([...sa, ...sb]));
-    }
+    } else if (!sa && !sb) arr.push(new Set([a, b]));
+    else if (sa && !sb) sa.add(b);
+    else if (!sa && sb) sb.add(a);
     arr.sort((a, b) => b.size - a.size);
     // if (i === 10) {
     if (i === 1000) {
