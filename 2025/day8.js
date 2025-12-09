@@ -15,8 +15,7 @@ const pairs = points
 
 let arr = [];
 let i = 0;
-for (let j = 0; j < pairs.length; j++) {
-    const [a, b] = pairs[j];
+for (const [a, b] of pairs) {
     const sa = arr.find((s) => s.has(a));
     const sb = arr.find((s) => s.has(b));
     i++;
