@@ -1,26 +1,38 @@
 {
-  "version": "3",
-  "packages": {
-    "specifiers": {
-      "npm:z3-solver": "npm:z3-solver@4.12.4"
+  "version": "5",
+  "specifiers": {
+    "npm:dtk-z3-solver-deno-v2@*": "0.1.4",
+    "npm:dtk-z3-solver-deno-v2@0.1.4": "0.1.4",
+    "npm:z3-solver@4.15.1": "4.15.1",
+    "npm:z3-solver@4.15.3": "4.15.3"
+  },
+  "npm": {
+    "async-mutex@0.3.2": {
+      "integrity": "sha512-HuTK7E7MT7jZEh1P9GtRW9+aTWiDWWi9InbZ5hjxrnRa39KS4BW04+xLBhYNS2aXhHUIKZSw3gj4Pn1pj+qGAA==",
+      "dependencies": [
+        "tslib"
+      ]
     },
-    "npm": {
-      "async-mutex@0.3.2": {
-        "integrity": "sha512-HuTK7E7MT7jZEh1P9GtRW9+aTWiDWWi9InbZ5hjxrnRa39KS4BW04+xLBhYNS2aXhHUIKZSw3gj4Pn1pj+qGAA==",
-        "dependencies": {
-          "tslib": "tslib@2.6.2"
-        }
-      },
-      "tslib@2.6.2": {
-        "integrity": "sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q==",
-        "dependencies": {}
-      },
-      "z3-solver@4.12.4": {
-        "integrity": "sha512-B9ymul40bvtGSW0OQYfcYan1EhGm0JV/HgbO24JikIhuEOUv2+mdcOVd4V3q89UOx2mA0MOv+6d5msVF+/yJ6g==",
-        "dependencies": {
-          "async-mutex": "async-mutex@0.3.2"
-        }
-      }
+    "dtk-z3-solver-deno-v2@0.1.4": {
+      "integrity": "sha512-k5ZefjoIDD7+BWKV2gh0RdQ3yp/SylRbaY6yyLE5/2g1eprq3tOdaP+FrYgjpu/B+M/xsYYFICU9kj0FF6gN3g==",
+      "dependencies": [
+        "async-mutex"
+      ]
+    },
+    "tslib@2.6.2": {
+      "integrity": "sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q=="
+    },
+    "z3-solver@4.15.1": {
+      "integrity": "sha512-1B7mMjiPHtjua20lKCNJgixvRyrkbCpmxk70B2WfoCVymEh2cBemUseDX5RMHl4KmuXe3g6Di8MtD9xp2IKdFQ==",
+      "dependencies": [
+        "async-mutex"
+      ]
+    },
+    "z3-solver@4.15.3": {
+      "integrity": "sha512-Bdqs80qnXVc8vNmL7WcO998o+/EPwM+4j5uJAapbWG1ag/ozGACW3aQCS4SYjAr4RdebJZVUFkIO0/3xxjc+Gg==",
+      "dependencies": [
+        "async-mutex"
+      ]
     }
   },
   "redirects": {
