@@ -50,13 +50,9 @@ const letters = 'abcdefghijklmnopqrstuvwxyz';
 const { Context } = await init();
 for (const { buttons, joltage } of lights) {
     const { Int, Optimize } = new Context('main');
-    const vars = [];
     const solver = new Optimize();
-    buttons.forEach((_b, i) => {
-        const v = Int.const(letters[i]);
-        solver.add(v.ge(0));
-        vars.push(v);
-    });
+    const vars = buttons.map((_b, i) => Int.const(letters[i]));
+    vars.forEach((v) => solver.add(v.ge(0)));
     joltage.forEach((v, i) => {
         let condition = Int.val(0);
         buttons.forEach((b, bi) => {
