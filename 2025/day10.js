@@ -46,12 +46,13 @@ const buttonPress = ({ target, buttons }) => {
 console.log(lights.map(buttonPress).reduce((a, c) => a + c, 0));
 
 const result = [];
-const letters = 'abcdefghijklmnopqrstuvwxyz';
 const { Context } = await init();
 for (const { buttons, joltage } of lights) {
     const { Int, Optimize } = new Context('main');
     const solver = new Optimize();
-    const vars = buttons.map((_b, i) => Int.const(letters[i]));
+    const vars = buttons.map((_b, i) =>
+        Int.const(String.fromCodePoint(i + 97))
+    );
     vars.forEach((v) => solver.add(v.ge(0)));
     joltage.forEach((v, i) => {
         let condition = Int.val(0);
