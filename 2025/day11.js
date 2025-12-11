@@ -1,13 +1,12 @@
 import data from './day11_input.js';
 // import { data } from './day11_sample.js';
 // import { data2 as data } from './day11_sample.js';
-const M = data()
-    .split('\n')
-    .reduce((a, c) => {
-        const [key, value] = c.split(': ');
-        a[key] = value.split(' ');
-        return a;
-    }, {});
+
+const M = {};
+for (const line of data().split('\n')) {
+    const [key, value] = line.split(': ');
+    M[key] = value.split(' ');
+}
 
 const dfs = (from, to, memo = {}) => {
     if (from === to) return 1;
